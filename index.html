@@ -209,11 +209,7 @@
         /* ===== NOUVEAU: Emoji santé repas ===== */
         .meal-health-emoji { font-size:1.5rem; flex-shrink:0; margin-right:4px; }
 
-        /* ===== NOUVEAU: Alerte 20% ===== */
-        .alert-unhealthy { background:linear-gradient(135deg,#fff5f5,#fed7d7); border-left:4px solid var(--danger); border-radius:12px; padding:14px; margin-bottom:14px; display:none; }
-        body.dark-mode .alert-unhealthy { background:linear-gradient(135deg,#2d1515,#3d1a1a); }
-        .alert-unhealthy-title { font-weight:800; color:var(--danger); font-size:0.95rem; }
-        .alert-unhealthy-msg { font-size:0.82rem; color:var(--text-muted); margin-top:4px; }
+
 
         /* ===== NOUVEAU: Courbe de poids ===== */
         .weight-chart { width:100%; height:120px; }
@@ -287,6 +283,16 @@
             <div id="sleep-quality-msg" style="font-size:0.82rem;font-weight:700;text-align:center;margin-bottom:14px;min-height:20px"></div>
             <button class="gemini-btn" onclick="saveSleepEntry()">Enregistrer 💾</button>
             <button class="outline" style="margin-top:8px" onclick="closeSleepModal()">Annuler</button>
+        </div>
+    </div>
+
+    <!-- Modal rapport hebdo dimanche -->
+    <div id="modal-weekly-report" class="modal-overlay">
+        <div class="modal-box">
+            <div style="font-size:2rem;margin-bottom:6px">📊</div>
+            <h3>Bilan de la semaine</h3>
+            <div id="weekly-report-content" style="margin:12px 0;font-size:0.88rem;line-height:1.7"></div>
+            <button class="gemini-btn" onclick="document.getElementById('modal-weekly-report').style.display='none'">Compris 💪</button>
         </div>
     </div>
 
@@ -431,10 +437,7 @@
         <div id="week-container"></div>
 
         <!-- NOUVEAU #4: Alerte repas malsains -->
-        <div class="alert-unhealthy" id="alert-unhealthy">
-            <div class="alert-unhealthy-title">⚠️ Attention à tes habitudes !</div>
-            <div class="alert-unhealthy-msg" id="alert-unhealthy-msg"></div>
-        </div>
+
 
         <!-- Calories -->
         <div class="card calorie-card" onclick="showSection('view-day')">
@@ -606,13 +609,14 @@
             <div id="loader-m" class="loader">🔍 L'IA analyse ton repas...</div>
 
             <div id="m-preview" style="display:none" class="card">
-                <div style="display:flex;align-items:center;gap:12px;margin-bottom:14px">
+                <div style="display:flex;align-items:center;gap:12px;margin-bottom:10px">
                     <div id="meal-health-emoji" style="font-size:2.5rem;line-height:1">😊</div>
                     <div>
                         <div style="font-weight:800;font-size:1rem">Résultats de l'analyse</div>
                         <div id="meal-health-label" style="font-size:0.82rem;color:var(--text-muted);font-weight:600"></div>
                     </div>
                 </div>
+                <div id="meal-health-tips" style="display:none;background:rgba(214,158,46,0.1);border-left:3px solid #d69e2e;border-radius:8px;padding:10px 12px;margin-bottom:12px;color:var(--text-color)"></div>
                 <div class="grid-2">
                     <div><label>Calories (kcal)</label><input type="number" id="m-kcal-val"></div>
                     <div><label>Protéines (g)</label><input type="number" id="m-prot-val"></div>
@@ -783,7 +787,7 @@
         renderShortcuts();
         renderWeightChart();
         checkWeightReminder(); // NOUVEAU #6
-        checkUnhealthyAlert(); // NOUVEAU #4
+        checkWeeklyReport();
         showSection('view-home');
     }
 
@@ -1095,10 +1099,30 @@
     ];
 
     function getMealPct(key) {
-        const split = appData.profile?.mealSplit;
-        if (split && split[key] !== undefined) return split[key];
-        const defaults = { 'Petit Déjeuner': 0.25, 'Déjeuner': 0.35, 'Dîner': 0.30, 'Collation': 0.10 };
-        return defaults[key] || 0.10;
+        // Répartition dynamique selon les repas DÉJÀ saisis aujourd'hui
+        const day = appData.days[selectedDate] || { meals: [] };
+        const hasCollation = day.meals.some(m => m.type === 'Collation');
+
+        // Si collation enregistrée → répartition 4 repas
+        // Si pas de collation → répartition sur 3 repas seulement (Collation = 0)
+        const splitWith = {
+            'Petit Déjeuner': 0.25, 'Déjeuner': 0.35, 'Dîner': 0.30, 'Collation': 0.10
+        };
+        const splitWithout = {
+            'Petit Déjeuner': 0.28, 'Déjeuner': 0.40, 'Dîner': 0.32, 'Collation': 0
+        };
+
+        // Priorité : préférence profil si définie explicitement pour 4+ repas
+        const profileSplit = appData.profile?.mealSplit;
+        const profileFreq  = appData.profile?.mealFreq || 4;
+
+        if (profileFreq >= 4 || hasCollation) {
+            // Utiliser le split profil si dispo, sinon splitWith
+            return (profileSplit && profileSplit[key] !== undefined) ? profileSplit[key] : (splitWith[key] ?? 0);
+        } else {
+            // Pas de collation et profil 3 repas → splitWithout
+            return splitWithout[key] ?? 0;
+        }
     }
 
     function renderMealCategories() {
@@ -1123,6 +1147,7 @@
                 <div class="meal-cat-emoji">${cat.emoji}</div>
                 <div class="meal-cat-name">${cat.label}</div>
                 <div class="meal-cat-kcal">Idéal : <span>~${idealKcal} kcal</span></div>
+                ${cat.key === 'Collation' && idealKcal === 0 ? '<div style="font-size:0.65rem;color:var(--text-muted);font-weight:600">non planifiée</div>' : ''}
                 ${hasMeal ? `<div class="meal-cat-recorded">${totalKcal} kcal enregistrés</div>` : ''}
                 <div class="meal-cat-add-icon">+</div>
             `;
@@ -1199,9 +1224,14 @@
         const cat = MEAL_CATS.find(c => c.key === activeCategory);
         const idealKcal = cat ? Math.round((profile?.targets?.cal || 2000) * getMealPct(cat.key)) : 600;
 
-        const prompt = `${promptParts.join('. ')}. Type de repas: ${activeCategory} (objectif ~${idealKcal} kcal pour ce repas). Objectif utilisateur: ${goalStr}.
-Analyse ce repas, estime les valeurs nutritionnelles et donne un score de santé (1=mauvais, 2=moyen, 3=bon) par rapport à l'objectif.
-Réponds JSON: {"kcal":number,"prot":number,"carb":number,"fat":number,"healthScore":1|2|3,"healthLabel":string}`;
+        const dietInfo = profile?.diet && profile.diet !== 'none' ? `Régime: ${profile.diet}.` : '';
+        const allergiesInfo = profile?.allergies ? `Allergies: ${profile.allergies}.` : '';
+
+        const prompt = `${promptParts.join('. ')}. Type de repas: ${activeCategory} (objectif ~${idealKcal} kcal). Objectif: ${goalStr}. ${dietInfo} ${allergiesInfo}
+Analyse ce repas et estime les valeurs nutritionnelles.
+- Si healthScore vaut 1 ou 2, fournis dans "healthTips" 2-3 conseils CONCRETS et COURTS pour améliorer CE repas précis afin qu'il soit mieux adapté à l'objectif ${goalStr} (ex: "Remplace le riz blanc par du riz complet", "Ajoute une source de protéines comme un oeuf").
+- Si healthScore vaut 3, healthTips = "".
+Réponds JSON: {"kcal":number,"prot":number,"carb":number,"fat":number,"healthScore":1|2|3,"healthLabel":string,"healthTips":string}`;
 
         const res = await callGemini(prompt, true, currentImgs);
         document.getElementById('loader-m').style.display = 'none';
@@ -1214,6 +1244,17 @@ Réponds JSON: {"kcal":number,"prot":number,"carb":number,"fat":number,"healthSc
             const emojis = { 1: '😟', 2: '😐', 3: '😊' };
             document.getElementById('meal-health-emoji').textContent = emojis[res.healthScore] || '😐';
             document.getElementById('meal-health-label').textContent = res.healthLabel || '';
+            // Afficher les conseils si repas peu adapté
+            const tipsEl = document.getElementById('meal-health-tips');
+            if (tipsEl) {
+                if (res.healthTips && res.healthScore < 3) {
+                    tipsEl.style.display = 'block';
+                    tipsEl.innerHTML = '<div style="font-weight:800;font-size:0.82rem;margin-bottom:4px">💡 Comment améliorer ce repas :</div>' +
+                        res.healthTips.split('\n').filter(Boolean).map(t => `<div style="font-size:0.8rem;margin-top:3px">• ${t.replace(/^[-•]\s*/, '')}</div>`).join('');
+                } else {
+                    tipsEl.style.display = 'none';
+                }
+            }
             document.getElementById('m-preview').style.display = 'block';
             appData.lastMacros = res;
         } else {
@@ -1230,13 +1271,13 @@ Réponds JSON: {"kcal":number,"prot":number,"carb":number,"fat":number,"healthSc
             carb: parseInt(document.getElementById('m-carb-val').value) || 0,
             fat: parseInt(document.getElementById('m-fat-val').value) || 0,
             healthScore: appData.lastMacros?.healthScore || 2,
-            healthLabel: appData.lastMacros?.healthLabel || ''
+            healthLabel: appData.lastMacros?.healthLabel || '',
+            healthTips:  appData.lastMacros?.healthTips  || ''
         };
         appData.days[selectedDate].meals.push(meal);
         saveData(); clearImages(); renderHomeData(); renderMealCategories();
         cancelPreview('m-preview');
         document.getElementById('m-desc').value = '';
-        checkUnhealthyAlert();
         // Rester sur le formulaire pour permettre une saisie supplémentaire (collation)
         // Mais si ce n'est pas une collation, retourner aux catégories
         if (activeCategory === 'Collation') {
@@ -1254,37 +1295,7 @@ Réponds JSON: {"kcal":number,"prot":number,"carb":number,"fat":number,"healthSc
         renderImagesGrid();
     }
 
-    // NOUVEAU #4: Vérification alerte 20% repas malsains sur 7 jours
-    function checkUnhealthyAlert() {
-        const alertEl = document.getElementById('alert-unhealthy');
-        const msgEl = document.getElementById('alert-unhealthy-msg');
-        // Collecter tous les repas des 7 derniers jours
-        let totalMeals = 0, unhealthyMeals = 0;
-        const today = new Date();
-        for (let i = 0; i < 7; i++) {
-            const d = new Date(today);
-            d.setDate(today.getDate() - i);
-            const ds = d.toISOString().split('T')[0];
-            const day = appData.days[ds];
-            if (day) {
-                day.meals.forEach(m => {
-                    totalMeals++;
-                    if (m.healthScore === 1) unhealthyMeals++;
-                });
-            }
-        }
-        if (totalMeals >= 3) {
-            const pct = Math.round((unhealthyMeals / totalMeals) * 100);
-            if (pct > 20) {
-                alertEl.style.display = 'block';
-                msgEl.textContent = `${pct}% de tes repas des 7 derniers jours sont peu adaptés à ton objectif (limite : 20%). C'est le moment d'ajuster ! 💪`;
-            } else {
-                alertEl.style.display = 'none';
-            }
-        } else {
-            alertEl.style.display = 'none';
-        }
-    }
+
 
     // Suppression repas
     function askDeleteMeal(index) { mealDeleteIndex = index; document.getElementById('modal-delete-meal').style.display = 'flex'; }
@@ -1292,7 +1303,7 @@ Réponds JSON: {"kcal":number,"prot":number,"carb":number,"fat":number,"healthSc
         if (mealDeleteIndex !== null && appData.days[selectedDate]) {
             appData.days[selectedDate].meals.splice(mealDeleteIndex, 1);
             mealDeleteIndex = null;
-            saveData(); renderHomeData(); checkUnhealthyAlert();
+            saveData(); renderHomeData();
         }
         closeDeleteModal(); showToast("Repas supprimé");
     }
@@ -1335,7 +1346,9 @@ Réponds JSON: {"kcal":number,"prot":number,"carb":number,"fat":number,"healthSc
         const prompt = `Tu es un coach nutritionnel bienveillant. Analyse cette journée et donne un conseil court, encourageant et personnalisé (3-4 phrases max).
 Profil: ${p.name}, ${p.weight}kg, morphotype ${p.morph || 'meso'}. ${goalInfo} ${lifestyleInfo} ${dietInfo} ${stressInfo} ${sleepInfo} ${allergiesInfo}
 Objectifs: ${t.cal} kcal, ${t.prot}g protéines, ${t.carb}g glucides, ${t.fat}g lipides.
-Journée: ${JSON.stringify({ calories: day.meals.reduce((s,m)=>s+m.kcal,0), proteines: day.meals.reduce((s,m)=>s+m.prot,0), glucides: day.meals.reduce((s,m)=>s+(m.carb||0),0), lipides: day.meals.reduce((s,m)=>s+(m.fat||0),0), sport: day.sport, pas: day.steps||0, eau_litres: ((day.water||0)*0.25).toFixed(1), eau_objectif_litres: (getWaterTarget()*0.25).toFixed(1) })}.`;
+Repas de la journée: ${JSON.stringify(day.meals.map(m => ({type:m.type, kcal:m.kcal, score:m.healthScore})))}.
+Totaux: ${JSON.stringify({ calories: day.meals.reduce((s,m)=>s+m.kcal,0), proteines: day.meals.reduce((s,m)=>s+m.prot,0), glucides: day.meals.reduce((s,m)=>s+(m.carb||0),0), lipides: day.meals.reduce((s,m)=>s+(m.fat||0),0), sport: day.sport, pas: day.steps||0, eau_litres: ((day.water||0)*0.25).toFixed(1) })}.
+Pour chaque repas avec score 1 ou 2, donne 1 conseil CONCRET pour l'améliorer la prochaine fois. Reste bienveillant et encourageant.`;
         const txt = await callGemini(prompt, false);
         document.getElementById('loader-bilan').style.display = 'none';
         day.aiSummary = txt; saveData(); renderHomeData();
@@ -1545,7 +1558,115 @@ Journée: ${JSON.stringify({ calories: day.meals.reduce((s,m)=>s+m.kcal,0), prot
         renderWaterGlasses();
     }
 
-        // ========================
+        function checkWeeklyReport() {
+        // Afficher le bilan uniquement le dimanche et une seule fois par semaine
+        const today = new Date();
+        if (today.getDay() !== 0) return; // 0 = dimanche
+        const weekKey = 'weekly_report_' + getWeekKey();
+        if (localStorage.getItem(weekKey)) return; // déjà affiché cette semaine
+
+        // Calculer le ratio des 7 derniers jours
+        let totalMeals = 0, unhealthyMeals = 0, mediumMeals = 0, goodMeals = 0;
+        for (let i = 0; i < 7; i++) {
+            const d = new Date(today);
+            d.setDate(today.getDate() - i);
+            const ds = d.toISOString().split('T')[0];
+            const day = appData.days[ds];
+            if (day) {
+                day.meals.forEach(m => {
+                    totalMeals++;
+                    if      (m.healthScore === 1) unhealthyMeals++;
+                    else if (m.healthScore === 2) mediumMeals++;
+                    else if (m.healthScore === 3) goodMeals++;
+                });
+            }
+        }
+        if (totalMeals < 3) return; // pas assez de données
+
+        const goodPct    = Math.round((goodMeals    / totalMeals) * 100);
+        const mediumPct  = Math.round((mediumMeals  / totalMeals) * 100);
+        const badPct     = Math.round((unhealthyMeals / totalMeals) * 100);
+
+        // Emoji global selon le ratio
+        let globalEmoji, globalMsg;
+        if (goodPct >= 70) {
+            globalEmoji = '🟢'; globalMsg = 'Excellente semaine, continue comme ça !';
+        } else if (goodPct >= 50) {
+            globalEmoji = '🟡'; globalMsg = 'Bonne semaine, quelques ajustements possibles.';
+        } else if (badPct > 30) {
+            globalEmoji = '🔴'; globalMsg = 'Semaine difficile, concentre-toi sur la qualité des repas.';
+        } else {
+            globalEmoji = '🟠'; globalMsg = 'Semaine correcte, tu peux encore progresser !';
+        }
+
+        // Collecte des tips déjà générés cette semaine (si repas avec healthTips)
+        let weeklyTips = [];
+        for (let i = 0; i < 7; i++) {
+            const d = new Date(today); d.setDate(today.getDate() - i);
+            const ds = d.toISOString().split('T')[0];
+            const dayData = appData.days[ds];
+            if (dayData) dayData.meals.forEach(m => {
+                if (m.healthScore === 1 && m.healthTips) weeklyTips.push(m.healthTips);
+            });
+        }
+        // Dédupliquer et limiter à 3 conseils
+        weeklyTips = [...new Set(weeklyTips)].slice(0, 3);
+
+        const tipsHtml = weeklyTips.length > 0
+            ? `<div style="margin-top:12px;background:rgba(128,90,213,0.08);border-left:3px solid var(--primary);border-radius:0 10px 10px 0;padding:10px 12px">
+                <div style="font-weight:800;font-size:0.8rem;margin-bottom:6px">💡 Axes d'amélioration pour la semaine prochaine :</div>
+                ${weeklyTips.map(t => `<div style="font-size:0.78rem;margin-top:4px;color:var(--text-color)">• ${t.replace(/^[-•]\s*/, '')}</div>`).join('')}
+               </div>`
+            : '';
+
+        const reportHtml = `
+            <div style="text-align:center;font-size:2.5rem;margin-bottom:8px">${globalEmoji}</div>
+            <div style="font-weight:800;text-align:center;margin-bottom:14px">${globalMsg}</div>
+            <div style="background:var(--bg-body);border-radius:12px;padding:12px 14px">
+                <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
+                    <span style="font-size:0.88rem">😊 Repas adaptés</span>
+                    <div style="display:flex;align-items:center;gap:8px">
+                        <div style="width:80px;height:6px;background:rgba(0,0,0,0.08);border-radius:6px;overflow:hidden">
+                            <div style="width:${goodPct}%;height:100%;background:var(--success);border-radius:6px"></div>
+                        </div>
+                        <strong style="color:var(--success);min-width:40px;text-align:right">${goodPct}%</strong>
+                    </div>
+                </div>
+                <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
+                    <span style="font-size:0.88rem">😐 Repas moyens</span>
+                    <div style="display:flex;align-items:center;gap:8px">
+                        <div style="width:80px;height:6px;background:rgba(0,0,0,0.08);border-radius:6px;overflow:hidden">
+                            <div style="width:${mediumPct}%;height:100%;background:#d69e2e;border-radius:6px"></div>
+                        </div>
+                        <strong style="color:#d69e2e;min-width:40px;text-align:right">${mediumPct}%</strong>
+                    </div>
+                </div>
+                <div style="display:flex;justify-content:space-between;align-items:center">
+                    <span style="font-size:0.88rem">😟 Peu adaptés</span>
+                    <div style="display:flex;align-items:center;gap:8px">
+                        <div style="width:80px;height:6px;background:rgba(0,0,0,0.08);border-radius:6px;overflow:hidden">
+                            <div style="width:${badPct}%;height:100%;background:var(--danger);border-radius:6px"></div>
+                        </div>
+                        <strong style="color:var(--danger);min-width:40px;text-align:right">${badPct}%</strong>
+                    </div>
+                </div>
+            </div>
+            <div style="font-size:0.75rem;color:var(--text-muted);margin-top:8px;text-align:center">${totalMeals} repas analysés cette semaine</div>
+            ${tipsHtml}
+        `;
+        document.getElementById('weekly-report-content').innerHTML = reportHtml;
+        document.getElementById('modal-weekly-report').style.display = 'flex';
+        localStorage.setItem(weekKey, '1');
+    }
+
+    function getWeekKey() {
+        const d = new Date();
+        const jan1 = new Date(d.getFullYear(), 0, 1);
+        const week = Math.ceil(((d - jan1) / 86400000 + jan1.getDay() + 1) / 7);
+        return d.getFullYear() + '_w' + week;
+    }
+
+    // ========================
     // SUIVI SOMMEIL QUOTIDIEN
     // ========================
     let sleepInputVal = 7.0;
