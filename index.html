@@ -192,6 +192,33 @@
         .week-card.active-day-card { border-color:var(--primary); background:var(--primary-light); }
         .week-card.active-day-card .wc-num { color:var(--primary); }
 
+        /* ===== Meal expand + edit ===== */
+        .meal-item { cursor:pointer; }
+        .meal-item-detail {
+            display:none; margin-top:10px; padding-top:10px;
+            border-top:1px solid rgba(0,0,0,0.06);
+        }
+        body.dark-mode .meal-item-detail { border-color:rgba(255,255,255,0.08); }
+        .meal-item.expanded .meal-item-detail { display:block; }
+        .meal-item-desc {
+            font-size:0.78rem; color:var(--text-muted); font-style:italic;
+            line-height:1.5; margin-bottom:8px;
+        }
+        .meal-item-tips {
+            font-size:0.76rem; background:rgba(128,90,213,0.08);
+            border-left:3px solid var(--primary); border-radius:0 8px 8px 0;
+            padding:7px 10px; line-height:1.6; margin-bottom:8px;
+        }
+        .meal-edit-btn {
+            background:none; border:none; width:30px; height:30px; border-radius:50%;
+            display:flex; align-items:center; justify-content:center;
+            cursor:pointer; color:var(--primary); font-size:1rem; flex-shrink:0;
+        }
+        .meal-chevron {
+            font-size:0.7rem; color:var(--text-muted); transition:transform 0.2s; margin-left:2px;
+        }
+        .meal-item.expanded .meal-chevron { transform:rotate(180deg); }
+
         /* ===== Meal items ===== */
         .meal-item { display:flex; align-items:center; justify-content:space-between; padding:12px 14px; background:var(--card-bg); border-radius:12px; margin-bottom:8px; box-shadow:0 2px 8px rgba(0,0,0,0.05); border:1px solid rgba(0,0,0,0.03); }
         body.dark-mode .meal-item { border-color:rgba(255,255,255,0.05); }
@@ -1266,6 +1293,7 @@ Réponds JSON: {"kcal":number,"prot":number,"carb":number,"fat":number,"healthSc
         if (!appData.days[selectedDate]) appData.days[selectedDate] = { meals:[], sport:0, sportEntries:[], closed:false };
         const meal = {
             type: activeCategory,
+            desc: document.getElementById('m-desc').value.trim(),
             kcal: parseInt(document.getElementById('m-kcal-val').value) || 0,
             prot: parseInt(document.getElementById('m-prot-val').value) || 0,
             carb: parseInt(document.getElementById('m-carb-val').value) || 0,
@@ -1298,6 +1326,48 @@ Réponds JSON: {"kcal":number,"prot":number,"carb":number,"fat":number,"healthSc
 
 
     // Suppression repas
+    function editMeal(index) {
+        const day = appData.days[selectedDate];
+        if (!day) return;
+        const m = day.meals[index];
+        if (!m) return;
+
+        // Ouvrir le formulaire sur la bonne catégorie
+        openMealForm(m.type);
+
+        // Pré-remplir la description
+        document.getElementById('m-desc').value = m.desc || '';
+
+        // Pré-remplir les valeurs nutritionnelles directement dans le preview
+        document.getElementById('m-kcal-val').value = m.kcal;
+        document.getElementById('m-prot-val').value = m.prot;
+        document.getElementById('m-carb-val').value = m.carb;
+        document.getElementById('m-fat-val').value = m.fat;
+        const emojis = { 1:'😟', 2:'😐', 3:'😊' };
+        document.getElementById('meal-health-emoji').textContent = emojis[m.healthScore] || '😐';
+        document.getElementById('meal-health-label').textContent = m.healthLabel || '';
+        const tipsEl = document.getElementById('meal-health-tips');
+        if (tipsEl) {
+            if (m.healthTips && m.healthScore < 3) {
+                tipsEl.style.display = 'block';
+                tipsEl.innerHTML = '<strong style="font-size:0.82rem">💡 Comment améliorer ce repas :</strong>' +
+                    m.healthTips.split('\n').filter(t => t.trim()).map(t => `<div style="margin-top:3px">• ${t.replace(/^[-•]\s*/, '')}</div>`).join('');
+            } else { tipsEl.style.display = 'none'; }
+        }
+        document.getElementById('m-preview').style.display = 'block';
+        document.getElementById('btn-analyze-meal').style.display = 'none';
+
+        // Stocker lastMacros pour que saveMeal récupère les bonnes valeurs
+        appData.lastMacros = { kcal: m.kcal, prot: m.prot, carb: m.carb, fat: m.fat,
+            healthScore: m.healthScore, healthLabel: m.healthLabel, healthTips: m.healthTips };
+
+        // Supprimer l'ancien repas — saveMeal en créera un nouveau
+        day.meals.splice(index, 1);
+        saveData();
+        renderHomeData();
+        renderMealCategories();
+    }
+
     function askDeleteMeal(index) { mealDeleteIndex = index; document.getElementById('modal-delete-meal').style.display = 'flex'; }
     function confirmDeleteMeal() {
         if (mealDeleteIndex !== null && appData.days[selectedDate]) {
@@ -1436,23 +1506,48 @@ Pour chaque repas avec score 1 ou 2, donne 1 conseil CONCRET pour l'améliorer l
             day.meals.forEach((m, i) => {
                 const el = document.createElement('div');
                 el.className = 'meal-item';
+
+                // Zone dépliable : description + tips
+                const descHtml = m.desc
+                    ? `<div class="meal-item-desc">📝 ${m.desc}</div>`
+                    : '<div class="meal-item-desc" style="color:var(--text-muted);opacity:0.6">Aucune description saisie</div>';
+
+                const tipsHtml = (m.healthTips && m.healthScore < 3)
+                    ? `<div class="meal-item-tips">💡 ${m.healthTips.split('\n').filter(Boolean).map(t => t.replace(/^[-•]\s*/, '')).join('<br>• ')}</div>`
+                    : '';
+
+                const macrosDetail = `
+                    <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:4px">
+                        <span style="font-size:0.75rem;font-weight:700;color:var(--prot-color)">🥩 ${m.prot}g prot.</span>
+                        <span style="font-size:0.75rem;font-weight:700;color:var(--carb-color)">🍞 ${m.carb}g gluc.</span>
+                        <span style="font-size:0.75rem;font-weight:700;color:var(--fat-color)">🥑 ${m.fat}g lip.</span>
+                    </div>`;
+
                 el.innerHTML = `
-                    <div class="meal-item-left">
-                        <div class="meal-type-icon">${mealIcons[m.type]||'🍽️'}</div>
-                        <div>
-                            <div class="meal-item-name">${m.type}</div>
-                            <div class="meal-item-kcal">${m.kcal} kcal</div>
-                            <div class="macros-mini">
-                                <span class="macro-tag p">P: ${m.prot}g</span>
-                                <span class="macro-tag c">G: ${m.carb}g</span>
-                                <span class="macro-tag f">L: ${m.fat}g</span>
+                    <div style="display:flex;justify-content:space-between;align-items:center;width:100%">
+                        <div class="meal-item-left" style="flex:1;min-width:0">
+                            <div class="meal-type-icon">${mealIcons[m.type]||'🍽️'}</div>
+                            <div style="min-width:0">
+                                <div class="meal-item-name">${m.type}
+                                    <span class="meal-chevron">▼</span>
+                                </div>
+                                <div class="meal-item-kcal">${m.kcal} kcal</div>
                             </div>
                         </div>
+                        <div style="display:flex;align-items:center;gap:4px;flex-shrink:0">
+                            ${m.healthScore ? `<span style="font-size:1.2rem" title="${m.healthLabel||''}">${healthEmojis[m.healthScore]||''}</span>` : ''}
+                            <button class="meal-edit-btn" onclick="event.stopPropagation();editMeal(${i})" title="Modifier">✏️</button>
+                            <button class="meal-delete-btn" onclick="event.stopPropagation();askDeleteMeal(${i})" title="Supprimer">🗑️</button>
+                        </div>
                     </div>
-                    <div style="display:flex;align-items:center;gap:6px">
-                        ${m.healthScore ? `<span title="${m.healthLabel||''}" style="font-size:1.4rem">${healthEmojis[m.healthScore]||''}</span>` : ''}
-                        <button class="meal-delete-btn" onclick="askDeleteMeal(${i})" title="Supprimer">🗑️</button>
+                    <div class="meal-item-detail">
+                        ${descHtml}
+                        ${tipsHtml}
+                        ${macrosDetail}
                     </div>`;
+
+                // Toggle expand au clic sur la carte
+                el.addEventListener('click', () => el.classList.toggle('expanded'));
                 list.appendChild(el);
             });
         }
