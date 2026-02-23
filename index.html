@@ -594,10 +594,11 @@
             </div>
 
             <label>Photos du repas <span style="font-weight:600;text-transform:none;font-size:0.75rem;color:var(--primary)">(jusqu'à 4)</span></label>
-            <div class="images-grid" id="images-grid">
+            <div style="display:flex;gap:10px;margin-bottom:6px;flex-shrink:0">
                 <div class="add-photo-btn" onclick="triggerImportMulti('camera')"><span>📸</span>Photo</div>
                 <div class="add-photo-btn" onclick="triggerImportMulti('gallery')"><span>🖼️</span>Galerie</div>
             </div>
+            <div class="images-grid" id="images-grid"></div>
 
             <label>Description du repas</label>
             <textarea id="m-desc" placeholder="Ex: 150g de poulet grillé, riz basmati, salade verte..." rows="3" style="resize:none"></textarea>
@@ -912,19 +913,35 @@
             5: { 'Petit Déjeuner': 0.20, 'Déjeuner': 0.30, 'Dîner': 0.25, 'Collation': 0.125 },
         };
 
+        const safeMealFreq = [2,3,4,5].includes(mealFreq) ? mealFreq : 4;
+
         appData.profile = {
             name, weight, height, age, sex, activity, lifestyle,
             morph, goalDir, weightTarget, goalWeeks, goalDelta,
-            mealFreq, sleep, stress, diet, allergies, cooking,
+            mealFreq: safeMealFreq, sleep, stress, diet, allergies, cooking,
             targets: { cal: calTarget, prot: protTarget, fat: fatTarget, carb: carbTarget },
-            mealSplit: mealSplit[mealFreq] || mealSplit[4],
+            mealSplit: mealSplit[safeMealFreq] || mealSplit[4],
             bmr: Math.round(bmr), tdeeBase: tdee
         };
 
+        if (!appData.weightHistory) appData.weightHistory = [];
         if (appData.weightHistory.length === 0) {
             appData.weightHistory.push({ date: getTodayStr(), weight });
         }
-        saveData(); initApp(); showToast("Profil enregistré !");
+
+        // Sauvegarder AVANT tout re-rendu
+        saveData();
+
+        // Mettre à jour l'affichage sans recharger le profil (évite l'écrasement des champs)
+        if (document.getElementById('home-user-name')) {
+            document.getElementById('home-user-name').textContent = name;
+        }
+        renderWeek();
+        renderHomeData();
+        renderShortcuts();
+
+        showToast("Profil enregistré ✅");
+        showSection('view-home');
     }
 
     // ========================
@@ -1051,6 +1068,7 @@
 
     function renderImagesGrid() {
         const grid = document.getElementById('images-grid');
+        if (!grid) return;
         grid.innerHTML = '';
         currentImgs.forEach((b64, i) => {
             const div = document.createElement('div');
@@ -1058,10 +1076,10 @@
             div.innerHTML = `<img src="data:image/jpeg;base64,${b64}"><div class="img-thumb-remove" onclick="removeImg(${i})">×</div>`;
             grid.appendChild(div);
         });
-        if (currentImgs.length < 4) {
-            grid.innerHTML += `<div class="add-photo-btn" onclick="triggerImportMulti('camera')"><span>📸</span>Photo</div>`;
-            grid.innerHTML += `<div class="add-photo-btn" onclick="triggerImportMulti('gallery')"><span>🖼️</span>Galerie</div>`;
-        }
+        // Les boutons Photo/Galerie sont fixes dans le HTML — on ne les touche plus ici
+        // On masque les boutons si 4 photos atteintes
+        const btns = document.querySelectorAll('#view-meal-form .add-photo-btn');
+        btns.forEach(b => b.style.display = currentImgs.length >= 4 ? 'none' : '');
     }
 
     // ========================
