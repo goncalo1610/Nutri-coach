@@ -1242,23 +1242,37 @@
         document.getElementById('btn-analyze-meal').style.display = 'none';
         document.getElementById('m-preview').style.display = 'none';
 
-        const promptParts = [];
-        if (desc) promptParts.push(`Description du repas: "${desc}"`);
-        if (currentImgs.length) promptParts.push(`${currentImgs.length} photo(s) du repas jointe(s).`);
-
         const profile = appData.profile;
-        const goalStr = profile?.goal < 0 ? 'perte de poids' : profile?.goal > 0 ? 'prise de masse' : 'maintien';
+        const goalStr = profile?.goalDir === 'loss' ? 'perte de poids' : profile?.goalDir === 'gain' ? 'prise de masse' : 'maintien';
         const cat = MEAL_CATS.find(c => c.key === activeCategory);
         const idealKcal = cat ? Math.round((profile?.targets?.cal || 2000) * getMealPct(cat.key)) : 600;
-
         const dietInfo = profile?.diet && profile.diet !== 'none' ? `Régime: ${profile.diet}.` : '';
         const allergiesInfo = profile?.allergies ? `Allergies: ${profile.allergies}.` : '';
 
-        const prompt = `${promptParts.join('. ')}. Type de repas: ${activeCategory} (objectif ~${idealKcal} kcal). Objectif: ${goalStr}. ${dietInfo} ${allergiesInfo}
-Analyse ce repas et estime les valeurs nutritionnelles.
-- Si healthScore vaut 1 ou 2, fournis dans "healthTips" 2-3 conseils CONCRETS et COURTS pour améliorer CE repas précis afin qu'il soit mieux adapté à l'objectif ${goalStr} (ex: "Remplace le riz blanc par du riz complet", "Ajoute une source de protéines comme un oeuf").
-- Si healthScore vaut 3, healthTips = "".
-Réponds JSON: {"kcal":number,"prot":number,"carb":number,"fat":number,"healthScore":1|2|3,"healthLabel":string,"healthTips":string}`;
+        const hasPhoto = currentImgs.length > 0;
+        const hasDesc  = desc.length > 0;
+
+        let contextBlock = '';
+        if (hasPhoto && hasDesc) {
+            contextBlock = `L'utilisateur a fourni UNE PHOTO du repas ET une description texte : "${desc}".
+INSTRUCTIONS IMPORTANTES :
+1. Analyse la photo visuellement pour identifier les aliments, portions et modes de cuisson.
+2. Compare avec la description textuelle.
+3. Si la photo et la description sont COHÉRENTES, combine les deux pour une estimation plus précise.
+4. Si tu détectes une INCOHÉRENCE (ex: la photo montre un burger mais la description dit "salade"), mentionne-le dans "healthLabel" et base-toi prioritairement sur la PHOTO.
+5. Utilise les deux sources pour affiner les quantités (ex: la description dit "150g de poulet" → applique ce grammage à ce que tu vois).`;
+        } else if (hasPhoto) {
+            contextBlock = `L'utilisateur a fourni ${currentImgs.length} photo(s) du repas. Analyse visuellement les aliments, portions et modes de cuisson pour estimer les valeurs nutritionnelles.`;
+        } else {
+            contextBlock = `L'utilisateur a décrit son repas : "${desc}". Estime les valeurs nutritionnelles sur la base de cette description.`;
+        }
+
+        const prompt = `${contextBlock}
+Type de repas : ${activeCategory} (objectif ~${idealKcal} kcal). Objectif utilisateur : ${goalStr}. ${dietInfo} ${allergiesInfo}
+- healthScore : 1 = peu adapté à l'objectif, 2 = moyen, 3 = bien adapté.
+- Si healthScore ≤ 2, fournis dans "healthTips" 2-3 conseils CONCRETS (une ligne chacun, séparés par \\n) pour améliorer CE repas précis.
+- Si healthScore = 3, healthTips = "".
+Réponds UNIQUEMENT en JSON : {"kcal":number,"prot":number,"carb":number,"fat":number,"healthScore":1|2|3,"healthLabel":string,"healthTips":string}`;
 
         const res = await callGemini(prompt, true, currentImgs);
         document.getElementById('loader-m').style.display = 'none';
