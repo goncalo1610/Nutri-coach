@@ -90,25 +90,15 @@
         .shortcut-item { flex:0 0 auto; background:var(--primary-light); padding:8px 12px; border-radius:20px; border:1.5px solid var(--primary); color:var(--primary); font-size:0.8rem; font-weight:700; cursor:pointer; display:flex; align-items:center; gap:5px; transition:transform 0.15s; }
         .shortcut-item:active { transform:scale(0.95); }
         .shortcut-item .remove { color:var(--danger); font-size:1.1rem; margin-left:4px; line-height:1; }
-
-        /* ===== NOUVELLES: Multi-images ===== */
         .images-grid { display:flex; flex-wrap:wrap; gap:10px; margin-bottom:14px; }
         .img-thumb { position:relative; width:90px; height:90px; }
         .img-thumb img { width:100%; height:100%; object-fit:cover; border-radius:12px; border:2.5px solid var(--primary); }
         .img-thumb-remove { position:absolute; top:-8px; right:-8px; background:var(--danger); color:white; width:24px; height:24px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:0.9rem; font-weight:bold; cursor:pointer; border:2px solid white; z-index:10; }
         .add-photo-btn { width:90px; height:90px; border-radius:12px; border:2px dashed var(--primary); background:var(--primary-light); display:flex; flex-direction:column; align-items:center; justify-content:center; cursor:pointer; color:var(--primary); font-size:0.7rem; font-weight:800; gap:4px; flex-shrink:0; }
         .add-photo-btn span { font-size:1.4rem; }
-
-        /* ===== Profil enrichi ===== */
-        .profile-section-title {
-            font-size:0.7rem; font-weight:900; color:var(--primary);
-            text-transform:uppercase; letter-spacing:1.5px;
-            margin:20px 0 8px 0;
-        }
+        .profile-section-title { font-size:0.7rem; font-weight:900; color:var(--primary); text-transform:uppercase; letter-spacing:1.5px; margin:20px 0 8px 0; }
         .profile-section-title:first-child { margin-top:0; }
         .profile-hint { font-weight:600; text-transform:none; font-size:0.72rem; color:var(--primary); letter-spacing:0; }
-
-        /* Sélecteur morphotype */
         .morph-selector { display:grid; grid-template-columns:repeat(3,1fr); gap:8px; margin-bottom:14px; }
         .morph-opt { border:2px solid rgba(0,0,0,0.08); border-radius:14px; padding:10px 6px; text-align:center; cursor:pointer; transition:all 0.2s; background:var(--bg-body); }
         body.dark-mode .morph-opt { border-color:rgba(255,255,255,0.1); }
@@ -116,56 +106,31 @@
         .morph-icon { font-size:1.4rem; }
         .morph-name { font-size:0.72rem; font-weight:800; color:var(--text-color); margin-top:3px; }
         .morph-desc { font-size:0.62rem; color:var(--text-muted); font-weight:600; margin-top:2px; line-height:1.3; }
-
-        /* Aperçu calcul objectif */
         .goal-calc-box { background:linear-gradient(135deg,var(--primary-light),rgba(128,90,213,0.08)); border-radius:12px; padding:12px 14px; margin-top:4px; font-size:0.82rem; font-weight:700; line-height:1.8; border-left:3px solid var(--primary); }
         .goal-calc-box .gcb-val { color:var(--primary); font-weight:900; font-size:1rem; }
         .goal-calc-box .gcb-warn { color:#e67e22; font-size:0.75rem; font-weight:700; }
-
-        /* Résumé profil sur accueil */
         .profile-summary { display:flex; flex-wrap:wrap; gap:6px; margin-bottom:12px; }
         .profile-chip { font-size:0.7rem; font-weight:700; padding:4px 10px; border-radius:20px; background:var(--primary-light); color:var(--primary); }
-
-        /* ===== Hydratation ===== */
         .water-card { margin-bottom:14px; }
         .water-header { display:flex; justify-content:space-between; align-items:center; margin-bottom:14px; }
         .water-title { font-weight:900; font-size:0.95rem; }
         .water-stats { font-size:0.8rem; font-weight:700; color:var(--text-muted); }
         .water-stats span { color:#38b2ac; font-weight:900; }
         .water-glasses-row { display:flex; flex-wrap:wrap; gap:8px; justify-content:flex-start; margin-bottom:14px; }
-
-        /* Boutons +/- eau */
         .water-controls { display:flex; align-items:center; justify-content:center; gap:20px; margin-bottom:14px; }
         .water-count-display { text-align:center; min-width:80px; }
         .water-count-num { font-size:2.4rem; font-weight:900; color:#38b2ac; line-height:1; }
         .water-count-sub { font-size:0.72rem; font-weight:700; color:var(--text-muted); margin-top:2px; }
-        .water-pm-btn {
-            width:48px; height:48px; border-radius:50%;
-            border:2px solid #38b2ac; background:rgba(56,178,172,0.1);
-            color:#38b2ac; font-size:1.6rem; font-weight:900;
-            display:flex; align-items:center; justify-content:center;
-            cursor:pointer; transition:all 0.15s; line-height:1; padding:0;
-            flex-shrink:0;
-        }
+        .water-pm-btn { width:48px; height:48px; border-radius:50%; border:2px solid #38b2ac; background:rgba(56,178,172,0.1); color:#38b2ac; font-size:1.6rem; font-weight:900; display:flex; align-items:center; justify-content:center; cursor:pointer; transition:all 0.15s; line-height:1; padding:0; flex-shrink:0; }
         .water-pm-btn:active { transform:scale(0.88); background:rgba(56,178,172,0.25); }
         .water-pm-btn.minus { border-color:rgba(56,178,172,0.4); color:rgba(56,178,172,0.6); background:none; }
-
-        /* Barre de progression eau */
         .water-progress-track { height: 6px; background: rgba(56,178,172,0.15); border-radius:10px; overflow:hidden; margin-bottom:10px; }
         body.dark-mode .water-progress-track { background: rgba(79,209,197,0.12); }
         .water-progress-fill { height:100%; border-radius:10px; background: linear-gradient(90deg, #38b2ac, #805ad5); transition: width 0.5s cubic-bezier(0.34,1.56,0.64,1); }
         .water-footer { display:flex; justify-content:space-between; align-items:center; }
         .water-msg { font-size:0.75rem; font-weight:700; color:var(--text-muted); flex:1; }
-
-
-        /* ===== Cartes catégories repas ===== */
         .meal-cat-grid { display:grid; grid-template-columns:1fr 1fr; gap:14px; }
-        .meal-cat-card {
-            background:var(--card-bg); border-radius:20px; padding:20px 14px 16px;
-            box-shadow:var(--shadow); border:2px solid transparent;
-            cursor:pointer; transition:all 0.2s; text-align:center; position:relative;
-            display:flex; flex-direction:column; align-items:center; gap:6px;
-        }
+        .meal-cat-card { background:var(--card-bg); border-radius:20px; padding:20px 14px 16px; box-shadow:var(--shadow); border:2px solid transparent; cursor:pointer; transition:all 0.2s; text-align:center; position:relative; display:flex; flex-direction:column; align-items:center; gap:6px; }
         .meal-cat-card:active { transform:scale(0.97); }
         .meal-cat-card.has-meal { border-color:var(--primary); background:var(--primary-light); }
         body.dark-mode .meal-cat-card { border:2px solid rgba(255,255,255,0.06); }
@@ -178,12 +143,8 @@
         .meal-cat-recorded { font-size:0.7rem; color:var(--primary); font-weight:700; margin-top:2px; }
         .meal-cat-add-icon { width:28px; height:28px; border-radius:50%; background:var(--primary); color:white; display:flex; align-items:center; justify-content:center; font-size:1.1rem; margin-top:4px; transition:transform 0.2s; }
         .meal-cat-card:active .meal-cat-add-icon { transform:scale(0.9); }
-
-        /* ===== Macros avec objectif ===== */
         .macro-card-v3 { padding:12px 8px; margin:0; display:flex; flex-direction:column; align-items:center; gap:4px; text-align:center; }
         .macro-val-target { font-size:0.68rem; color:var(--text-muted); font-weight:700; margin-top:1px; }
-
-        /* ===== NOUVELLES: Semaine ===== */
         #week-container { display:flex; overflow-x:auto; gap:8px; padding:4px 16px 14px 16px; margin:0 -16px 4px -16px; scrollbar-width:none; }
         #week-container::-webkit-scrollbar { display:none; }
         .week-card { min-width:56px; flex:0 0 auto; text-align:center; cursor:pointer; border:2px solid transparent; border-radius:14px; padding:10px 6px; transition:all 0.2s; background:var(--bg-body); }
@@ -191,35 +152,15 @@
         .week-card .wc-num { font-size:1.1rem; font-weight:900; color:var(--text-color); margin-top:2px; }
         .week-card.active-day-card { border-color:var(--primary); background:var(--primary-light); }
         .week-card.active-day-card .wc-num { color:var(--primary); }
-
-        /* ===== Meal expand + edit ===== */
         .meal-item { cursor:pointer; }
-        .meal-item-detail {
-            display:none; margin-top:10px; padding-top:10px;
-            border-top:1px solid rgba(0,0,0,0.06);
-        }
+        .meal-item-detail { display:none; margin-top:10px; padding-top:10px; border-top:1px solid rgba(0,0,0,0.06); }
         body.dark-mode .meal-item-detail { border-color:rgba(255,255,255,0.08); }
         .meal-item.expanded .meal-item-detail { display:block; }
-        .meal-item-desc {
-            font-size:0.78rem; color:var(--text-muted); font-style:italic;
-            line-height:1.5; margin-bottom:8px;
-        }
-        .meal-item-tips {
-            font-size:0.76rem; background:rgba(128,90,213,0.08);
-            border-left:3px solid var(--primary); border-radius:0 8px 8px 0;
-            padding:7px 10px; line-height:1.6; margin-bottom:8px;
-        }
-        .meal-edit-btn {
-            background:none; border:none; width:30px; height:30px; border-radius:50%;
-            display:flex; align-items:center; justify-content:center;
-            cursor:pointer; color:var(--primary); font-size:1rem; flex-shrink:0;
-        }
-        .meal-chevron {
-            font-size:0.7rem; color:var(--text-muted); transition:transform 0.2s; margin-left:2px;
-        }
+        .meal-item-desc { font-size:0.78rem; color:var(--text-muted); font-style:italic; line-height:1.5; margin-bottom:8px; }
+        .meal-item-tips { font-size:0.76rem; background:rgba(128,90,213,0.08); border-left:3px solid var(--primary); border-radius:0 8px 8px 0; padding:7px 10px; line-height:1.6; margin-bottom:8px; }
+        .meal-edit-btn { background:none; border:none; width:30px; height:30px; border-radius:50%; display:flex; align-items:center; justify-content:center; cursor:pointer; color:var(--primary); font-size:1rem; flex-shrink:0; }
+        .meal-chevron { font-size:0.7rem; color:var(--text-muted); transition:transform 0.2s; margin-left:2px; }
         .meal-item.expanded .meal-chevron { transform:rotate(180deg); }
-
-        /* ===== Meal items ===== */
         .meal-item { display:flex; align-items:center; justify-content:space-between; padding:12px 14px; background:var(--card-bg); border-radius:12px; margin-bottom:8px; box-shadow:0 2px 8px rgba(0,0,0,0.05); border:1px solid rgba(0,0,0,0.03); }
         body.dark-mode .meal-item { border-color:rgba(255,255,255,0.05); }
         .meal-item-left { display:flex; align-items:center; gap:10px; flex:1; }
@@ -232,13 +173,7 @@
         .macro-tag.p { background:rgba(229,62,62,0.12); color:var(--prot-color); }
         .macro-tag.c { background:rgba(56,161,105,0.12); color:var(--carb-color); }
         .macro-tag.f { background:rgba(214,158,46,0.12); color:var(--fat-color); }
-
-        /* ===== NOUVEAU: Emoji santé repas ===== */
         .meal-health-emoji { font-size:1.5rem; flex-shrink:0; margin-right:4px; }
-
-
-
-        /* ===== NOUVEAU: Courbe de poids ===== */
         .weight-chart { width:100%; height:120px; }
         .weight-entry { display:flex; justify-content:space-between; align-items:center; padding:8px 0; border-bottom:1px solid rgba(0,0,0,0.05); font-size:0.85rem; }
         body.dark-mode .weight-entry { border-bottom-color:rgba(255,255,255,0.05); }
@@ -246,7 +181,6 @@
         .weight-delta-pos { color:var(--danger); font-weight:800; }
         .weight-delta-neg { color:var(--success); font-weight:800; }
         .weight-delta-0 { color:var(--text-muted); font-weight:800; }
-
         .section-title { font-size:0.72rem; font-weight:800; color:var(--text-muted); text-transform:uppercase; letter-spacing:1px; margin:18px 0 8px 0; }
         .grid-2 { display:grid; grid-template-columns:1fr 1fr; gap:10px; }
         .grid-3 { display:grid; grid-template-columns:repeat(3,1fr); gap:10px; }
@@ -269,12 +203,10 @@
 
     <div id="toast" class="toast"></div>
 
-    <!-- Modal Alerte générale -->
     <div id="modal-alert" class="modal-overlay">
         <div class="modal-box"><h3 id="alert-title">Info</h3><p id="alert-msg">...</p><button onclick="closeAlert()">D'accord</button></div>
     </div>
 
-    <!-- Modal Pas -->
     <div id="modal-steps" class="modal-overlay">
         <div class="modal-box">
             <h3>🏁 Fin de journée</h3><p>Combien de pas as-tu fait aujourd'hui ?</p>
@@ -285,7 +217,6 @@
         </div>
     </div>
 
-    <!-- Modal Suppression repas -->
     <div id="modal-delete-meal" class="modal-overlay">
         <div class="modal-box"><h3>🗑️ Supprimer ?</h3><p>Veux-tu vraiment supprimer ce repas ?</p>
             <button class="danger" onclick="confirmDeleteMeal()">Supprimer</button>
@@ -293,7 +224,6 @@
         </div>
     </div>
 
-    <!-- Modal sommeil -->
     <div id="modal-sleep" class="modal-overlay">
         <div class="modal-box">
             <div style="font-size:2rem;margin-bottom:6px">😴</div>
@@ -313,7 +243,6 @@
         </div>
     </div>
 
-    <!-- Modal rapport hebdo dimanche -->
     <div id="modal-weekly-report" class="modal-overlay">
         <div class="modal-box">
             <div style="font-size:2rem;margin-bottom:6px">📊</div>
@@ -323,7 +252,6 @@
         </div>
     </div>
 
-    <!-- NOUVEAU: Modal mise à jour du poids -->
     <div id="modal-weight" class="modal-overlay">
         <div class="modal-box">
             <h3>⚖️ Mise à jour du poids</h3>
@@ -337,8 +265,6 @@
     <!-- 0. PROFIL -->
     <div id="view-profile" class="view-section">
         <h2>Ton Profil 👤</h2>
-
-        <!-- Bloc 1 : Identité -->
         <div class="profile-section-title">📋 Informations de base</div>
         <div class="card">
             <label>Prénom</label>
@@ -374,7 +300,6 @@
             </div>
         </div>
 
-        <!-- Bloc 2 : Objectif précis -->
         <div class="profile-section-title">🎯 Objectif</div>
         <div class="card">
             <label>Direction</label>
@@ -398,7 +323,6 @@
             </div>
         </div>
 
-        <!-- Bloc 3 : Activité & mode de vie -->
         <div class="profile-section-title">🏃 Activité & Mode de vie</div>
         <div class="card">
             <label>Niveau d'activité physique</label>
@@ -424,7 +348,6 @@
             </select>
         </div>
 
-        <!-- Bloc 4 : Préférences alimentaires -->
         <div class="profile-section-title">🥗 Alimentation & Restrictions</div>
         <div class="card">
             <label>Régime alimentaire</label>
@@ -447,7 +370,6 @@
             </select>
         </div>
 
-        <!-- Bloc 5 : Contexte IA -->
         <div class="profile-section-title">🤖 Contexte pour l'IA</div>
         <div class="card">
             <label>Décris ton quotidien <span class="profile-hint">améliore la précision des conseils</span></label>
@@ -463,10 +385,6 @@
         <div class="profile-summary" id="profile-summary"></div>
         <div id="week-container"></div>
 
-        <!-- NOUVEAU #4: Alerte repas malsains -->
-
-
-        <!-- Calories -->
         <div class="card calorie-card" onclick="showSection('view-day')">
             <div style="display:flex;justify-content:space-between;align-items:center">
                 <div>
@@ -487,7 +405,6 @@
             </div>
         </div>
 
-        <!-- MODIFIÉ #1: Macros avec valeur / objectif et barre de progression -->
         <div class="grid-3" style="margin-bottom:12px">
             <div class="card macro-card-v3" style="margin:0">
                 <span style="font-size:0.62rem;color:var(--text-muted);font-weight:800;text-transform:uppercase">Protéines</span>
@@ -499,9 +416,7 @@
                     <div class="gauge-icon" style="font-size:0.95rem">🥩</div>
                 </div>
                 <div style="font-weight:800;color:var(--prot-color);font-size:0.88rem"><span id="h-prot">0</span>g</div>
-                <!-- NOUVEAU: objectif -->
                 <div class="macro-val-target">/ <span id="h-prot-target">—</span>g</div>
-                
             </div>
             <div class="card macro-card-v3" style="margin:0">
                 <span style="font-size:0.62rem;color:var(--text-muted);font-weight:800;text-transform:uppercase">Glucides</span>
@@ -514,7 +429,6 @@
                 </div>
                 <div style="font-weight:800;color:var(--carb-color);font-size:0.88rem"><span id="h-carb">0</span>g</div>
                 <div class="macro-val-target">/ <span id="h-carb-target">—</span>g</div>
-                
             </div>
             <div class="card macro-card-v3" style="margin:0">
                 <span style="font-size:0.62rem;color:var(--text-muted);font-weight:800;text-transform:uppercase">Lipides</span>
@@ -527,11 +441,9 @@
                 </div>
                 <div style="font-weight:800;color:var(--fat-color);font-size:0.88rem"><span id="h-fat">0</span>g</div>
                 <div class="macro-val-target">/ <span id="h-fat-target">—</span>g</div>
-                
             </div>
         </div>
 
-        <!-- Sommeil + Sport côte à côte -->
         <div class="grid-2" style="margin-bottom:14px">
             <div class="card" onclick="openSleepModal()" style="cursor:pointer;display:flex;align-items:center;gap:10px;margin:0;border:1.5px dashed rgba(128,90,213,0.3);background:rgba(128,90,213,0.03)">
                 <div style="width:38px;height:38px;border-radius:10px;background:rgba(128,90,213,0.12);display:flex;align-items:center;justify-content:center;font-size:1.2rem;flex-shrink:0">😴</div>
@@ -549,7 +461,6 @@
             </div>
         </div>
 
-        <!-- Hydratation -->
         <div class="card water-card">
             <div class="water-header">
                 <div class="water-title">💧 Hydratation</div>
@@ -572,7 +483,6 @@
         <div class="section-title">Repas du jour</div>
         <div id="home-meals-list"></div>
 
-        <!-- Bilan -->
         <div class="card" style="margin-top:6px">
             <div style="display:flex;align-items:center;gap:12px;cursor:pointer" onclick="triggerBilan()">
                 <div id="chk-bilan-icon" style="width:26px;height:26px;border-radius:8px;border:2px solid var(--primary);display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:all 0.2s;font-size:1rem"></div>
@@ -617,7 +527,6 @@
     <div id="view-meal-form" class="view-section">
         <h2 id="meal-form-title">☕ Petit Déjeuner</h2>
         <div class="card">
-            <!-- Repas déjà saisis pour cette catégorie -->
             <div id="existing-meals-preview" style="display:none; margin-bottom:14px">
                 <div class="section-title" style="margin-top:0">Déjà enregistrés aujourd'hui</div>
                 <div id="existing-meals-list"></div>
@@ -684,7 +593,6 @@
             <div id="recipe-res" class="coach-message" style="display:none"></div>
         </div>
 
-        <!-- NOUVEAU #6: Courbe de poids -->
         <div class="card">
             <h3>⚖️ Évolution du poids</h3>
             <div id="weight-chart-container">
@@ -726,7 +634,6 @@
 
     <input type="file" id="camera-input" accept="image/*" capture="environment" style="display:none">
     <input type="file" id="gallery-input" accept="image/*" style="display:none">
-    <!-- NOUVEAU: input multi-photos -->
     <input type="file" id="multi-camera-input" accept="image/*" capture="environment" style="display:none">
     <input type="file" id="multi-gallery-input" accept="image/*" style="display:none">
 
@@ -748,12 +655,12 @@
     let appData = {
         profile: null, apiKey: "", theme: "light",
         days: {}, shortcuts: [], lastIAKcal: 0, lastMacros: null,
-        weightHistory: [],      // NOUVEAU #6
-        lastWeightPrompt: null  // NOUVEAU #6
+        weightHistory: [],
+        lastWeightPrompt: null
     };
 
     let selectedDate = getTodayStr();
-    let currentImgs = [];   // MODIFIÉ #2: tableau de plusieurs images
+    let currentImgs = [];
     let importCtx = "meal";
     let navHistory = [];
     let mealDeleteIndex = null;
@@ -761,16 +668,11 @@
 
     function getTodayStr() { return new Date().toISOString().split('T')[0]; }
 
-    // ========================
-    // INIT
-    // ========================
     window.onload = () => {
         const saved = localStorage.getItem('nutri_v5_pro_complete');
         if (saved) { try { appData = JSON.parse(saved); } catch(e) {} }
         applyTheme();
-        // Inputs fichiers
         document.getElementById('camera-input').onchange = function(){ processFile(this); };
-        // Listeners calcul objectif en temps réel
         ['p-weight-target','p-goal-weeks','p-weight'].forEach(id => {
             const el = document.getElementById(id);
             if (el) el.addEventListener('input', updateGoalPreview);
@@ -786,7 +688,6 @@
         document.querySelectorAll('.loader').forEach(l => l.style.display = 'none');
         document.getElementById('home-user-name').textContent = appData.profile.name;
         document.getElementById('api-key-in').value = appData.apiKey;
-        // Remplir le profil
         const p = appData.profile;
         document.getElementById('p-name').value = p.name || '';
         document.getElementById('p-weight').value = p.weight || 70;
@@ -795,33 +696,27 @@
         if (p.sex) document.getElementById('p-sex').value = p.sex;
         if (p.activity) document.getElementById('p-activity').value = p.activity;
         if (p.lifestyle) document.getElementById('p-lifestyle').value = p.lifestyle;
-        // Nouveaux champs profil enrichi
         if (p.morph) { selectedMorph = p.morph; setTimeout(() => selectMorph(p.morph), 50); }
         else { setTimeout(() => selectMorph('meso'), 50); }
         if (p.goalDir) document.getElementById('p-goal-dir').value = p.goalDir;
         if (p.weightTarget) document.getElementById('p-weight-target').value = p.weightTarget;
         if (p.goalWeeks) document.getElementById('p-goal-weeks').value = p.goalWeeks;
         if (p.mealFreq) document.getElementById('p-meal-freq').value = p.mealFreq;
-        // p-sleep supprimé — saisi quotidiennement
         if (p.stress) document.getElementById('p-stress').value = p.stress;
         if (p.diet) document.getElementById('p-diet').value = p.diet;
         if (p.allergies) document.getElementById('p-allergies').value = p.allergies;
         if (p.cooking) document.getElementById('p-cooking').value = p.cooking;
         updateGoalUI();
-
         renderWeek();
         renderHomeData();
         renderShortcuts();
         renderWeightChart();
-        checkWeightReminder(); // NOUVEAU #6
+        checkWeightReminder();
         checkWeeklyReport();
         showSection('view-home');
     }
 
-    // ========================
-    // PROFIL ENRICHI
-    // ========================
-    let selectedMorph = 'meso'; // valeur par défaut
+    let selectedMorph = 'meso';
 
     function selectMorph(val) {
         selectedMorph = val;
@@ -845,7 +740,7 @@
         const box = document.getElementById('goal-calc-preview');
         if (!targetW || !weeks || isNaN(weight)) { box.style.display = 'none'; return; }
         const diff = targetW - weight;
-        const totalKcal = diff * 7700; // 1kg ≈ 7700 kcal
+        const totalKcal = diff * 7700;
         const dailyDelta = Math.round(totalKcal / (weeks * 7));
         const absDelta = Math.abs(dailyDelta);
         const isLoss = dailyDelta < 0;
@@ -869,20 +764,17 @@
         const sex = document.getElementById('p-sex').value;
         const activity = parseFloat(document.getElementById('p-activity').value);
         const lifestyle = document.getElementById('p-lifestyle').value.trim();
-
-        // Nouveaux champs
         const morph = selectedMorph;
         const goalDir = document.getElementById('p-goal-dir').value;
         const weightTarget = parseFloat(document.getElementById('p-weight-target').value) || null;
         const goalWeeks = parseInt(document.getElementById('p-goal-weeks').value) || null;
         const mealFreq = parseInt(document.getElementById('p-meal-freq').value);
-        const sleep = null; // Sommeil saisi quotidiennement sur l'accueil
+        const sleep = null;
         const stress = document.getElementById('p-stress').value;
         const diet = document.getElementById('p-diet').value;
         const allergies = document.getElementById('p-allergies').value.trim();
         const cooking = document.getElementById('p-cooking').value;
 
-        // Validations
         if (!name) return showAlert("Prénom manquant", "Entre ton prénom pour continuer.");
         if (isNaN(weight) || weight < 30 || weight > 300) return showAlert("Poids invalide", "Entre un poids entre 30 et 300 kg.");
         if (isNaN(height) || height < 100 || height > 250) return showAlert("Taille invalide", "Entre une taille entre 100 et 250 cm.");
@@ -892,26 +784,15 @@
             if (weeklyRate > 1.5) return showAlert("Objectif trop rapide", "Un rythme de plus de 1.5 kg/semaine est risqué pour la santé. Allonge le délai.");
         }
 
-        // ── Calcul BMR (Mifflin-St Jeor) ──
         let bmr = sex === 'male'
             ? (10 * weight) + (6.25 * height) - (5 * age) + 5
             : (10 * weight) + (6.25 * height) - (5 * age) - 161;
 
-        // ── Ajustement morphotype sur le TDEE ──
-        // Ecto: métabolisme plus rapide (+3%), Endo: plus lent (-3%)
         const morphMult = { ecto: 1.03, meso: 1.00, endo: 0.97 };
         let tdee = Math.round(bmr * activity * (morphMult[morph] || 1));
-
-        // ── Ajustement sommeil ──
-        // Calculé dynamiquement dans le bilan via getAvgSleep7Days(), pas ici
-
-        // ── Ajustement stress ──
-        // Le stress chronique augmente le cortisol → rétention + besoin accru
         const stressMult = { low: 1.0, medium: 1.0, high: 0.97, very_high: 0.95 };
-        // (on réduit le TDEE effectif car le cortisol réduit l'oxydation des graisses)
         tdee = Math.round(tdee * (stressMult[stress] || 1));
 
-        // ── Calcul du delta calorique selon l'objectif précis ──
         let goalDelta = 0;
         if (goalDir === 'loss') {
             if (weightTarget && goalWeeks) {
@@ -926,8 +807,6 @@
         }
         const calTarget = tdee + goalDelta;
 
-        // ── Macros selon morphotype ──
-        // Ecto: +glucides, Endo: +protéines -glucides
         let protMult = 2.0, fatMult = 0.9;
         if (morph === 'ecto') { protMult = 1.8; fatMult = 0.85; }
         if (morph === 'endo') { protMult = 2.2; fatMult = 0.95; }
@@ -936,7 +815,6 @@
         const fatTarget = Math.round(weight * fatMult);
         const carbTarget = Math.max(50, Math.round((calTarget - (protTarget * 4) - (fatTarget * 9)) / 4));
 
-        // ── Répartition kcal par repas selon fréquence choisie ──
         const mealSplit = {
             2: { 'Petit Déjeuner': 0.40, 'Déjeuner': 0.60, 'Dîner': 0, 'Collation': 0 },
             3: { 'Petit Déjeuner': 0.25, 'Déjeuner': 0.40, 'Dîner': 0.35, 'Collation': 0 },
@@ -960,24 +838,17 @@
             appData.weightHistory.push({ date: getTodayStr(), weight });
         }
 
-        // Sauvegarder AVANT tout re-rendu
         saveData();
-
-        // Mettre à jour l'affichage sans recharger le profil (évite l'écrasement des champs)
         if (document.getElementById('home-user-name')) {
             document.getElementById('home-user-name').textContent = name;
         }
         renderWeek();
         renderHomeData();
         renderShortcuts();
-
         showToast("Profil enregistré ✅");
         showSection('view-home');
     }
 
-    // ========================
-    // SEMAINE
-    // ========================
     function renderWeek() {
         const container = document.getElementById('week-container');
         container.innerHTML = '';
@@ -998,15 +869,11 @@
         if (active) active.scrollIntoView({ inline: 'center', behavior: 'smooth' });
     }
 
-    // ========================
-    // IA
-    // ========================
     async function callGemini(prompt, isJson = false, imagesBase64 = []) {
         if (!appData.apiKey) { showAlert("Clé API manquante", "Va dans ⚙️ Réglages et entre ta clé API Gemini."); return null; }
         const url = `https://generativelanguage.googleapis.com/v1beta/models/${MODEL}:generateContent?key=${appData.apiKey}`;
         const fullPrompt = isJson ? prompt + " Réponds UNIQUEMENT en JSON valide, sans texte avant ni après, sans balises markdown." : prompt;
         let parts = [{ text: fullPrompt }];
-        // MODIFIÉ #2: support multi-images
         imagesBase64.forEach(b64 => { if(b64) parts.push({ inlineData: { mimeType: "image/jpeg", data: b64 } }); });
         try {
             const resp = await fetch(url, { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ contents: [{ parts }] }) });
@@ -1019,9 +886,6 @@
         } catch(e) { showAlert("Erreur IA", e.message); return null; }
     }
 
-    // ========================
-    // SPORT
-    // ========================
     function renderShortcuts() {
         const c = document.getElementById('sport-shortcuts');
         if (!c) return;
@@ -1068,11 +932,6 @@
         showToast("Séance enregistrée 💪");
     }
 
-    // ========================
-    // REPAS — multi-images + emoji santé
-    // ========================
-
-    // NOUVEAU #2: Gestion multi-images
     function triggerImportMulti(mode) {
         if (currentImgs.length >= 4) return showAlert("Maximum atteint","Tu peux ajouter jusqu'à 4 photos maximum.");
         if (mode === 'camera') document.getElementById('multi-camera-input').click();
@@ -1081,13 +940,30 @@
 
     function processMultiFile(input) {
         if (input.files && input.files[0]) {
+            const file = input.files[0];
             const reader = new FileReader();
             reader.onload = (e) => {
-                const b64 = e.target.result.split(',')[1];
-                currentImgs.push(b64);
-                renderImagesGrid();
+                const img = new Image();
+                img.onload = () => {
+                    // Redimensionner via canvas pour normaliser caméra ET galerie
+                    const MAX = 1024;
+                    let w = img.width, h = img.height;
+                    if (w > MAX || h > MAX) {
+                        if (w > h) { h = Math.round(h * MAX / w); w = MAX; }
+                        else       { w = Math.round(w * MAX / h); h = MAX; }
+                    }
+                    const canvas = document.createElement('canvas');
+                    canvas.width = w; canvas.height = h;
+                    const ctx = canvas.getContext('2d');
+                    ctx.drawImage(img, 0, 0, w, h);
+                    const b64 = canvas.toDataURL('image/jpeg', 0.85).split(',')[1];
+                    currentImgs.push(b64);
+                    renderImagesGrid();
+                };
+                img.onerror = () => showAlert("Erreur", "Impossible de charger cette image. Essaie un autre format.");
+                img.src = e.target.result;
             };
-            reader.readAsDataURL(input.files[0]);
+            reader.readAsDataURL(file);
         }
         input.value = "";
     }
@@ -1107,15 +983,10 @@
             div.innerHTML = `<img src="data:image/jpeg;base64,${b64}"><div class="img-thumb-remove" onclick="removeImg(${i})">×</div>`;
             grid.appendChild(div);
         });
-        // Les boutons Photo/Galerie sont fixes dans le HTML — on ne les touche plus ici
-        // On masque les boutons si 4 photos atteintes
         const btns = document.querySelectorAll('#view-meal-form .add-photo-btn');
         btns.forEach(b => b.style.display = currentImgs.length >= 4 ? 'none' : '');
     }
 
-    // ========================
-    // CATÉGORIES REPAS
-    // ========================
     let activeCategory = 'Déjeuner';
 
     const MEAL_CATS = [
@@ -1126,28 +997,15 @@
     ];
 
     function getMealPct(key) {
-        // Répartition dynamique selon les repas DÉJÀ saisis aujourd'hui
         const day = appData.days[selectedDate] || { meals: [] };
         const hasCollation = day.meals.some(m => m.type === 'Collation');
-
-        // Si collation enregistrée → répartition 4 repas
-        // Si pas de collation → répartition sur 3 repas seulement (Collation = 0)
-        const splitWith = {
-            'Petit Déjeuner': 0.25, 'Déjeuner': 0.35, 'Dîner': 0.30, 'Collation': 0.10
-        };
-        const splitWithout = {
-            'Petit Déjeuner': 0.28, 'Déjeuner': 0.40, 'Dîner': 0.32, 'Collation': 0
-        };
-
-        // Priorité : préférence profil si définie explicitement pour 4+ repas
+        const splitWith = { 'Petit Déjeuner': 0.25, 'Déjeuner': 0.35, 'Dîner': 0.30, 'Collation': 0.10 };
+        const splitWithout = { 'Petit Déjeuner': 0.28, 'Déjeuner': 0.40, 'Dîner': 0.32, 'Collation': 0 };
         const profileSplit = appData.profile?.mealSplit;
         const profileFreq  = appData.profile?.mealFreq || 4;
-
         if (profileFreq >= 4 || hasCollation) {
-            // Utiliser le split profil si dispo, sinon splitWith
             return (profileSplit && profileSplit[key] !== undefined) ? profileSplit[key] : (splitWith[key] ?? 0);
         } else {
-            // Pas de collation et profil 3 repas → splitWithout
             return splitWithout[key] ?? 0;
         }
     }
@@ -1186,13 +1044,8 @@
     function openMealForm(category) {
         activeCategory = category;
         const cat = MEAL_CATS.find(c => c.key === category);
-        const targets = appData.profile ? appData.profile.targets : { cal: 2000 };
-        const idealKcal = Math.round(targets.cal * getMealPct(cat.key));
-
-        // Titre de la page formulaire
         document.getElementById('meal-form-title').textContent = cat.emoji + ' ' + cat.label;
 
-        // Afficher les repas déjà enregistrés pour cette catégorie
         const day = appData.days[selectedDate] || { meals: [] };
         const existing = day.meals.map((m, i) => ({...m, _idx: i})).filter(m => m.type === category);
         const prevEl = document.getElementById('existing-meals-preview');
@@ -1215,12 +1068,10 @@
             prevEl.style.display = 'none';
         }
 
-        // Reset formulaire
         clearImages();
         document.getElementById('m-desc').value = '';
         cancelPreview('m-preview');
 
-        // Placeholder adapté
         const subtitles = {
             'Petit Déjeuner': 'Ex: 2 œufs brouillés, toast complet, café...',
             'Déjeuner': 'Ex: 150g poulet, riz basmati, légumes vapeur...',
@@ -1230,11 +1081,9 @@
         document.getElementById('m-desc').placeholder = subtitles[category] || 'Décris ton repas...';
         document.getElementById('loader-m').style.display = 'none';
         document.getElementById('btn-analyze-meal').style.display = 'flex';
-
         showSection('view-meal-form');
     }
 
-    // Analyse repas avec emoji santé
     async function estimateMeal() {
         const desc = document.getElementById('m-desc').value.trim();
         if (!desc && !currentImgs.length) return showAlert("Info","Ajoute une description ou une photo de ton repas.");
@@ -1254,23 +1103,17 @@
 
         let contextBlock = '';
         if (hasPhoto && hasDesc) {
-            contextBlock = `L'utilisateur a fourni UNE PHOTO du repas ET une description texte : "${desc}".
-INSTRUCTIONS IMPORTANTES :
-1. Analyse la photo visuellement pour identifier les aliments, portions et modes de cuisson.
-2. Compare avec la description textuelle.
-3. Si la photo et la description sont COHÉRENTES, combine les deux pour une estimation plus précise.
-4. Si tu détectes une INCOHÉRENCE (ex: la photo montre un burger mais la description dit "salade"), mentionne-le dans "healthLabel" et base-toi prioritairement sur la PHOTO.
-5. Utilise les deux sources pour affiner les quantités (ex: la description dit "150g de poulet" → applique ce grammage à ce que tu vois).`;
+            contextBlock = `L'utilisateur a fourni UNE PHOTO du repas ET une description texte : "${desc}". Analyse la photo visuellement, compare avec la description, et combine les deux pour une estimation précise.`;
         } else if (hasPhoto) {
-            contextBlock = `L'utilisateur a fourni ${currentImgs.length} photo(s) du repas. Analyse visuellement les aliments, portions et modes de cuisson pour estimer les valeurs nutritionnelles.`;
+            contextBlock = `L'utilisateur a fourni ${currentImgs.length} photo(s) du repas. Analyse visuellement les aliments, portions et modes de cuisson.`;
         } else {
             contextBlock = `L'utilisateur a décrit son repas : "${desc}". Estime les valeurs nutritionnelles sur la base de cette description.`;
         }
 
         const prompt = `${contextBlock}
 Type de repas : ${activeCategory} (objectif ~${idealKcal} kcal). Objectif utilisateur : ${goalStr}. ${dietInfo} ${allergiesInfo}
-- healthScore : 1 = peu adapté à l'objectif, 2 = moyen, 3 = bien adapté.
-- Si healthScore ≤ 2, fournis dans "healthTips" 2-3 conseils CONCRETS (une ligne chacun, séparés par \\n) pour améliorer CE repas précis.
+- healthScore : 1 = peu adapté, 2 = moyen, 3 = bien adapté.
+- Si healthScore ≤ 2, fournis dans "healthTips" 2-3 conseils CONCRETS séparés par \\n.
 - Si healthScore = 3, healthTips = "".
 Réponds UNIQUEMENT en JSON : {"kcal":number,"prot":number,"carb":number,"fat":number,"healthScore":1|2|3,"healthLabel":string,"healthTips":string}`;
 
@@ -1285,7 +1128,6 @@ Réponds UNIQUEMENT en JSON : {"kcal":number,"prot":number,"carb":number,"fat":n
             const emojis = { 1: '😟', 2: '😐', 3: '😊' };
             document.getElementById('meal-health-emoji').textContent = emojis[res.healthScore] || '😐';
             document.getElementById('meal-health-label').textContent = res.healthLabel || '';
-            // Afficher les conseils si repas peu adapté
             const tipsEl = document.getElementById('meal-health-tips');
             if (tipsEl) {
                 if (res.healthTips && res.healthScore < 3) {
@@ -1320,10 +1162,7 @@ Réponds UNIQUEMENT en JSON : {"kcal":number,"prot":number,"carb":number,"fat":n
         saveData(); clearImages(); renderHomeData(); renderMealCategories();
         cancelPreview('m-preview');
         document.getElementById('m-desc').value = '';
-        // Rester sur le formulaire pour permettre une saisie supplémentaire (collation)
-        // Mais si ce n'est pas une collation, retourner aux catégories
         if (activeCategory === 'Collation') {
-            // Rafraîchir l'affichage des collations existantes
             openMealForm('Collation');
             showToast("Collation ajoutée ✅ — tu peux en ajouter une autre !");
         } else {
@@ -1337,22 +1176,13 @@ Réponds UNIQUEMENT en JSON : {"kcal":number,"prot":number,"carb":number,"fat":n
         renderImagesGrid();
     }
 
-
-
-    // Suppression repas
     function editMeal(index) {
         const day = appData.days[selectedDate];
         if (!day) return;
         const m = day.meals[index];
         if (!m) return;
-
-        // Ouvrir le formulaire sur la bonne catégorie
         openMealForm(m.type);
-
-        // Pré-remplir la description
         document.getElementById('m-desc').value = m.desc || '';
-
-        // Pré-remplir les valeurs nutritionnelles directement dans le preview
         document.getElementById('m-kcal-val').value = m.kcal;
         document.getElementById('m-prot-val').value = m.prot;
         document.getElementById('m-carb-val').value = m.carb;
@@ -1370,12 +1200,8 @@ Réponds UNIQUEMENT en JSON : {"kcal":number,"prot":number,"carb":number,"fat":n
         }
         document.getElementById('m-preview').style.display = 'block';
         document.getElementById('btn-analyze-meal').style.display = 'none';
-
-        // Stocker lastMacros pour que saveMeal récupère les bonnes valeurs
         appData.lastMacros = { kcal: m.kcal, prot: m.prot, carb: m.carb, fat: m.fat,
             healthScore: m.healthScore, healthLabel: m.healthLabel, healthTips: m.healthTips };
-
-        // Supprimer l'ancien repas — saveMeal en créera un nouveau
         day.meals.splice(index, 1);
         saveData();
         renderHomeData();
@@ -1393,9 +1219,6 @@ Réponds UNIQUEMENT en JSON : {"kcal":number,"prot":number,"carb":number,"fat":n
     }
     function closeDeleteModal() { document.getElementById('modal-delete-meal').style.display = 'none'; mealDeleteIndex = null; }
 
-    // ========================
-    // BILAN
-    // ========================
     function triggerBilan() {
         const day = appData.days[selectedDate] || { closed: false };
         if (day.closed) { day.closed = false; day.aiSummary = ""; saveData(); renderHomeData(); return; }
@@ -1416,7 +1239,6 @@ Réponds UNIQUEMENT en JSON : {"kcal":number,"prot":number,"carb":number,"fat":n
         document.getElementById('loader-bilan').style.display = 'block';
         const p = appData.profile;
         const t = p.targets;
-        // MODIFIÉ #3: on inclut le lifestyle dans le prompt du bilan
         const lifestyleInfo = p.lifestyle ? `Quotidien: ${p.lifestyle}.` : '';
         const dietInfo = p.diet && p.diet !== 'none' ? `Régime: ${p.diet}.` : '';
         const stressInfo = p.stress ? `Stress: ${p.stress}.` : '';
@@ -1438,11 +1260,7 @@ Pour chaque repas avec score 1 ou 2, donne 1 conseil CONCRET pour l'améliorer l
         day.aiSummary = txt; saveData(); renderHomeData();
     }
 
-    // ========================
-    // RENDER HOME — avec barres de progression macros
-    // ========================
     function renderHomeData() {
-        // Résumé profil en chips
         const sumEl = document.getElementById('profile-summary');
         if (sumEl && appData.profile) {
             const p = appData.profile;
@@ -1455,7 +1273,6 @@ Pour chaque repas avec score 1 ou 2, donne 1 conseil CONCRET pour l'améliorer l
             if (p.morph) chips.push(morphLabels[p.morph] || '');
             const avgSleep = getAvgSleep7Days();
             if (avgSleep !== 7) chips.push(`😴 moy. ${avgSleep.toFixed(1)}h`);
-            // Eau du jour dans les chips
             const todayWater = (appData.days[getTodayStr()]?.water || 0) * 0.25;
             const waterTarget = getWaterTarget() * 0.25;
             if (todayWater > 0) chips.push(`💧 ${todayWater.toFixed(1)}/${waterTarget.toFixed(1)}L`);
@@ -1472,13 +1289,9 @@ Pour chaque repas avec score 1 ou 2, donne 1 conseil CONCRET pour l'améliorer l
         document.getElementById('h-prot').textContent = total.prot;
         document.getElementById('h-carb').textContent = total.carb;
         document.getElementById('h-fat').textContent = total.fat;
-
-        // NOUVEAU #1: afficher les objectifs sous chaque macro
         document.getElementById('h-prot-target').textContent = targets.prot;
         document.getElementById('h-carb-target').textContent = targets.carb;
         document.getElementById('h-fat-target').textContent = targets.fat;
-
-
 
         const remaining = adjCal - total.cal;
         const statusEl = document.getElementById('h-cal-status');
@@ -1491,10 +1304,8 @@ Pour chaque repas avec score 1 ou 2, donne 1 conseil CONCRET pour l'améliorer l
 
         document.getElementById('h-sport-val').textContent = (day.sport||0) > 0 ? `+ ${day.sport} kcal brûlées` : "+ Ajouter une séance";
 
-        // Eau du jour
         renderWaterGlasses();
 
-        // Sommeil du jour
         const sleepEl = document.getElementById('h-sleep-val');
         if (sleepEl) {
             const s = day.sleep;
@@ -1509,7 +1320,6 @@ Pour chaque repas avec score 1 ou 2, donne 1 conseil CONCRET pour l'améliorer l
         if (day.closed && day.aiSummary) { bText.textContent=day.aiSummary; bText.style.display='block'; }
         else { bText.style.display='none'; }
 
-        // Liste repas avec emoji santé #5
         const mealIcons = { 'Petit Déjeuner':'☕','Déjeuner':'☀️','Dîner':'🌙','Collation':'🍎' };
         const healthEmojis = { 1:'😟', 2:'😐', 3:'😊' };
         const list = document.getElementById('home-meals-list');
@@ -1520,31 +1330,24 @@ Pour chaque repas avec score 1 ou 2, donne 1 conseil CONCRET pour l'améliorer l
             day.meals.forEach((m, i) => {
                 const el = document.createElement('div');
                 el.className = 'meal-item';
-
-                // Zone dépliable : description + tips
                 const descHtml = m.desc
                     ? `<div class="meal-item-desc">📝 ${m.desc}</div>`
                     : '<div class="meal-item-desc" style="color:var(--text-muted);opacity:0.6">Aucune description saisie</div>';
-
                 const tipsHtml = (m.healthTips && m.healthScore < 3)
                     ? `<div class="meal-item-tips">💡 ${m.healthTips.split('\n').filter(Boolean).map(t => t.replace(/^[-•]\s*/, '')).join('<br>• ')}</div>`
                     : '';
-
                 const macrosDetail = `
                     <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:4px">
                         <span style="font-size:0.75rem;font-weight:700;color:var(--prot-color)">🥩 ${m.prot}g prot.</span>
                         <span style="font-size:0.75rem;font-weight:700;color:var(--carb-color)">🍞 ${m.carb}g gluc.</span>
                         <span style="font-size:0.75rem;font-weight:700;color:var(--fat-color)">🥑 ${m.fat}g lip.</span>
                     </div>`;
-
                 el.innerHTML = `
                     <div style="display:flex;justify-content:space-between;align-items:center;width:100%">
                         <div class="meal-item-left" style="flex:1;min-width:0">
                             <div class="meal-type-icon">${mealIcons[m.type]||'🍽️'}</div>
                             <div style="min-width:0">
-                                <div class="meal-item-name">${m.type}
-                                    <span class="meal-chevron">▼</span>
-                                </div>
+                                <div class="meal-item-name">${m.type}<span class="meal-chevron">▼</span></div>
                                 <div class="meal-item-kcal">${m.kcal} kcal</div>
                             </div>
                         </div>
@@ -1559,17 +1362,12 @@ Pour chaque repas avec score 1 ou 2, donne 1 conseil CONCRET pour l'améliorer l
                         ${tipsHtml}
                         ${macrosDetail}
                     </div>`;
-
-                // Toggle expand au clic sur la carte
                 el.addEventListener('click', () => el.classList.toggle('expanded'));
                 list.appendChild(el);
             });
         }
     }
 
-    // ========================
-    // IMPORT IMAGE (scan menu)
-    // ========================
     function triggerImport(mode, ctx='meal') {
         importCtx = ctx;
         if (mode === 'camera') document.getElementById('camera-input').click();
@@ -1584,9 +1382,6 @@ Pour chaque repas avec score 1 ou 2, donne 1 conseil CONCRET pour l'améliorer l
         input.value = "";
     }
 
-    // ========================
-    // OUTILS
-    // ========================
     async function analyzeMenu(b64) {
         const resDiv = document.getElementById('scan-res');
         const loader = document.getElementById('loader-scan');
@@ -1607,22 +1402,13 @@ Pour chaque repas avec score 1 ou 2, donne 1 conseil CONCRET pour l'améliorer l
         if (res) { resDiv.textContent = res; resDiv.style.display = 'block'; }
     }
 
-    // ========================
-    // HYDRATATION
-    // ========================
-
     function getWaterTarget() {
-        // Formule : 35ml × poids (kg) + bonus activité + bonus stress
         const p = appData.profile;
-        if (!p) return 8; // défaut 8 verres = 2L
+        if (!p) return 8;
         let ml = p.weight * 35;
-        // +500ml si activité modérée/élevée
         if (parseFloat(p.activity) >= 1.55) ml += 500;
-        // +250ml si stress élevé
         if (p.stress === 'high' || p.stress === 'very_high') ml += 250;
-        // +250ml si perte de poids (métabolisme accru)
         if (p.goalDir === 'loss') ml += 250;
-        // Arrondir au verre le plus proche (1 verre = 250ml)
         return Math.max(6, Math.min(12, Math.round(ml / 250)));
     }
 
@@ -1632,7 +1418,6 @@ Pour chaque repas avec score 1 ou 2, donne 1 conseil CONCRET pour l'améliorer l
         var target = getWaterTarget();
         var liters = (filled * 0.25).toFixed(2).replace(/\.?0+$/, '') || '0';
         var pct    = Math.round(Math.min((filled / target) * 100, 100));
-
         var elCur = document.getElementById('w-current');
         var elLit = document.getElementById('w-liters');
         var elPct = document.getElementById('w-pct');
@@ -1640,14 +1425,12 @@ Pour chaque repas avec score 1 ou 2, donne 1 conseil CONCRET pour l'améliorer l
         var elTgtL = document.getElementById('w-target-l');
         var pfill  = document.getElementById('water-progress-fill');
         var msgEl  = document.getElementById('water-msg');
-
         if (elCur)  elCur.textContent  = filled;
         if (elLit)  elLit.textContent  = liters;
         if (elPct)  elPct.textContent  = pct;
         if (elTgt)  elTgt.textContent  = target;
         if (elTgtL) elTgtL.textContent = (target * 0.25).toFixed(2).replace(/\.?0+$/, '');
         if (pfill)  pfill.style.width  = pct + '%';
-
         if (msgEl) {
             if      (filled === 0)          msgEl.textContent = "Pense à t'hydrater ! 💧";
             else if (filled < target * 0.4) msgEl.textContent = "Continue, tu es bien parti ! 🌊";
@@ -1667,14 +1450,11 @@ Pour chaque repas avec score 1 ou 2, donne 1 conseil CONCRET pour l'améliorer l
         renderWaterGlasses();
     }
 
-        function checkWeeklyReport() {
-        // Afficher le bilan uniquement le dimanche et une seule fois par semaine
+    function checkWeeklyReport() {
         const today = new Date();
-        if (today.getDay() !== 0) return; // 0 = dimanche
+        if (today.getDay() !== 0) return;
         const weekKey = 'weekly_report_' + getWeekKey();
-        if (localStorage.getItem(weekKey)) return; // déjà affiché cette semaine
-
-        // Calculer le ratio des 7 derniers jours
+        if (localStorage.getItem(weekKey)) return;
         let totalMeals = 0, unhealthyMeals = 0, mediumMeals = 0, goodMeals = 0;
         for (let i = 0; i < 7; i++) {
             const d = new Date(today);
@@ -1690,25 +1470,15 @@ Pour chaque repas avec score 1 ou 2, donne 1 conseil CONCRET pour l'améliorer l
                 });
             }
         }
-        if (totalMeals < 3) return; // pas assez de données
-
+        if (totalMeals < 3) return;
         const goodPct    = Math.round((goodMeals    / totalMeals) * 100);
         const mediumPct  = Math.round((mediumMeals  / totalMeals) * 100);
         const badPct     = Math.round((unhealthyMeals / totalMeals) * 100);
-
-        // Emoji global selon le ratio
         let globalEmoji, globalMsg;
-        if (goodPct >= 70) {
-            globalEmoji = '🟢'; globalMsg = 'Excellente semaine, continue comme ça !';
-        } else if (goodPct >= 50) {
-            globalEmoji = '🟡'; globalMsg = 'Bonne semaine, quelques ajustements possibles.';
-        } else if (badPct > 30) {
-            globalEmoji = '🔴'; globalMsg = 'Semaine difficile, concentre-toi sur la qualité des repas.';
-        } else {
-            globalEmoji = '🟠'; globalMsg = 'Semaine correcte, tu peux encore progresser !';
-        }
-
-        // Collecte des tips déjà générés cette semaine (si repas avec healthTips)
+        if (goodPct >= 70) { globalEmoji = '🟢'; globalMsg = 'Excellente semaine, continue comme ça !'; }
+        else if (goodPct >= 50) { globalEmoji = '🟡'; globalMsg = 'Bonne semaine, quelques ajustements possibles.'; }
+        else if (badPct > 30) { globalEmoji = '🔴'; globalMsg = 'Semaine difficile, concentre-toi sur la qualité des repas.'; }
+        else { globalEmoji = '🟠'; globalMsg = 'Semaine correcte, tu peux encore progresser !'; }
         let weeklyTips = [];
         for (let i = 0; i < 7; i++) {
             const d = new Date(today); d.setDate(today.getDate() - i);
@@ -1718,16 +1488,12 @@ Pour chaque repas avec score 1 ou 2, donne 1 conseil CONCRET pour l'améliorer l
                 if (m.healthScore === 1 && m.healthTips) weeklyTips.push(m.healthTips);
             });
         }
-        // Dédupliquer et limiter à 3 conseils
         weeklyTips = [...new Set(weeklyTips)].slice(0, 3);
-
         const tipsHtml = weeklyTips.length > 0
             ? `<div style="margin-top:12px;background:rgba(128,90,213,0.08);border-left:3px solid var(--primary);border-radius:0 10px 10px 0;padding:10px 12px">
-                <div style="font-weight:800;font-size:0.8rem;margin-bottom:6px">💡 Axes d'amélioration pour la semaine prochaine :</div>
-                ${weeklyTips.map(t => `<div style="font-size:0.78rem;margin-top:4px;color:var(--text-color)">• ${t.replace(/^[-•]\s*/, '')}</div>`).join('')}
-               </div>`
-            : '';
-
+                <div style="font-weight:800;font-size:0.8rem;margin-bottom:6px">💡 Axes d'amélioration :</div>
+                ${weeklyTips.map(t => `<div style="font-size:0.78rem;margin-top:4px">• ${t.replace(/^[-•]\s*/, '')}</div>`).join('')}
+               </div>` : '';
         const reportHtml = `
             <div style="text-align:center;font-size:2.5rem;margin-bottom:8px">${globalEmoji}</div>
             <div style="font-weight:800;text-align:center;margin-bottom:14px">${globalMsg}</div>
@@ -1775,9 +1541,6 @@ Pour chaque repas avec score 1 ou 2, donne 1 conseil CONCRET pour l'améliorer l
         return d.getFullYear() + '_w' + week;
     }
 
-    // ========================
-    // SUIVI SOMMEIL QUOTIDIEN
-    // ========================
     let sleepInputVal = 7.0;
 
     function openSleepModal() {
@@ -1788,9 +1551,7 @@ Pour chaque repas avec score 1 ou 2, donne 1 conseil CONCRET pour l'améliorer l
         document.getElementById('modal-sleep').style.display = 'flex';
     }
 
-    function closeSleepModal() {
-        document.getElementById('modal-sleep').style.display = 'none';
-    }
+    function closeSleepModal() { document.getElementById('modal-sleep').style.display = 'none'; }
 
     function adjustSleep(delta) {
         sleepInputVal = Math.min(12, Math.max(2, sleepInputVal + delta));
@@ -1800,22 +1561,11 @@ Pour chaque repas avec score 1 ou 2, donne 1 conseil CONCRET pour l'améliorer l
 
     function updateSleepQualityMsg() {
         const el = document.getElementById('sleep-quality-msg');
-        if (sleepInputVal < 5) {
-            el.textContent = '🔴 Très insuffisant — impact fort sur métabolisme & appétit';
-            el.style.color = 'var(--danger)';
-        } else if (sleepInputVal < 6.5) {
-            el.textContent = '🟠 Insuffisant — la faim sera plus difficile à contrôler';
-            el.style.color = '#e67e22';
-        } else if (sleepInputVal < 7.5) {
-            el.textContent = '🟡 Correct — un peu plus aiderait la récupération';
-            el.style.color = '#d69e2e';
-        } else if (sleepInputVal <= 9) {
-            el.textContent = '🟢 Optimal — bonne récupération, métabolisme au top !';
-            el.style.color = 'var(--success)';
-        } else {
-            el.textContent = '🔵 Très long — vérifie ta qualité de sommeil';
-            el.style.color = 'var(--primary)';
-        }
+        if (sleepInputVal < 5) { el.textContent = '🔴 Très insuffisant — impact fort sur métabolisme & appétit'; el.style.color = 'var(--danger)'; }
+        else if (sleepInputVal < 6.5) { el.textContent = '🟠 Insuffisant — la faim sera plus difficile à contrôler'; el.style.color = '#e67e22'; }
+        else if (sleepInputVal < 7.5) { el.textContent = '🟡 Correct — un peu plus aiderait la récupération'; el.style.color = '#d69e2e'; }
+        else if (sleepInputVal <= 9) { el.textContent = '🟢 Optimal — bonne récupération, métabolisme au top !'; el.style.color = 'var(--success)'; }
+        else { el.textContent = '🔵 Très long — vérifie ta qualité de sommeil'; el.style.color = 'var(--primary)'; }
     }
 
     function saveSleepEntry() {
@@ -1823,9 +1573,7 @@ Pour chaque repas avec score 1 ou 2, donne 1 conseil CONCRET pour l'améliorer l
             appData.days[selectedDate] = { meals:[], sport:0, sportEntries:[], closed:false };
         }
         appData.days[selectedDate].sleep = sleepInputVal;
-        saveData();
-        closeSleepModal();
-        renderHomeData();
+        saveData(); closeSleepModal(); renderHomeData();
         showToast(`Sommeil enregistré : ${sleepInputVal.toFixed(1)}h 😴`);
     }
 
@@ -1839,7 +1587,6 @@ Pour chaque repas avec score 1 ou 2, donne 1 conseil CONCRET pour l'améliorer l
     }
 
     function getAvgSleep7Days() {
-        // Moyenne mobile sur 7 jours pour le calcul TDEE
         const today = new Date();
         let total = 0, count = 0;
         for (let i = 0; i < 7; i++) {
@@ -1849,12 +1596,9 @@ Pour chaque repas avec score 1 ou 2, donne 1 conseil CONCRET pour l'améliorer l
             const s = appData.days[ds]?.sleep;
             if (s) { total += s; count++; }
         }
-        return count > 0 ? total / count : 7; // défaut 7h si pas de données
+        return count > 0 ? total / count : 7;
     }
 
-    // ========================
-    // NOUVEAU #6: Suivi du poids
-    // ========================
     function checkWeightReminder() {
         const lastPrompt = appData.lastWeightPrompt;
         const today = getTodayStr();
@@ -1871,11 +1615,8 @@ Pour chaque repas avec score 1 ou 2, donne 1 conseil CONCRET pour l'améliorer l
         if (!appData.weightHistory) appData.weightHistory = [];
         appData.weightHistory.push({ date: getTodayStr(), weight: val });
         appData.lastWeightPrompt = getTodayStr();
-        // Mettre à jour le poids du profil
         if (appData.profile) appData.profile.weight = val;
-        saveData();
-        closeWeightModal();
-        renderWeightChart();
+        saveData(); closeWeightModal(); renderWeightChart();
         showToast("Poids enregistré ⚖️");
     }
 
@@ -1893,32 +1634,24 @@ Pour chaque repas avec score 1 ou 2, donne 1 conseil CONCRET pour l'améliorer l
         if (history.length < 2) { emptyEl.style.display='block'; canvas.style.display='none'; listEl.innerHTML=''; return; }
         emptyEl.style.display = 'none';
         canvas.style.display = 'block';
-
-        // Dessiner la courbe sur canvas
         const ctx = canvas.getContext('2d');
         const W = canvas.offsetWidth || 300;
         const H = 120;
         canvas.width = W; canvas.height = H;
         ctx.clearRect(0,0,W,H);
-
         const weights = history.map(e=>e.weight);
         const minW = Math.min(...weights) - 1;
         const maxW = Math.max(...weights) + 1;
         const pad = { l:30, r:10, t:10, b:20 };
         const chartW = W - pad.l - pad.r;
         const chartH = H - pad.t - pad.b;
-
         const toX = (i) => pad.l + (i/(history.length-1)) * chartW;
         const toY = (w) => pad.t + (1 - (w-minW)/(maxW-minW)) * chartH;
-
-        // Fond gradient
         const isDark = document.body.classList.contains('dark-mode');
         const lineColor = isDark ? '#4fd1c5' : '#38b2ac';
         const grad = ctx.createLinearGradient(0, pad.t, 0, H);
         grad.addColorStop(0, isDark ? 'rgba(79,209,197,0.3)' : 'rgba(56,178,172,0.2)');
         grad.addColorStop(1, 'rgba(0,0,0,0)');
-
-        // Zone remplie
         ctx.beginPath();
         ctx.moveTo(toX(0), H);
         history.forEach((e,i) => ctx.lineTo(toX(i), toY(e.weight)));
@@ -1926,31 +1659,23 @@ Pour chaque repas avec score 1 ou 2, donne 1 conseil CONCRET pour l'améliorer l
         ctx.closePath();
         ctx.fillStyle = grad;
         ctx.fill();
-
-        // Ligne
         ctx.beginPath();
         history.forEach((e,i) => { if(i===0) ctx.moveTo(toX(i),toY(e.weight)); else ctx.lineTo(toX(i),toY(e.weight)); });
         ctx.strokeStyle = lineColor;
         ctx.lineWidth = 2.5;
         ctx.lineJoin = 'round';
         ctx.stroke();
-
-        // Points
         history.forEach((e,i) => {
             ctx.beginPath();
             ctx.arc(toX(i), toY(e.weight), 4, 0, Math.PI*2);
             ctx.fillStyle = lineColor;
             ctx.fill();
         });
-
-        // Labels Y
         ctx.fillStyle = isDark ? '#a0aec0' : '#718096';
         ctx.font = '10px Nunito, sans-serif';
         ctx.textAlign = 'right';
         ctx.fillText(maxW.toFixed(1), pad.l-4, pad.t+6);
         ctx.fillText(minW.toFixed(1), pad.l-4, H-pad.b);
-
-        // Liste des entrées
         listEl.innerHTML = '';
         const sorted = [...history].reverse();
         sorted.forEach((e, i) => {
@@ -1966,9 +1691,6 @@ Pour chaque repas avec score 1 ou 2, donne 1 conseil CONCRET pour l'améliorer l
         });
     }
 
-    // ========================
-    // HISTORIQUE
-    // ========================
     function toggleHistory() {
         historyOpen = !historyOpen;
         const list = document.getElementById('history-list');
@@ -1997,9 +1719,6 @@ Pour chaque repas avec score 1 ou 2, donne 1 conseil CONCRET pour l'améliorer l
         return d.toLocaleDateString('fr-FR',{weekday:'long',day:'numeric',month:'long'});
     }
 
-    // ========================
-    // NAVIGATION
-    // ========================
     function showSection(id) {
         const current = document.querySelector('.view-section.active');
         if (current && current.id !== id) navHistory.push(current.id);
@@ -2015,9 +1734,6 @@ Pour chaque repas avec score 1 ou 2, donne 1 conseil CONCRET pour l'améliorer l
         else { showSection('view-home'); }
     }
 
-    // ========================
-    // THÈME & DONNÉES
-    // ========================
     function toggleTheme() { appData.theme=(appData.theme==='light'?'dark':'light'); applyTheme(); saveData(); showToast(appData.theme==='dark'?"Mode sombre activé 🌙":"Mode clair activé ☀️"); }
     function applyTheme() { document.body.classList.toggle('dark-mode', appData.theme==='dark'); }
     function saveData() { localStorage.setItem('nutri_v5_pro_complete', JSON.stringify(appData)); }
