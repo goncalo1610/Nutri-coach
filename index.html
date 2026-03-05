@@ -189,22 +189,49 @@
         .toast.show { opacity:1; transform:translateX(-50%) translateY(0); }
 
         /* ===== FIREBASE LOGIN SCREEN ===== */
-        #login-screen {
+        /* ===== SPLASH / LOGIN SCREEN ===== */
+        #splash-screen {
             position:fixed; top:0; left:0; width:100%; height:100%; z-index:2000;
             background:linear-gradient(135deg, #e6fffa 0%, #f0f4f8 50%, #e9d8fd 100%);
             display:flex; align-items:center; justify-content:center; padding:24px;
+            transition:opacity 0.4s ease;
         }
-        body.dark-mode #login-screen {
+        body.dark-mode #splash-screen {
             background:linear-gradient(135deg, #0d2626 0%, #0d1117 50%, #1a0a2e 100%);
         }
-        #login-screen.hidden { display:none; }
+        #splash-screen.hidden { opacity:0; pointer-events:none; }
+        #splash-screen.gone { display:none; }
+
+        /* Loader animé */
+        .splash-loader {
+            display:flex; flex-direction:column; align-items:center; gap:20px;
+        }
+        .splash-logo { font-size:3.5rem; animation:bounceLogo 1.2s ease-in-out infinite; }
+        @keyframes bounceLogo {
+            0%,100%{transform:translateY(0)} 50%{transform:translateY(-10px)}
+        }
+        .splash-title { font-size:1.8rem; font-weight:900; letter-spacing:-1px; }
+        .splash-subtitle { font-size:0.75rem; color:var(--primary); font-weight:800; text-transform:uppercase; letter-spacing:2px; }
+        .splash-dots { display:flex; gap:6px; margin-top:8px; }
+        .splash-dot {
+            width:8px; height:8px; border-radius:50%; background:var(--primary);
+            animation:dotPulse 1.2s ease-in-out infinite;
+        }
+        .splash-dot:nth-child(2){animation-delay:0.2s;}
+        .splash-dot:nth-child(3){animation-delay:0.4s;}
+        @keyframes dotPulse { 0%,100%{opacity:0.3;transform:scale(0.8)} 50%{opacity:1;transform:scale(1.2)} }
+
+        /* Login box (visible seulement si pas connecté) */
         .login-box {
+            display:none; flex-direction:column; align-items:center;
             background:var(--bg-app); border-radius:28px; padding:40px 28px;
             width:100%; max-width:340px; text-align:center;
             box-shadow:0 20px 60px rgba(0,0,0,0.15);
             border:1px solid rgba(255,255,255,0.8);
+            animation:popIn 0.3s cubic-bezier(0.34,1.56,0.64,1);
         }
         body.dark-mode .login-box { border-color:rgba(255,255,255,0.08); }
+        .login-box.visible { display:flex; }
         .login-logo { font-size:3rem; margin-bottom:8px; }
         .login-title { font-size:1.8rem; font-weight:900; letter-spacing:-1px; margin-bottom:4px; }
         .login-subtitle { font-size:0.82rem; color:var(--text-muted); font-weight:700; margin-bottom:32px; text-transform:uppercase; letter-spacing:1.5px; }
@@ -247,9 +274,24 @@
 </head>
 <body>
 
-<!-- ===== ÉCRAN DE CONNEXION ===== -->
-<div id="login-screen">
-    <div class="login-box">
+<!-- ===== SPLASH + CONNEXION ===== -->
+<div id="splash-screen">
+    <!-- Loader : visible pendant la vérification Firebase -->
+    <div class="splash-loader" id="splash-loader">
+        <div class="splash-logo">🥗</div>
+        <div>
+            <div class="splash-title">NUTRI+</div>
+            <div class="splash-subtitle">Coach IA</div>
+        </div>
+        <div class="splash-dots">
+            <div class="splash-dot"></div>
+            <div class="splash-dot"></div>
+            <div class="splash-dot"></div>
+        </div>
+    </div>
+
+    <!-- Login : visible seulement si pas connecté -->
+    <div class="login-box" id="login-box">
         <div class="login-logo">🥗</div>
         <div class="login-title">NUTRI+</div>
         <div class="login-subtitle">Coach IA</div>
@@ -765,14 +807,22 @@
 
     // ===== OBSERVER D'ÉTAT =====
     onAuthStateChanged(auth, async (user) => {
+        const splash = document.getElementById('splash-screen');
+        const loader = document.getElementById('splash-loader');
+        const loginBox = document.getElementById('login-box');
+
         if (user) {
             currentUser = user;
-            document.getElementById('login-screen').classList.add('hidden');
             renderAvatar(user);
             await loadDataFromFirebase(user.uid);
+            // Fade out le splash proprement
+            splash.classList.add('hidden');
+            setTimeout(() => splash.classList.add('gone'), 400);
         } else {
             currentUser = null;
-            document.getElementById('login-screen').classList.remove('hidden');
+            // Cacher le loader, montrer le login
+            loader.style.display = 'none';
+            loginBox.classList.add('visible');
         }
     });
 
