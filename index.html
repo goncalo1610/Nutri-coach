@@ -187,18 +187,99 @@
         .toast { position:fixed; bottom:calc(var(--nav-height) + 20px + env(safe-area-inset-bottom)); left:50%; transform:translateX(-50%) translateY(20px); background:#1a202c; color:white; padding:10px 20px; border-radius:20px; font-size:0.85rem; font-weight:700; z-index:999; opacity:0; transition:all 0.3s; pointer-events:none; white-space:nowrap; }
         body.dark-mode .toast { background:#e2e8f0; color:#1a202c; }
         .toast.show { opacity:1; transform:translateX(-50%) translateY(0); }
+
+        /* ===== FIREBASE LOGIN SCREEN ===== */
+        #login-screen {
+            position:fixed; top:0; left:0; width:100%; height:100%; z-index:2000;
+            background:linear-gradient(135deg, #e6fffa 0%, #f0f4f8 50%, #e9d8fd 100%);
+            display:flex; align-items:center; justify-content:center; padding:24px;
+        }
+        body.dark-mode #login-screen {
+            background:linear-gradient(135deg, #0d2626 0%, #0d1117 50%, #1a0a2e 100%);
+        }
+        #login-screen.hidden { display:none; }
+        .login-box {
+            background:var(--bg-app); border-radius:28px; padding:40px 28px;
+            width:100%; max-width:340px; text-align:center;
+            box-shadow:0 20px 60px rgba(0,0,0,0.15);
+            border:1px solid rgba(255,255,255,0.8);
+        }
+        body.dark-mode .login-box { border-color:rgba(255,255,255,0.08); }
+        .login-logo { font-size:3rem; margin-bottom:8px; }
+        .login-title { font-size:1.8rem; font-weight:900; letter-spacing:-1px; margin-bottom:4px; }
+        .login-subtitle { font-size:0.82rem; color:var(--text-muted); font-weight:700; margin-bottom:32px; text-transform:uppercase; letter-spacing:1.5px; }
+        .login-desc { font-size:0.9rem; color:var(--text-muted); font-weight:600; margin-bottom:24px; line-height:1.6; }
+        .btn-google {
+            width:100%; padding:16px; border:none; border-radius:14px;
+            background:#fff; color:#3c4043; font-size:15px; font-weight:800;
+            font-family:'Nunito',sans-serif; cursor:pointer;
+            display:flex; align-items:center; justify-content:center; gap:12px;
+            box-shadow:0 2px 12px rgba(0,0,0,0.12); transition:all 0.2s;
+            border:1.5px solid rgba(0,0,0,0.08);
+        }
+        .btn-google:hover { box-shadow:0 4px 20px rgba(0,0,0,0.18); transform:translateY(-1px); }
+        .btn-google:active { transform:scale(0.97); }
+        .google-icon { width:22px; height:22px; flex-shrink:0; }
+        .login-privacy { font-size:0.72rem; color:var(--text-muted); margin-top:16px; font-weight:600; }
+
+        /* ===== FIREBASE STATUS BADGE ===== */
+        .cloud-badge {
+            display:inline-flex; align-items:center; gap:5px;
+            font-size:0.68rem; font-weight:800; padding:3px 8px;
+            border-radius:20px; margin-left:6px;
+        }
+        .cloud-badge.synced { background:rgba(56,178,172,0.15); color:var(--primary); }
+        .cloud-badge.saving { background:rgba(128,90,213,0.15); color:var(--secondary); animation:pulse 1s infinite; }
+        .cloud-badge.offline { background:rgba(113,128,150,0.15); color:var(--text-muted); }
+
+        /* ===== USER AVATAR IN HEADER ===== */
+        .user-avatar {
+            width:32px; height:32px; border-radius:50%; object-fit:cover;
+            border:2px solid var(--primary); cursor:pointer;
+        }
+        .user-avatar-placeholder {
+            width:32px; height:32px; border-radius:50%;
+            background:var(--primary-light); border:2px solid var(--primary);
+            display:flex; align-items:center; justify-content:center;
+            font-size:0.9rem; font-weight:800; color:var(--primary); cursor:pointer;
+        }
     </style>
 </head>
 <body>
+
+<!-- ===== ÉCRAN DE CONNEXION ===== -->
+<div id="login-screen">
+    <div class="login-box">
+        <div class="login-logo">🥗</div>
+        <div class="login-title">NUTRI+</div>
+        <div class="login-subtitle">Coach IA</div>
+        <div class="login-desc">Connecte-toi pour sauvegarder tes données dans le cloud et y accéder depuis n'importe quel appareil.</div>
+        <button class="btn-google" onclick="signInWithGoogle()">
+            <svg class="google-icon" viewBox="0 0 24 24">
+                <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
+                <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
+                <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/>
+                <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
+            </svg>
+            Continuer avec Google
+        </button>
+        <div class="login-privacy">🔒 Tes données sont privées et sécurisées</div>
+    </div>
+</div>
+
 <div id="app-container">
     <header>
         <button class="header-btn" id="btn-back" style="visibility:hidden" onclick="goBack()">
             <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M15 18l-6-6 6-6"/></svg>
         </button>
-        <div class="header-title"><span>NUTRI+</span><span class="header-subtitle">Coach IA</span></div>
-        <button class="header-btn" onclick="showSection('view-menu')">
-            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
-        </button>
+        <div class="header-title">
+            <span style="display:flex;align-items:center;gap:6px">
+                NUTRI+
+                <span id="cloud-status" class="cloud-badge synced">☁️ Sync</span>
+            </span>
+            <span class="header-subtitle">Coach IA</span>
+        </div>
+        <div id="header-avatar" onclick="showSection('view-settings')" style="cursor:pointer"></div>
     </header>
 
     <div id="toast" class="toast"></div>
@@ -310,14 +391,8 @@
             </select>
             <div id="goal-target-block">
                 <div class="grid-2">
-                    <div>
-                        <label>Poids cible (kg)</label>
-                        <input type="number" id="p-weight-target" placeholder="Ex: 72" step="0.1" min="30" max="300">
-                    </div>
-                    <div>
-                        <label>Délai (semaines)</label>
-                        <input type="number" id="p-goal-weeks" placeholder="Ex: 12" min="1" max="104">
-                    </div>
+                    <div><label>Poids cible (kg)</label><input type="number" id="p-weight-target" placeholder="Ex: 72" step="0.1" min="30" max="300"></div>
+                    <div><label>Délai (semaines)</label><input type="number" id="p-goal-weeks" placeholder="Ex: 12" min="1" max="104"></div>
                 </div>
                 <div id="goal-calc-preview" class="goal-calc-box" style="display:none"></div>
             </div>
@@ -332,14 +407,14 @@
                 <option value="1.55">Modérément actif — 3-5 séances/sem.</option>
                 <option value="1.725">Très actif — sport quotidien intensif</option>
             </select>
-            <label>Fréquence de repas souhaitée <span class="profile-hint">répartit les kcal par repas</span></label>
+            <label>Fréquence de repas souhaitée</label>
             <select id="p-meal-freq">
                 <option value="3">3 repas / jour (classique)</option>
                 <option value="4" selected>4 repas / jour (+ 1 collation)</option>
                 <option value="5">5 repas / jour (+ 2 collations)</option>
                 <option value="2">2 repas / jour (intermittent)</option>
             </select>
-            <label>Niveau de stress <span class="profile-hint">impact cortisol</span></label>
+            <label>Niveau de stress</label>
             <select id="p-stress">
                 <option value="low">Faible 😌</option>
                 <option value="medium" selected>Modéré 😐</option>
@@ -360,7 +435,7 @@
                 <option value="keto">🥑 Keto / Low carb</option>
                 <option value="paleo">🥩 Paléo</option>
             </select>
-            <label>Allergies / Intolérances <span class="profile-hint">l'IA les exclura de ses conseils</span></label>
+            <label>Allergies / Intolérances</label>
             <input type="text" id="p-allergies" placeholder="Ex: lactose, arachides, fruits de mer...">
             <label>Niveau en cuisine</label>
             <select id="p-cooking">
@@ -372,8 +447,8 @@
 
         <div class="profile-section-title">🤖 Contexte pour l'IA</div>
         <div class="card">
-            <label>Décris ton quotidien <span class="profile-hint">améliore la précision des conseils</span></label>
-            <textarea id="p-lifestyle" rows="4" style="resize:none" placeholder="Ex: Je travaille dans un bureau 9h-18h, je fais de la musculation 3x/semaine le soir, je mange souvent à l'extérieur le midi, j'ai tendance à grignoter après 22h..."></textarea>
+            <label>Décris ton quotidien</label>
+            <textarea id="p-lifestyle" rows="4" style="resize:none" placeholder="Ex: Je travaille dans un bureau 9h-18h, je fais de la musculation 3x/semaine..."></textarea>
         </div>
 
         <button class="gemini-btn" onclick="saveProfile()" style="margin-bottom:20px">Enregistrer mon profil 💾</button>
@@ -409,10 +484,7 @@
             <div class="card macro-card-v3" style="margin:0">
                 <span style="font-size:0.62rem;color:var(--text-muted);font-weight:800;text-transform:uppercase">Protéines</span>
                 <div class="gauge-wrapper" style="width:38px;height:38px">
-                    <svg viewBox="0 0 36 36" class="gauge-svg">
-                        <path class="gauge-bg" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"/>
-                        <path id="g-prot-fill" class="gauge-fill" stroke="var(--prot-color)" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"/>
-                    </svg>
+                    <svg viewBox="0 0 36 36" class="gauge-svg"><path class="gauge-bg" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"/><path id="g-prot-fill" class="gauge-fill" stroke="var(--prot-color)" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"/></svg>
                     <div class="gauge-icon" style="font-size:0.95rem">🥩</div>
                 </div>
                 <div style="font-weight:800;color:var(--prot-color);font-size:0.88rem"><span id="h-prot">0</span>g</div>
@@ -421,10 +493,7 @@
             <div class="card macro-card-v3" style="margin:0">
                 <span style="font-size:0.62rem;color:var(--text-muted);font-weight:800;text-transform:uppercase">Glucides</span>
                 <div class="gauge-wrapper" style="width:38px;height:38px">
-                    <svg viewBox="0 0 36 36" class="gauge-svg">
-                        <path class="gauge-bg" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"/>
-                        <path id="g-carb-fill" class="gauge-fill" stroke="var(--carb-color)" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"/>
-                    </svg>
+                    <svg viewBox="0 0 36 36" class="gauge-svg"><path class="gauge-bg" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"/><path id="g-carb-fill" class="gauge-fill" stroke="var(--carb-color)" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"/></svg>
                     <div class="gauge-icon" style="font-size:0.95rem">🍞</div>
                 </div>
                 <div style="font-weight:800;color:var(--carb-color);font-size:0.88rem"><span id="h-carb">0</span>g</div>
@@ -433,10 +502,7 @@
             <div class="card macro-card-v3" style="margin:0">
                 <span style="font-size:0.62rem;color:var(--text-muted);font-weight:800;text-transform:uppercase">Lipides</span>
                 <div class="gauge-wrapper" style="width:38px;height:38px">
-                    <svg viewBox="0 0 36 36" class="gauge-svg">
-                        <path class="gauge-bg" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"/>
-                        <path id="g-fat-fill" class="gauge-fill" stroke="var(--fat-color)" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"/>
-                    </svg>
+                    <svg viewBox="0 0 36 36" class="gauge-svg"><path class="gauge-bg" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"/><path id="g-fat-fill" class="gauge-fill" stroke="var(--fat-color)" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"/></svg>
                     <div class="gauge-icon" style="font-size:0.95rem">🥑</div>
                 </div>
                 <div style="font-weight:800;color:var(--fat-color);font-size:0.88rem"><span id="h-fat">0</span>g</div>
@@ -486,7 +552,7 @@
         <div class="card" style="margin-top:6px">
             <div style="display:flex;align-items:center;gap:12px;cursor:pointer" onclick="triggerBilan()">
                 <div id="chk-bilan-icon" style="width:26px;height:26px;border-radius:8px;border:2px solid var(--primary);display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:all 0.2s;font-size:1rem"></div>
-                <div><div style="font-weight:800">Clôturer la journée</div><div style="font-size:0.78rem;color:var(--text-muted)">Analyse IA de ta journée</div></div>
+                <div><div style="font-weight:800">Clôturer la journée</div><div style="font-size:0.78rem;color:var(--text-muted)">Analyse IA + sauvegarde cloud ☁️</div></div>
             </div>
             <div id="loader-bilan" class="loader">🧠 Le coach analyse ta journée...</div>
             <div id="bilan-text" class="coach-message" style="display:none"></div>
@@ -531,19 +597,15 @@
                 <div class="section-title" style="margin-top:0">Déjà enregistrés aujourd'hui</div>
                 <div id="existing-meals-list"></div>
             </div>
-
             <label>Photos du repas <span style="font-weight:600;text-transform:none;font-size:0.75rem;color:var(--primary)">(jusqu'à 4)</span></label>
             <div style="display:flex;gap:10px;margin-bottom:6px;flex-shrink:0">
                 <div class="add-photo-btn" onclick="triggerImportMulti('camera')"><span>📸</span>Photo</div>
                 <div class="add-photo-btn" onclick="triggerImportMulti('gallery')"><span>🖼️</span>Galerie</div>
             </div>
             <div class="images-grid" id="images-grid"></div>
-
             <label>Description du repas</label>
             <textarea id="m-desc" placeholder="Ex: 150g de poulet grillé, riz basmati, salade verte..." rows="3" style="resize:none"></textarea>
-
             <div id="loader-m" class="loader">🔍 L'IA analyse ton repas...</div>
-
             <div id="m-preview" style="display:none" class="card">
                 <div style="display:flex;align-items:center;gap:12px;margin-bottom:10px">
                     <div id="meal-health-emoji" style="font-size:2.5rem;line-height:1">😊</div>
@@ -592,16 +654,14 @@
             <div id="loader-recipe" class="loader">🧠 Création de la recette...</div>
             <div id="recipe-res" class="coach-message" style="display:none"></div>
         </div>
-
         <div class="card">
             <h3>⚖️ Évolution du poids</h3>
             <div id="weight-chart-container">
-                <div id="weight-empty" style="text-align:center;color:var(--text-muted);font-size:0.85rem;padding:10px">Aucune donnée pour l'instant. L'app te demandera de te peser chaque semaine !</div>
+                <div id="weight-empty" style="text-align:center;color:var(--text-muted);font-size:0.85rem;padding:10px">Aucune donnée pour l'instant.</div>
                 <canvas id="weight-chart" class="weight-chart" style="display:none"></canvas>
                 <div id="weight-list" style="margin-top:10px"></div>
             </div>
         </div>
-
         <div class="card" style="cursor:pointer" onclick="toggleHistory()">
             <div style="display:flex;justify-content:space-between;align-items:center">
                 <h3 style="margin:0">📅 Historique</h3>
@@ -614,6 +674,20 @@
     <!-- 5. RÉGLAGES -->
     <div id="view-settings" class="view-section">
         <h2>⚙️ Réglages</h2>
+
+        <!-- Compte Firebase -->
+        <div class="card" style="background:var(--primary-light);border:1.5px solid var(--primary)">
+            <div style="display:flex;align-items:center;gap:12px">
+                <div id="settings-avatar" style="flex-shrink:0"></div>
+                <div style="flex:1;min-width:0">
+                    <div id="settings-user-name" style="font-weight:900;font-size:1rem"></div>
+                    <div id="settings-user-email" style="font-size:0.78rem;color:var(--text-muted);font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap"></div>
+                    <div style="font-size:0.68rem;color:var(--primary);font-weight:800;margin-top:2px">☁️ Données synchronisées</div>
+                </div>
+            </div>
+            <button class="danger" style="margin-top:14px;padding:10px" onclick="signOutUser()">Se déconnecter</button>
+        </div>
+
         <div class="card">
             <h3>🔑 Clé API Gemini</h3>
             <p style="font-size:0.82rem;color:var(--text-muted)">Obtiens ta clé gratuite sur <strong>aistudio.google.com</strong></p>
@@ -628,7 +702,7 @@
             <button class="danger" style="margin-top:20px" onclick="resetApp()">⚠️ Tout effacer et recommencer</button>
         </div>
         <div class="card" style="text-align:center;padding:20px">
-            <div style="font-size:0.75rem;color:var(--text-muted)">NUTRI+ Coach v3.0 ✨</div>
+            <div style="font-size:0.75rem;color:var(--text-muted)">NUTRI+ Coach v4.0 ☁️ Firebase</div>
         </div>
     </div>
 
@@ -650,13 +724,139 @@
     </nav>
 </div>
 
+<!-- ===== FIREBASE SDK ===== -->
+<script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+    import { getAuth, GoogleAuthProvider, signInWithPopup, signOut, onAuthStateChanged }
+        from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+    import { getFirestore, doc, getDoc, setDoc, updateDoc }
+        from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+
+    const firebaseConfig = {
+        apiKey: "AIzaSyCy-x2FWGauZI40hUuDk2XpQUD455Pdib8",
+        authDomain: "nutri-plus-fbe2b.firebaseapp.com",
+        projectId: "nutri-plus-fbe2b",
+        storageBucket: "nutri-plus-fbe2b.firebasestorage.app",
+        messagingSenderId: "38839404321",
+        appId: "1:38839404321:web:a95f0fa0de5439a3236060",
+        measurementId: "G-GQVM1P7XPW"
+    };
+
+    const firebaseApp = initializeApp(firebaseConfig);
+    const auth = getAuth(firebaseApp);
+    const db = getFirestore(firebaseApp);
+
+    let currentUser = null;
+
+    // ===== CONNEXION GOOGLE =====
+    window.signInWithGoogle = async function() {
+        const provider = new GoogleAuthProvider();
+        try {
+            await signInWithPopup(auth, provider);
+        } catch(e) {
+            alert("Erreur de connexion : " + e.message);
+        }
+    };
+
+    window.signOutUser = async function() {
+        await signOut(auth);
+        showToast("Déconnecté 👋");
+    };
+
+    // ===== OBSERVER D'ÉTAT =====
+    onAuthStateChanged(auth, async (user) => {
+        if (user) {
+            currentUser = user;
+            document.getElementById('login-screen').classList.add('hidden');
+            renderAvatar(user);
+            await loadDataFromFirebase(user.uid);
+        } else {
+            currentUser = null;
+            document.getElementById('login-screen').classList.remove('hidden');
+        }
+    });
+
+    // ===== CHARGER DONNÉES DEPUIS FIREBASE =====
+    async function loadDataFromFirebase(uid) {
+        setCloudStatus('saving');
+        try {
+            const docRef = doc(db, "users", uid);
+            const docSnap = await getDoc(docRef);
+            if (docSnap.exists()) {
+                const cloudData = docSnap.data();
+                // Fusion avec données locales (priorité cloud)
+                window.appData = { ...window.appData, ...cloudData };
+                localStorage.setItem('nutri_v5_pro_complete', JSON.stringify(window.appData));
+                showToast("Données chargées depuis le cloud ☁️");
+            }
+            setCloudStatus('synced');
+        } catch(e) {
+            setCloudStatus('offline');
+            console.error("Erreur chargement Firebase:", e);
+        }
+        initApp();
+    }
+
+    // ===== SAUVEGARDER DANS FIREBASE =====
+    window.saveToFirebase = async function(data) {
+        if (!currentUser) return;
+        setCloudStatus('saving');
+        try {
+            const docRef = doc(db, "users", currentUser.uid);
+            // On ne sauvegarde pas les images base64 (trop lourd)
+            const dataToSave = JSON.parse(JSON.stringify(data));
+            if (dataToSave.days) {
+                Object.keys(dataToSave.days).forEach(date => {
+                    if (dataToSave.days[date].meals) {
+                        dataToSave.days[date].meals = dataToSave.days[date].meals.map(m => {
+                            const meal = {...m};
+                            delete meal.images;
+                            return meal;
+                        });
+                    }
+                });
+            }
+            await setDoc(docRef, dataToSave, { merge: true });
+            setCloudStatus('synced');
+        } catch(e) {
+            setCloudStatus('offline');
+            console.error("Erreur sauvegarde Firebase:", e);
+        }
+    };
+
+    // ===== AFFICHER AVATAR =====
+    function renderAvatar(user) {
+        const headerAvatar = document.getElementById('header-avatar');
+        const settingsAvatar = document.getElementById('settings-avatar');
+        const avatarHtml = user.photoURL
+            ? `<img src="${user.photoURL}" class="user-avatar" alt="avatar">`
+            : `<div class="user-avatar-placeholder">${(user.displayName||'?')[0].toUpperCase()}</div>`;
+        if (headerAvatar) headerAvatar.innerHTML = avatarHtml;
+        if (settingsAvatar) settingsAvatar.innerHTML = user.photoURL
+            ? `<img src="${user.photoURL}" style="width:48px;height:48px;border-radius:50%;object-fit:cover;border:2px solid var(--primary)">`
+            : `<div style="width:48px;height:48px;border-radius:50%;background:var(--primary-light);border:2px solid var(--primary);display:flex;align-items:center;justify-content:center;font-size:1.4rem;font-weight:900;color:var(--primary)">${(user.displayName||'?')[0].toUpperCase()}</div>`;
+        const nameEl = document.getElementById('settings-user-name');
+        const emailEl = document.getElementById('settings-user-email');
+        if (nameEl) nameEl.textContent = user.displayName || 'Utilisateur';
+        if (emailEl) emailEl.textContent = user.email || '';
+    }
+
+    function setCloudStatus(status) {
+        const el = document.getElementById('cloud-status');
+        if (!el) return;
+        el.className = 'cloud-badge ' + status;
+        if (status === 'synced') el.textContent = '☁️ Sync';
+        else if (status === 'saving') el.textContent = '⏳ Sync...';
+        else el.textContent = '📵 Hors ligne';
+    }
+</script>
+
 <script>
     const MODEL = "gemini-2.5-flash";
     let appData = {
         profile: null, apiKey: "", theme: "light",
         days: {}, shortcuts: [], lastIAKcal: 0, lastMacros: null,
-        weightHistory: [],
-        lastWeightPrompt: null
+        weightHistory: [], lastWeightPrompt: null
     };
 
     let selectedDate = getTodayStr();
@@ -680,551 +880,62 @@
         document.getElementById('gallery-input').onchange = function(){ processFile(this); };
         document.getElementById('multi-camera-input').onchange = function(){ processMultiFile(this); };
         document.getElementById('multi-gallery-input').onchange = function(){ processMultiFile(this); };
-        if (!appData.profile) { showSection('view-profile'); }
-        else { initApp(); }
+        // initApp() est appelé après la connexion Firebase
     };
 
     function initApp() {
         document.querySelectorAll('.loader').forEach(l => l.style.display = 'none');
-        document.getElementById('home-user-name').textContent = appData.profile.name;
-        document.getElementById('api-key-in').value = appData.apiKey;
+        if (appData.profile) {
+            document.getElementById('home-user-name').textContent = appData.profile.name;
+        }
+        if (appData.apiKey) document.getElementById('api-key-in').value = appData.apiKey;
+        if (appData.theme) applyTheme();
         const p = appData.profile;
-        document.getElementById('p-name').value = p.name || '';
-        document.getElementById('p-weight').value = p.weight || 70;
-        document.getElementById('p-height').value = p.height || 175;
-        document.getElementById('p-age').value = p.age || 30;
-        if (p.sex) document.getElementById('p-sex').value = p.sex;
-        if (p.activity) document.getElementById('p-activity').value = p.activity;
-        if (p.lifestyle) document.getElementById('p-lifestyle').value = p.lifestyle;
-        if (p.morph) { selectedMorph = p.morph; setTimeout(() => selectMorph(p.morph), 50); }
-        else { setTimeout(() => selectMorph('meso'), 50); }
-        if (p.goalDir) document.getElementById('p-goal-dir').value = p.goalDir;
-        if (p.weightTarget) document.getElementById('p-weight-target').value = p.weightTarget;
-        if (p.goalWeeks) document.getElementById('p-goal-weeks').value = p.goalWeeks;
-        if (p.mealFreq) document.getElementById('p-meal-freq').value = p.mealFreq;
-        if (p.stress) document.getElementById('p-stress').value = p.stress;
-        if (p.diet) document.getElementById('p-diet').value = p.diet;
-        if (p.allergies) document.getElementById('p-allergies').value = p.allergies;
-        if (p.cooking) document.getElementById('p-cooking').value = p.cooking;
-        updateGoalUI();
-        renderWeek();
-        renderHomeData();
-        renderShortcuts();
-        renderWeightChart();
-        checkWeightReminder();
-        checkWeeklyReport();
-        showSection('view-home');
-    }
-
-    let selectedMorph = 'meso';
-
-    function selectMorph(val) {
-        selectedMorph = val;
-        document.querySelectorAll('.morph-opt').forEach(el => {
-            el.classList.toggle('selected', el.dataset.val === val);
-        });
-    }
-
-    function updateGoalUI() {
-        const dir = document.getElementById('p-goal-dir').value;
-        const block = document.getElementById('goal-target-block');
-        block.style.display = dir === 'maintain' ? 'none' : 'block';
-        updateGoalPreview();
-    }
-
-    function updateGoalPreview() {
-        const dir = document.getElementById('p-goal-dir').value;
-        const weight = parseFloat(document.getElementById('p-weight').value);
-        const targetW = parseFloat(document.getElementById('p-weight-target').value);
-        const weeks = parseInt(document.getElementById('p-goal-weeks').value);
-        const box = document.getElementById('goal-calc-preview');
-        if (!targetW || !weeks || isNaN(weight)) { box.style.display = 'none'; return; }
-        const diff = targetW - weight;
-        const totalKcal = diff * 7700;
-        const dailyDelta = Math.round(totalKcal / (weeks * 7));
-        const absDelta = Math.abs(dailyDelta);
-        const isLoss = dailyDelta < 0;
-        let warn = '';
-        if (absDelta > 1000) warn = '<div class="gcb-warn">⚠️ Déficit/surplus élevé — rythme agressif, consulte un professionnel</div>';
-        else if (absDelta > 700) warn = '<div class="gcb-warn">⚡ Rythme soutenu — reste attentif à ta récupération</div>';
-        box.style.display = 'block';
-        box.innerHTML = `
-            <div>${isLoss ? '📉' : '📈'} Écart : <span class="gcb-val">${diff > 0 ? '+' : ''}${diff.toFixed(1)} kg</span> en ${weeks} semaines</div>
-            <div>Ajustement quotidien : <span class="gcb-val">${isLoss ? '' : '+'}${dailyDelta} kcal/jour</span></div>
-            <div style="font-size:0.72rem;color:var(--text-muted);font-weight:600">Rythme : ~${Math.abs(diff/weeks*10)/10} kg/semaine</div>
-            ${warn}
-        `;
-    }
-
-    function saveProfile() {
-        const name = document.getElementById('p-name').value.trim();
-        const weight = parseFloat(document.getElementById('p-weight').value);
-        const height = parseFloat(document.getElementById('p-height').value);
-        const age = parseInt(document.getElementById('p-age').value);
-        const sex = document.getElementById('p-sex').value;
-        const activity = parseFloat(document.getElementById('p-activity').value);
-        const lifestyle = document.getElementById('p-lifestyle').value.trim();
-        const morph = selectedMorph;
-        const goalDir = document.getElementById('p-goal-dir').value;
-        const weightTarget = parseFloat(document.getElementById('p-weight-target').value) || null;
-        const goalWeeks = parseInt(document.getElementById('p-goal-weeks').value) || null;
-        const mealFreq = parseInt(document.getElementById('p-meal-freq').value);
-        const sleep = null;
-        const stress = document.getElementById('p-stress').value;
-        const diet = document.getElementById('p-diet').value;
-        const allergies = document.getElementById('p-allergies').value.trim();
-        const cooking = document.getElementById('p-cooking').value;
-
-        if (!name) return showAlert("Prénom manquant", "Entre ton prénom pour continuer.");
-        if (isNaN(weight) || weight < 30 || weight > 300) return showAlert("Poids invalide", "Entre un poids entre 30 et 300 kg.");
-        if (isNaN(height) || height < 100 || height > 250) return showAlert("Taille invalide", "Entre une taille entre 100 et 250 cm.");
-        if (isNaN(age) || age < 10 || age > 100) return showAlert("Âge invalide", "Entre un âge entre 10 et 100 ans.");
-        if (goalDir !== 'maintain' && weightTarget) {
-            const weeklyRate = Math.abs(weightTarget - weight) / (goalWeeks || 12);
-            if (weeklyRate > 1.5) return showAlert("Objectif trop rapide", "Un rythme de plus de 1.5 kg/semaine est risqué pour la santé. Allonge le délai.");
-        }
-
-        let bmr = sex === 'male'
-            ? (10 * weight) + (6.25 * height) - (5 * age) + 5
-            : (10 * weight) + (6.25 * height) - (5 * age) - 161;
-
-        const morphMult = { ecto: 1.03, meso: 1.00, endo: 0.97 };
-        let tdee = Math.round(bmr * activity * (morphMult[morph] || 1));
-        const stressMult = { low: 1.0, medium: 1.0, high: 0.97, very_high: 0.95 };
-        tdee = Math.round(tdee * (stressMult[stress] || 1));
-
-        let goalDelta = 0;
-        if (goalDir === 'loss') {
-            if (weightTarget && goalWeeks) {
-                const totalKcal = (weightTarget - weight) * 7700;
-                goalDelta = Math.max(-1000, Math.round(totalKcal / (goalWeeks * 7)));
-            } else { goalDelta = -500; }
-        } else if (goalDir === 'gain') {
-            if (weightTarget && goalWeeks) {
-                const totalKcal = (weightTarget - weight) * 7700;
-                goalDelta = Math.min(700, Math.round(totalKcal / (goalWeeks * 7)));
-            } else { goalDelta = 400; }
-        }
-        const calTarget = tdee + goalDelta;
-
-        let protMult = 2.0, fatMult = 0.9;
-        if (morph === 'ecto') { protMult = 1.8; fatMult = 0.85; }
-        if (morph === 'endo') { protMult = 2.2; fatMult = 0.95; }
-
-        const protTarget = Math.round(weight * protMult);
-        const fatTarget = Math.round(weight * fatMult);
-        const carbTarget = Math.max(50, Math.round((calTarget - (protTarget * 4) - (fatTarget * 9)) / 4));
-
-        const mealSplit = {
-            2: { 'Petit Déjeuner': 0.40, 'Déjeuner': 0.60, 'Dîner': 0, 'Collation': 0 },
-            3: { 'Petit Déjeuner': 0.25, 'Déjeuner': 0.40, 'Dîner': 0.35, 'Collation': 0 },
-            4: { 'Petit Déjeuner': 0.25, 'Déjeuner': 0.35, 'Dîner': 0.30, 'Collation': 0.10 },
-            5: { 'Petit Déjeuner': 0.20, 'Déjeuner': 0.30, 'Dîner': 0.25, 'Collation': 0.125 },
-        };
-
-        const safeMealFreq = [2,3,4,5].includes(mealFreq) ? mealFreq : 4;
-
-        appData.profile = {
-            name, weight, height, age, sex, activity, lifestyle,
-            morph, goalDir, weightTarget, goalWeeks, goalDelta,
-            mealFreq: safeMealFreq, sleep, stress, diet, allergies, cooking,
-            targets: { cal: calTarget, prot: protTarget, fat: fatTarget, carb: carbTarget },
-            mealSplit: mealSplit[safeMealFreq] || mealSplit[4],
-            bmr: Math.round(bmr), tdeeBase: tdee
-        };
-
-        if (!appData.weightHistory) appData.weightHistory = [];
-        if (appData.weightHistory.length === 0) {
-            appData.weightHistory.push({ date: getTodayStr(), weight });
-        }
-
-        saveData();
-        if (document.getElementById('home-user-name')) {
-            document.getElementById('home-user-name').textContent = name;
-        }
-        renderWeek();
-        renderHomeData();
-        renderShortcuts();
-        showToast("Profil enregistré ✅");
-        showSection('view-home');
-    }
-
-    function renderWeek() {
-        const container = document.getElementById('week-container');
-        container.innerHTML = '';
-        const days = ['Dim','Lun','Mar','Mer','Jeu','Ven','Sam'];
-        const today = new Date();
-        for (let i = 6; i >= 0; i--) {
-            const d = new Date(today);
-            d.setDate(today.getDate() - i);
-            const ds = d.toISOString().split('T')[0];
-            const hasData = appData.days[ds] && appData.days[ds].meals.length > 0;
-            const div = document.createElement('div');
-            div.className = 'week-card' + (ds === selectedDate ? ' active-day-card' : '');
-            div.innerHTML = `<div class="wc-day">${days[d.getDay()]}</div><div class="wc-num">${d.getDate()}</div>${hasData ? '<div style="width:5px;height:5px;border-radius:50%;background:var(--primary);margin:3px auto 0"></div>' : ''}`;
-            div.onclick = () => { selectedDate = ds; renderWeek(); renderHomeData(); };
-            container.appendChild(div);
-        }
-        const active = container.querySelector('.active-day-card');
-        if (active) active.scrollIntoView({ inline: 'center', behavior: 'smooth' });
-    }
-
-    async function callGemini(prompt, isJson = false, imagesBase64 = []) {
-        if (!appData.apiKey) { showAlert("Clé API manquante", "Va dans ⚙️ Réglages et entre ta clé API Gemini."); return null; }
-        const url = `https://generativelanguage.googleapis.com/v1beta/models/${MODEL}:generateContent?key=${appData.apiKey}`;
-        const fullPrompt = isJson ? prompt + " Réponds UNIQUEMENT en JSON valide, sans texte avant ni après, sans balises markdown." : prompt;
-        let parts = [{ text: fullPrompt }];
-        imagesBase64.forEach(b64 => { if(b64) parts.push({ inlineData: { mimeType: "image/jpeg", data: b64 } }); });
-        try {
-            const resp = await fetch(url, { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ contents: [{ parts }] }) });
-            const data = await resp.json();
-            if (!resp.ok) throw new Error(data.error?.message || "Erreur serveur Google");
-            if (!data.candidates?.length) throw new Error("L'IA n'a pas répondu. Réessaie.");
-            const text = data.candidates[0].content.parts[0].text;
-            if (isJson) { try { return JSON.parse(text.replace(/```json|```/g,"").trim()); } catch(e) { throw new Error("Format inattendu. Réessaie."); } }
-            return text;
-        } catch(e) { showAlert("Erreur IA", e.message); return null; }
-    }
-
-    function renderShortcuts() {
-        const c = document.getElementById('sport-shortcuts');
-        if (!c) return;
-        if (!appData.shortcuts.length) { c.innerHTML = '<div style="font-size:0.8rem;color:var(--text-muted);font-style:italic">Aucun raccourci — appuie sur ⭐ pour en créer</div>'; return; }
-        c.innerHTML = appData.shortcuts.map((s,i) => `<div class="shortcut-item" onclick="loadShortcut(${i})">${s.act} (${s.dur}min) <span class="remove" onclick="event.stopPropagation();deleteShortcut(${i})">×</span></div>`).join('');
-    }
-    function saveAsShortcut() {
-        const act = document.getElementById('t-act').value.trim();
-        const dur = document.getElementById('t-dur').value;
-        if (!act) return showAlert("Activité manquante","Entre le nom de l'activité.");
-        if (appData.shortcuts.find(s=>s.act===act)) return showToast("Raccourci déjà existant !");
-        appData.shortcuts.push({act,dur}); saveData(); renderShortcuts(); showToast("Raccourci ajouté ⭐");
-    }
-    function loadShortcut(i) { const s=appData.shortcuts[i]; document.getElementById('t-act').value=s.act; document.getElementById('t-dur').value=s.dur; document.getElementById('t-preview').style.display='none'; }
-    function deleteShortcut(i) { appData.shortcuts.splice(i,1); saveData(); renderShortcuts(); }
-
-    async function estimateSport() {
-        const act = document.getElementById('t-act').value.trim();
-        const dur = document.getElementById('t-dur').value;
-        if (!act) return showAlert("Activité manquante","Précise l'activité sportive.");
-        const p = appData.profile;
-        const pInfo = p ? `Profil: ${p.weight}kg, ${p.age}ans, ${p.sex==='male'?'homme':'femme'}` : '';
-        document.getElementById('loader-sport').style.display = 'block';
-        const res = await callGemini(`Estimation calories brûlées pour "${act}" pendant ${dur} minutes. ${pInfo}. JSON: {"kcal":number}`, true);
-        document.getElementById('loader-sport').style.display = 'none';
-        if (res?.kcal) { appData.lastIAKcal=res.kcal; document.getElementById('t-kcal-ia').textContent=res.kcal; document.getElementById('t-preview').style.display='block'; }
-    }
-
-    function saveSport() {
-        const manual = document.getElementById('t-kcal-manual').value !== '' ? parseInt(document.getElementById('t-kcal-manual').value) : NaN;
-        const kcal = !isNaN(manual) && manual > 0 ? manual : appData.lastIAKcal;
-        const act = document.getElementById('t-act').value.trim();
-        if (!kcal || kcal <= 0) return showAlert("Calories manquantes","Saisis les calories ou utilise l'IA.");
-        if (!act) return showAlert("Activité manquante","Entre le nom de l'activité.");
-        if (!appData.days[selectedDate]) appData.days[selectedDate] = { meals:[], sport:0, sportEntries:[], closed:false };
-        if (!appData.days[selectedDate].sportEntries) appData.days[selectedDate].sportEntries = [];
-        appData.days[selectedDate].sport += kcal;
-        appData.days[selectedDate].sportEntries.push({act,kcal});
-        appData.lastIAKcal = 0;
-        saveData(); renderHomeData(); showSection('view-home');
-        document.getElementById('t-preview').style.display = 'none';
-        document.getElementById('t-kcal-manual').value = '';
-        document.getElementById('t-act').value = '';
-        showToast("Séance enregistrée 💪");
-    }
-
-    function triggerImportMulti(mode) {
-        if (currentImgs.length >= 4) return showAlert("Maximum atteint","Tu peux ajouter jusqu'à 4 photos maximum.");
-        if (mode === 'camera') document.getElementById('multi-camera-input').click();
-        else document.getElementById('multi-gallery-input').click();
-    }
-
-    function processMultiFile(input) {
-        if (!input.files || !input.files[0]) return;
-        const file = input.files[0];
-        input.value = "";
-
-        const reader = new FileReader();
-        reader.onload = (e) => {
-            const dataURL = e.target.result;
-            if (!dataURL || !dataURL.startsWith("data:")) {
-                return showAlert("Erreur", "Impossible de lire ce fichier image.");
-            }
-            const b64 = dataURL.split(",")[1];
-            currentImgs.push(b64);
-            renderImagesGrid();
-        };
-        reader.onerror = () => showAlert("Erreur", "Impossible de lire ce fichier image.");
-        reader.readAsDataURL(file);
-    }
-
-    function removeImg(i) {
-        currentImgs.splice(i, 1);
-        renderImagesGrid();
-    }
-
-    function renderImagesGrid() {
-        const grid = document.getElementById('images-grid');
-        if (!grid) return;
-        grid.innerHTML = '';
-        currentImgs.forEach((b64, i) => {
-            const div = document.createElement('div');
-            div.className = 'img-thumb';
-            div.innerHTML = `<img src="data:image/jpeg;base64,${b64}"><div class="img-thumb-remove" onclick="removeImg(${i})">×</div>`;
-            grid.appendChild(div);
-        });
-        const btns = document.querySelectorAll('#view-meal-form .add-photo-btn');
-        btns.forEach(b => b.style.display = currentImgs.length >= 4 ? 'none' : '');
-    }
-
-    let activeCategory = 'Déjeuner';
-
-    const MEAL_CATS = [
-        { key: 'Petit Déjeuner', emoji: '☕', label: 'Petit Déjeuner' },
-        { key: 'Déjeuner',       emoji: '☀️', label: 'Déjeuner' },
-        { key: 'Dîner',          emoji: '🌙', label: 'Dîner' },
-        { key: 'Collation',      emoji: '🍎', label: 'Collation' },
-    ];
-
-    function getMealPct(key) {
-        const day = appData.days[selectedDate] || { meals: [] };
-        const hasCollation = day.meals.some(m => m.type === 'Collation');
-        const splitWith = { 'Petit Déjeuner': 0.25, 'Déjeuner': 0.35, 'Dîner': 0.30, 'Collation': 0.10 };
-        const splitWithout = { 'Petit Déjeuner': 0.28, 'Déjeuner': 0.40, 'Dîner': 0.32, 'Collation': 0 };
-        const profileSplit = appData.profile?.mealSplit;
-        const profileFreq  = appData.profile?.mealFreq || 4;
-        if (profileFreq >= 4 || hasCollation) {
-            return (profileSplit && profileSplit[key] !== undefined) ? profileSplit[key] : (splitWith[key] ?? 0);
+        if (p) {
+            document.getElementById('p-name').value = p.name || '';
+            document.getElementById('p-weight').value = p.weight || 70;
+            document.getElementById('p-height').value = p.height || 175;
+            document.getElementById('p-age').value = p.age || 30;
+            if (p.sex) document.getElementById('p-sex').value = p.sex;
+            if (p.activity) document.getElementById('p-activity').value = p.activity;
+            if (p.lifestyle) document.getElementById('p-lifestyle').value = p.lifestyle;
+            if (p.morph) { selectedMorph = p.morph; setTimeout(() => selectMorph(p.morph), 50); }
+            else { setTimeout(() => selectMorph('meso'), 50); }
+            if (p.goalDir) document.getElementById('p-goal-dir').value = p.goalDir;
+            if (p.weightTarget) document.getElementById('p-weight-target').value = p.weightTarget;
+            if (p.goalWeeks) document.getElementById('p-goal-weeks').value = p.goalWeeks;
+            if (p.mealFreq) document.getElementById('p-meal-freq').value = p.mealFreq;
+            if (p.stress) document.getElementById('p-stress').value = p.stress;
+            if (p.diet) document.getElementById('p-diet').value = p.diet;
+            if (p.allergies) document.getElementById('p-allergies').value = p.allergies;
+            if (p.cooking) document.getElementById('p-cooking').value = p.cooking;
+            updateGoalUI();
+            renderWeek();
+            renderHomeData();
+            renderShortcuts();
+            renderWeightChart();
+            checkWeightReminder();
+            checkWeeklyReport();
+            showSection('view-home');
         } else {
-            return splitWithout[key] ?? 0;
+            showSection('view-profile');
         }
     }
 
-    function renderMealCategories() {
-        const grid = document.getElementById('meal-categories-grid');
-        if (!grid) return;
-        const targets = appData.profile ? appData.profile.targets : { cal: 2000 };
-        const day = appData.days[selectedDate] || { meals: [] };
-        grid.innerHTML = '<div class="meal-cat-grid"></div>';
-        const inner = grid.querySelector('.meal-cat-grid');
-
-        MEAL_CATS.forEach(cat => {
-            const idealKcal = Math.round(targets.cal * getMealPct(cat.key));
-            const meals = day.meals.filter(m => m.type === cat.key);
-            const totalKcal = meals.reduce((s, m) => s + m.kcal, 0);
-            const count = meals.length;
-            const hasMeal = count > 0;
-
-            const card = document.createElement('div');
-            card.className = 'meal-cat-card' + (hasMeal ? ' has-meal' : '');
-            card.innerHTML = `
-                ${count > 0 ? `<div class="meal-cat-badge">${count}</div>` : ''}
-                <div class="meal-cat-emoji">${cat.emoji}</div>
-                <div class="meal-cat-name">${cat.label}</div>
-                <div class="meal-cat-kcal">Idéal : <span>~${idealKcal} kcal</span></div>
-                ${cat.key === 'Collation' && idealKcal === 0 ? '<div style="font-size:0.65rem;color:var(--text-muted);font-weight:600">non planifiée</div>' : ''}
-                ${hasMeal ? `<div class="meal-cat-recorded">${totalKcal} kcal enregistrés</div>` : ''}
-                <div class="meal-cat-add-icon">+</div>
-            `;
-            card.onclick = () => openMealForm(cat.key);
-            inner.appendChild(card);
-        });
+    // ===== SAUVEGARDE LOCALE + CLOUD =====
+    function saveData() {
+        localStorage.setItem('nutri_v5_pro_complete', JSON.stringify(appData));
+        if (window.saveToFirebase) window.saveToFirebase(appData);
     }
 
-    function openMealForm(category) {
-        activeCategory = category;
-        const cat = MEAL_CATS.find(c => c.key === category);
-        document.getElementById('meal-form-title').textContent = cat.emoji + ' ' + cat.label;
-
-        const day = appData.days[selectedDate] || { meals: [] };
-        const existing = day.meals.map((m, i) => ({...m, _idx: i})).filter(m => m.type === category);
-        const prevEl = document.getElementById('existing-meals-preview');
-        const prevList = document.getElementById('existing-meals-list');
-        if (existing.length > 0) {
-            prevEl.style.display = 'block';
-            prevList.innerHTML = existing.map(m => `
-                <div style="display:flex;justify-content:space-between;align-items:center;padding:8px 10px;background:var(--primary-light);border-radius:10px;margin-bottom:6px">
-                    <div>
-                        <div style="font-weight:700;font-size:0.88rem">${cat.emoji} ${m.kcal} kcal</div>
-                        <div style="font-size:0.72rem;color:var(--text-muted)">P:${m.prot}g G:${m.carb}g L:${m.fat}g</div>
-                    </div>
-                    <div style="display:flex;align-items:center;gap:8px">
-                        ${m.healthScore ? (['','😟','😐','😊'][m.healthScore] || '') : ''}
-                        <button class="meal-delete-btn" onclick="askDeleteMeal(${m._idx})" style="font-size:1rem">🗑️</button>
-                    </div>
-                </div>
-            `).join('');
-        } else {
-            prevEl.style.display = 'none';
-        }
-
-        clearImages();
-        document.getElementById('m-desc').value = '';
-        cancelPreview('m-preview');
-
-        const subtitles = {
-            'Petit Déjeuner': 'Ex: 2 œufs brouillés, toast complet, café...',
-            'Déjeuner': 'Ex: 150g poulet, riz basmati, légumes vapeur...',
-            'Dîner': 'Ex: Saumon grillé, quinoa, salade verte...',
-            'Collation': 'Ex: Pomme, amandes, yaourt grec...'
-        };
-        document.getElementById('m-desc').placeholder = subtitles[category] || 'Décris ton repas...';
-        document.getElementById('loader-m').style.display = 'none';
-        document.getElementById('btn-analyze-meal').style.display = 'flex';
-        showSection('view-meal-form');
-    }
-
-    async function estimateMeal() {
-        const desc = document.getElementById('m-desc').value.trim();
-        if (!desc && !currentImgs.length) return showAlert("Info","Ajoute une description ou une photo de ton repas.");
-        document.getElementById('loader-m').style.display = 'block';
-        document.getElementById('btn-analyze-meal').style.display = 'none';
-        document.getElementById('m-preview').style.display = 'none';
-
-        const profile = appData.profile;
-        const goalStr = profile?.goalDir === 'loss' ? 'perte de poids' : profile?.goalDir === 'gain' ? 'prise de masse' : 'maintien';
-        const cat = MEAL_CATS.find(c => c.key === activeCategory);
-        const idealKcal = cat ? Math.round((profile?.targets?.cal || 2000) * getMealPct(cat.key)) : 600;
-        const dietInfo = profile?.diet && profile.diet !== 'none' ? `Régime: ${profile.diet}.` : '';
-        const allergiesInfo = profile?.allergies ? `Allergies: ${profile.allergies}.` : '';
-
-        const hasPhoto = currentImgs.length > 0;
-        const hasDesc  = desc.length > 0;
-
-        let contextBlock = '';
-        if (hasPhoto && hasDesc) {
-            contextBlock = `L'utilisateur a fourni UNE PHOTO du repas ET une description texte : "${desc}". Analyse la photo visuellement, compare avec la description, et combine les deux pour une estimation précise.`;
-        } else if (hasPhoto) {
-            contextBlock = `L'utilisateur a fourni ${currentImgs.length} photo(s) du repas. Analyse visuellement les aliments, portions et modes de cuisson.`;
-        } else {
-            contextBlock = `L'utilisateur a décrit son repas : "${desc}". Estime les valeurs nutritionnelles sur la base de cette description.`;
-        }
-
-        const prompt = `${contextBlock}
-Type de repas : ${activeCategory} (objectif ~${idealKcal} kcal). Objectif utilisateur : ${goalStr}. ${dietInfo} ${allergiesInfo}
-- healthScore : 1 = peu adapté, 2 = moyen, 3 = bien adapté.
-- Si healthScore ≤ 2, fournis dans "healthTips" 2-3 conseils CONCRETS séparés par \\n.
-- Si healthScore = 3, healthTips = "".
-Réponds UNIQUEMENT en JSON : {"kcal":number,"prot":number,"carb":number,"fat":number,"healthScore":1|2|3,"healthLabel":string,"healthTips":string}`;
-
-        const res = await callGemini(prompt, true, currentImgs);
-        document.getElementById('loader-m').style.display = 'none';
-
-        if (res) {
-            document.getElementById('m-kcal-val').value = res.kcal || 0;
-            document.getElementById('m-prot-val').value = res.prot || 0;
-            document.getElementById('m-carb-val').value = res.carb || 0;
-            document.getElementById('m-fat-val').value = res.fat || 0;
-            const emojis = { 1: '😟', 2: '😐', 3: '😊' };
-            document.getElementById('meal-health-emoji').textContent = emojis[res.healthScore] || '😐';
-            document.getElementById('meal-health-label').textContent = res.healthLabel || '';
-            const tipsEl = document.getElementById('meal-health-tips');
-            if (tipsEl) {
-                if (res.healthTips && res.healthScore < 3) {
-                    tipsEl.style.display = 'block';
-                    tipsEl.innerHTML = '<div style="font-weight:800;font-size:0.82rem;margin-bottom:4px">💡 Comment améliorer ce repas :</div>' +
-                        res.healthTips.split('\n').filter(Boolean).map(t => `<div style="font-size:0.8rem;margin-top:3px">• ${t.replace(/^[-•]\s*/, '')}</div>`).join('');
-                } else {
-                    tipsEl.style.display = 'none';
-                }
-            }
-            document.getElementById('m-preview').style.display = 'block';
-            appData.lastMacros = res;
-        } else {
-            document.getElementById('btn-analyze-meal').style.display = 'flex';
-        }
-    }
-
-    function saveMeal() {
-        if (!appData.days[selectedDate]) appData.days[selectedDate] = { meals:[], sport:0, sportEntries:[], closed:false };
-        const meal = {
-            type: activeCategory,
-            desc: document.getElementById('m-desc').value.trim(),
-            kcal: parseInt(document.getElementById('m-kcal-val').value) || 0,
-            prot: parseInt(document.getElementById('m-prot-val').value) || 0,
-            carb: parseInt(document.getElementById('m-carb-val').value) || 0,
-            fat: parseInt(document.getElementById('m-fat-val').value) || 0,
-            healthScore: appData.lastMacros?.healthScore || 2,
-            healthLabel: appData.lastMacros?.healthLabel || '',
-            healthTips:  appData.lastMacros?.healthTips  || ''
-        };
-        appData.days[selectedDate].meals.push(meal);
-        saveData(); clearImages(); renderHomeData(); renderMealCategories();
-        cancelPreview('m-preview');
-        document.getElementById('m-desc').value = '';
-        if (activeCategory === 'Collation') {
-            openMealForm('Collation');
-            showToast("Collation ajoutée ✅ — tu peux en ajouter une autre !");
-        } else {
-            showSection('view-day');
-            showToast("Repas ajouté ✅");
-        }
-    }
-
-    function clearImages() {
-        currentImgs = [];
-        renderImagesGrid();
-    }
-
-    function editMeal(index) {
-        const day = appData.days[selectedDate];
-        if (!day) return;
-        const m = day.meals[index];
-        if (!m) return;
-        openMealForm(m.type);
-        document.getElementById('m-desc').value = m.desc || '';
-        document.getElementById('m-kcal-val').value = m.kcal;
-        document.getElementById('m-prot-val').value = m.prot;
-        document.getElementById('m-carb-val').value = m.carb;
-        document.getElementById('m-fat-val').value = m.fat;
-        const emojis = { 1:'😟', 2:'😐', 3:'😊' };
-        document.getElementById('meal-health-emoji').textContent = emojis[m.healthScore] || '😐';
-        document.getElementById('meal-health-label').textContent = m.healthLabel || '';
-        const tipsEl = document.getElementById('meal-health-tips');
-        if (tipsEl) {
-            if (m.healthTips && m.healthScore < 3) {
-                tipsEl.style.display = 'block';
-                tipsEl.innerHTML = '<strong style="font-size:0.82rem">💡 Comment améliorer ce repas :</strong>' +
-                    m.healthTips.split('\n').filter(t => t.trim()).map(t => `<div style="margin-top:3px">• ${t.replace(/^[-•]\s*/, '')}</div>`).join('');
-            } else { tipsEl.style.display = 'none'; }
-        }
-        document.getElementById('m-preview').style.display = 'block';
-        document.getElementById('btn-analyze-meal').style.display = 'none';
-        appData.lastMacros = { kcal: m.kcal, prot: m.prot, carb: m.carb, fat: m.fat,
-            healthScore: m.healthScore, healthLabel: m.healthLabel, healthTips: m.healthTips };
-        day.meals.splice(index, 1);
-        saveData();
-        renderHomeData();
-        renderMealCategories();
-    }
-
-    function askDeleteMeal(index) { mealDeleteIndex = index; document.getElementById('modal-delete-meal').style.display = 'flex'; }
-    function confirmDeleteMeal() {
-        if (mealDeleteIndex !== null && appData.days[selectedDate]) {
-            appData.days[selectedDate].meals.splice(mealDeleteIndex, 1);
-            mealDeleteIndex = null;
-            saveData(); renderHomeData();
-        }
-        closeDeleteModal(); showToast("Repas supprimé");
-    }
-    function closeDeleteModal() { document.getElementById('modal-delete-meal').style.display = 'none'; mealDeleteIndex = null; }
-
-    function triggerBilan() {
-        const day = appData.days[selectedDate] || { closed: false };
-        if (day.closed) { day.closed = false; day.aiSummary = ""; saveData(); renderHomeData(); return; }
-        document.getElementById('modal-steps').style.display = 'flex';
-    }
-    function cancelBilan() { document.getElementById('modal-steps').style.display = 'none'; }
-    function cancelPreview(id) {
-        document.getElementById(id).style.display = 'none';
-        if (id === 'm-preview') document.getElementById('btn-analyze-meal').style.display = 'flex';
-    }
-
+    // ===== SAUVEGARDE CLOUD À LA CLÔTURE =====
     async function finalizeDay(hasSteps) {
         document.getElementById('modal-steps').style.display = 'none';
         if (!appData.days[selectedDate]) appData.days[selectedDate] = { meals:[], sport:0, sportEntries:[], steps:0, closed:false };
         const day = appData.days[selectedDate];
         if (hasSteps) day.steps = parseInt(document.getElementById('input-steps-val').value) || 0;
-        day.closed = true; renderHomeData();
+        day.closed = true;
+        renderHomeData();
         document.getElementById('loader-bilan').style.display = 'block';
         const p = appData.profile;
         const t = p.targets;
@@ -1241,500 +952,538 @@ Réponds UNIQUEMENT en JSON : {"kcal":number,"prot":number,"carb":number,"fat":n
         const prompt = `Tu es un coach nutritionnel bienveillant. Analyse cette journée et donne un conseil court, encourageant et personnalisé (3-4 phrases max).
 Profil: ${p.name}, ${p.weight}kg, morphotype ${p.morph || 'meso'}. ${goalInfo} ${lifestyleInfo} ${dietInfo} ${stressInfo} ${sleepInfo} ${allergiesInfo}
 Objectifs: ${t.cal} kcal, ${t.prot}g protéines, ${t.carb}g glucides, ${t.fat}g lipides.
-Repas de la journée: ${JSON.stringify(day.meals.map(m => ({type:m.type, kcal:m.kcal, score:m.healthScore})))}.
-Totaux: ${JSON.stringify({ calories: day.meals.reduce((s,m)=>s+m.kcal,0), proteines: day.meals.reduce((s,m)=>s+m.prot,0), glucides: day.meals.reduce((s,m)=>s+(m.carb||0),0), lipides: day.meals.reduce((s,m)=>s+(m.fat||0),0), sport: day.sport, pas: day.steps||0, eau_litres: ((day.water||0)*0.25).toFixed(1) })}.
-Pour chaque repas avec score 1 ou 2, donne 1 conseil CONCRET pour l'améliorer la prochaine fois. Reste bienveillant et encourageant.`;
+Repas: ${JSON.stringify(day.meals.map(m => ({type:m.type, kcal:m.kcal, score:m.healthScore})))}.
+Totaux: ${JSON.stringify({ calories: day.meals.reduce((s,m)=>s+m.kcal,0), proteines: day.meals.reduce((s,m)=>s+m.prot,0), sport: day.sport, pas: day.steps||0, eau_litres: ((day.water||0)*0.25).toFixed(1) })}.`;
         const txt = await callGemini(prompt, false);
         document.getElementById('loader-bilan').style.display = 'none';
-        day.aiSummary = txt; saveData(); renderHomeData();
+        day.aiSummary = txt;
+        // 💾 SAUVEGARDE CLOUD À LA CLÔTURE
+        saveData();
+        showToast("Journée clôturée et sauvegardée ☁️");
+        renderHomeData();
     }
 
-    function renderHomeData() {
-        const sumEl = document.getElementById('profile-summary');
-        if (sumEl && appData.profile) {
-            const p = appData.profile;
-            const goalLabels = { loss:'Perte de poids', maintain:'Maintien', gain:'Prise de masse' };
-            const morphLabels = { ecto:'Ectomorphe', meso:'Mésomorphe', endo:'Endomorphe' };
-            const chips = [];
-            if (p.targets?.cal) chips.push(`🔥 ${p.targets.cal} kcal/j`);
-            if (p.goalDir) chips.push(goalLabels[p.goalDir] || '');
-            if (p.weightTarget) chips.push(`🎯 ${p.weightTarget} kg`);
-            if (p.morph) chips.push(morphLabels[p.morph] || '');
-            const avgSleep = getAvgSleep7Days();
-            if (avgSleep !== 7) chips.push(`😴 moy. ${avgSleep.toFixed(1)}h`);
-            const todayWater = (appData.days[getTodayStr()]?.water || 0) * 0.25;
-            const waterTarget = getWaterTarget() * 0.25;
-            if (todayWater > 0) chips.push(`💧 ${todayWater.toFixed(1)}/${waterTarget.toFixed(1)}L`);
-            sumEl.innerHTML = chips.filter(Boolean).map(c => `<span class="profile-chip">${c}</span>`).join('');
+    let selectedMorph = 'meso';
+    function selectMorph(val) {
+        selectedMorph = val;
+        document.querySelectorAll('.morph-opt').forEach(el => el.classList.toggle('selected', el.dataset.val === val));
+    }
+    function updateGoalUI() {
+        const dir = document.getElementById('p-goal-dir').value;
+        document.getElementById('goal-target-block').style.display = dir === 'maintain' ? 'none' : 'block';
+        updateGoalPreview();
+    }
+    function updateGoalPreview() {
+        const dir = document.getElementById('p-goal-dir').value;
+        const weight = parseFloat(document.getElementById('p-weight').value);
+        const targetW = parseFloat(document.getElementById('p-weight-target').value);
+        const weeks = parseInt(document.getElementById('p-goal-weeks').value);
+        const box = document.getElementById('goal-calc-preview');
+        if (!targetW || !weeks || isNaN(weight)) { box.style.display = 'none'; return; }
+        const diff = targetW - weight;
+        const dailyDelta = Math.round((diff * 7700) / (weeks * 7));
+        const absDelta = Math.abs(dailyDelta);
+        const isLoss = dailyDelta < 0;
+        let warn = '';
+        if (absDelta > 1000) warn = '<div class="gcb-warn">⚠️ Déficit/surplus élevé</div>';
+        else if (absDelta > 700) warn = '<div class="gcb-warn">⚡ Rythme soutenu</div>';
+        box.style.display = 'block';
+        box.innerHTML = `<div>${isLoss?'📉':'📈'} Écart : <span class="gcb-val">${diff>0?'+':''}${diff.toFixed(1)} kg</span> en ${weeks} semaines</div><div>Ajustement : <span class="gcb-val">${isLoss?'':'+'}${dailyDelta} kcal/jour</span></div>${warn}`;
+    }
+
+    function saveProfile() {
+        const name = document.getElementById('p-name').value.trim();
+        const weight = parseFloat(document.getElementById('p-weight').value);
+        const height = parseFloat(document.getElementById('p-height').value);
+        const age = parseInt(document.getElementById('p-age').value);
+        const sex = document.getElementById('p-sex').value;
+        const activity = parseFloat(document.getElementById('p-activity').value);
+        const lifestyle = document.getElementById('p-lifestyle').value.trim();
+        const morph = selectedMorph;
+        const goalDir = document.getElementById('p-goal-dir').value;
+        const weightTarget = parseFloat(document.getElementById('p-weight-target').value) || null;
+        const goalWeeks = parseInt(document.getElementById('p-goal-weeks').value) || null;
+        const mealFreq = parseInt(document.getElementById('p-meal-freq').value);
+        const stress = document.getElementById('p-stress').value;
+        const diet = document.getElementById('p-diet').value;
+        const allergies = document.getElementById('p-allergies').value.trim();
+        const cooking = document.getElementById('p-cooking').value;
+        if (!name) return showAlert("Prénom manquant","Entre ton prénom pour continuer.");
+        if (isNaN(weight)||weight<30||weight>300) return showAlert("Poids invalide","Entre un poids entre 30 et 300 kg.");
+        if (isNaN(height)||height<100||height>250) return showAlert("Taille invalide","Entre une taille entre 100 et 250 cm.");
+        if (isNaN(age)||age<10||age>100) return showAlert("Âge invalide","Entre un âge entre 10 et 100 ans.");
+        let bmr = sex==='male' ? (10*weight)+(6.25*height)-(5*age)+5 : (10*weight)+(6.25*height)-(5*age)-161;
+        const morphMult = {ecto:1.03,meso:1.00,endo:0.97};
+        let tdee = Math.round(bmr * activity * (morphMult[morph]||1));
+        const stressMult = {low:1.0,medium:1.0,high:0.97,very_high:0.95};
+        tdee = Math.round(tdee*(stressMult[stress]||1));
+        let goalDelta = 0;
+        if (goalDir==='loss') goalDelta = weightTarget&&goalWeeks ? Math.max(-1000,Math.round(((weightTarget-weight)*7700)/(goalWeeks*7))) : -500;
+        else if (goalDir==='gain') goalDelta = weightTarget&&goalWeeks ? Math.min(700,Math.round(((weightTarget-weight)*7700)/(goalWeeks*7))) : 400;
+        const calTarget = tdee + goalDelta;
+        let protMult=2.0, fatMult=0.9;
+        if (morph==='ecto'){protMult=1.8;fatMult=0.85;}
+        if (morph==='endo'){protMult=2.2;fatMult=0.95;}
+        const protTarget = Math.round(weight*protMult);
+        const fatTarget = Math.round(weight*fatMult);
+        const carbTarget = Math.max(50,Math.round((calTarget-(protTarget*4)-(fatTarget*9))/4));
+        const mealSplit = {
+            2:{'Petit Déjeuner':0.40,'Déjeuner':0.60,'Dîner':0,'Collation':0},
+            3:{'Petit Déjeuner':0.25,'Déjeuner':0.40,'Dîner':0.35,'Collation':0},
+            4:{'Petit Déjeuner':0.25,'Déjeuner':0.35,'Dîner':0.30,'Collation':0.10},
+            5:{'Petit Déjeuner':0.20,'Déjeuner':0.30,'Dîner':0.25,'Collation':0.125},
+        };
+        const safeMealFreq = [2,3,4,5].includes(mealFreq)?mealFreq:4;
+        appData.profile = {
+            name,weight,height,age,sex,activity,lifestyle,morph,goalDir,weightTarget,goalWeeks,goalDelta,
+            mealFreq:safeMealFreq,sleep:null,stress,diet,allergies,cooking,
+            targets:{cal:calTarget,prot:protTarget,fat:fatTarget,carb:carbTarget},
+            mealSplit:mealSplit[safeMealFreq]||mealSplit[4],
+            bmr:Math.round(bmr),tdeeBase:tdee
+        };
+        if (!appData.weightHistory) appData.weightHistory=[];
+        if (appData.weightHistory.length===0) appData.weightHistory.push({date:getTodayStr(),weight});
+        saveData();
+        if (document.getElementById('home-user-name')) document.getElementById('home-user-name').textContent=name;
+        renderWeek(); renderHomeData(); renderShortcuts();
+        showToast("Profil enregistré et synchronisé ☁️");
+        showSection('view-home');
+    }
+
+    function renderWeek() {
+        const container = document.getElementById('week-container');
+        container.innerHTML='';
+        const days=['Dim','Lun','Mar','Mer','Jeu','Ven','Sam'];
+        const today=new Date();
+        for(let i=6;i>=0;i--){
+            const d=new Date(today); d.setDate(today.getDate()-i);
+            const ds=d.toISOString().split('T')[0];
+            const hasData=appData.days[ds]&&appData.days[ds].meals.length>0;
+            const div=document.createElement('div');
+            div.className='week-card'+(ds===selectedDate?' active-day-card':'');
+            div.innerHTML=`<div class="wc-day">${days[d.getDay()]}</div><div class="wc-num">${d.getDate()}</div>${hasData?'<div style="width:5px;height:5px;border-radius:50%;background:var(--primary);margin:3px auto 0"></div>':''}`;
+            div.onclick=()=>{selectedDate=ds;renderWeek();renderHomeData();};
+            container.appendChild(div);
         }
-        const day = appData.days[selectedDate] || { meals:[], sport:0, closed:false, aiSummary:"" };
-        const targets = appData.profile ? appData.profile.targets : { cal:2000, prot:100, carb:200, fat:60 };
-        let total = { cal:0, prot:0, carb:0, fat:0 };
-        day.meals.forEach(m => { total.cal+=m.kcal; total.prot+=m.prot; total.carb+=(m.carb||0); total.fat+=(m.fat||0); });
-        const adjCal = targets.cal + (day.sport || 0);
+        const active=container.querySelector('.active-day-card');
+        if(active) active.scrollIntoView({inline:'center',behavior:'smooth'});
+    }
 
-        document.getElementById('h-cal').textContent = total.cal;
-        document.getElementById('h-target').textContent = adjCal;
-        document.getElementById('h-prot').textContent = total.prot;
-        document.getElementById('h-carb').textContent = total.carb;
-        document.getElementById('h-fat').textContent = total.fat;
-        document.getElementById('h-prot-target').textContent = targets.prot;
-        document.getElementById('h-carb-target').textContent = targets.carb;
-        document.getElementById('h-fat-target').textContent = targets.fat;
+    async function callGemini(prompt, isJson=false, imagesBase64=[]) {
+        if(!appData.apiKey){showAlert("Clé API manquante","Va dans ⚙️ Réglages et entre ta clé API Gemini.");return null;}
+        const url=`https://generativelanguage.googleapis.com/v1beta/models/${MODEL}:generateContent?key=${appData.apiKey}`;
+        const fullPrompt=isJson?prompt+" Réponds UNIQUEMENT en JSON valide, sans texte avant ni après, sans balises markdown.":prompt;
+        let parts=[{text:fullPrompt}];
+        imagesBase64.forEach(b64=>{if(b64)parts.push({inlineData:{mimeType:"image/jpeg",data:b64}});});
+        try{
+            const resp=await fetch(url,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({contents:[{parts}]})});
+            const data=await resp.json();
+            if(!resp.ok)throw new Error(data.error?.message||"Erreur serveur Google");
+            if(!data.candidates?.length)throw new Error("L'IA n'a pas répondu. Réessaie.");
+            const text=data.candidates[0].content.parts[0].text;
+            if(isJson){try{return JSON.parse(text.replace(/```json|```/g,"").trim());}catch(e){throw new Error("Format inattendu. Réessaie.");}}
+            return text;
+        }catch(e){showAlert("Erreur IA",e.message);return null;}
+    }
 
-        const remaining = adjCal - total.cal;
-        const statusEl = document.getElementById('h-cal-status');
-        if (total.cal === 0) statusEl.textContent = "Touche pour ajouter un repas";
-        else if (remaining > 0) statusEl.textContent = `Il te reste ${remaining} kcal`;
-        else statusEl.textContent = `Objectif dépassé de ${Math.abs(remaining)} kcal`;
+    function renderShortcuts(){
+        const c=document.getElementById('sport-shortcuts');
+        if(!c)return;
+        if(!appData.shortcuts.length){c.innerHTML='<div style="font-size:0.8rem;color:var(--text-muted);font-style:italic">Aucun raccourci — appuie sur ⭐ pour en créer</div>';return;}
+        c.innerHTML=appData.shortcuts.map((s,i)=>`<div class="shortcut-item" onclick="loadShortcut(${i})">${s.act} (${s.dur}min) <span class="remove" onclick="event.stopPropagation();deleteShortcut(${i})">×</span></div>`).join('');
+    }
+    function saveAsShortcut(){const act=document.getElementById('t-act').value.trim();const dur=document.getElementById('t-dur').value;if(!act)return showAlert("Activité manquante","Entre le nom de l'activité.");if(appData.shortcuts.find(s=>s.act===act))return showToast("Raccourci déjà existant !");appData.shortcuts.push({act,dur});saveData();renderShortcuts();showToast("Raccourci ajouté ⭐");}
+    function loadShortcut(i){const s=appData.shortcuts[i];document.getElementById('t-act').value=s.act;document.getElementById('t-dur').value=s.dur;document.getElementById('t-preview').style.display='none';}
+    function deleteShortcut(i){appData.shortcuts.splice(i,1);saveData();renderShortcuts();}
 
-        const setG = (id, v, t) => { const el = document.getElementById(`g-${id}-fill`); if(el) el.style.strokeDashoffset = 100 - Math.min((v/(t||1))*100,100); };
-        setG('cal',total.cal,adjCal); setG('prot',total.prot,targets.prot); setG('carb',total.carb,targets.carb); setG('fat',total.fat,targets.fat);
+    async function estimateSport(){
+        const act=document.getElementById('t-act').value.trim();
+        const dur=document.getElementById('t-dur').value;
+        if(!act)return showAlert("Activité manquante","Précise l'activité sportive.");
+        const p=appData.profile;
+        const pInfo=p?`Profil: ${p.weight}kg, ${p.age}ans, ${p.sex==='male'?'homme':'femme'}`:'';
+        document.getElementById('loader-sport').style.display='block';
+        const res=await callGemini(`Estimation calories brûlées pour "${act}" pendant ${dur} minutes. ${pInfo}. JSON: {"kcal":number}`,true);
+        document.getElementById('loader-sport').style.display='none';
+        if(res?.kcal){appData.lastIAKcal=res.kcal;document.getElementById('t-kcal-ia').textContent=res.kcal;document.getElementById('t-preview').style.display='block';}
+    }
 
-        document.getElementById('h-sport-val').textContent = (day.sport||0) > 0 ? `+ ${day.sport} kcal brûlées` : "+ Ajouter une séance";
+    function saveSport(){
+        const manual=document.getElementById('t-kcal-manual').value!==''?parseInt(document.getElementById('t-kcal-manual').value):NaN;
+        const kcal=!isNaN(manual)&&manual>0?manual:appData.lastIAKcal;
+        const act=document.getElementById('t-act').value.trim();
+        if(!kcal||kcal<=0)return showAlert("Calories manquantes","Saisis les calories ou utilise l'IA.");
+        if(!act)return showAlert("Activité manquante","Entre le nom de l'activité.");
+        if(!appData.days[selectedDate])appData.days[selectedDate]={meals:[],sport:0,sportEntries:[],closed:false};
+        if(!appData.days[selectedDate].sportEntries)appData.days[selectedDate].sportEntries=[];
+        appData.days[selectedDate].sport+=kcal;
+        appData.days[selectedDate].sportEntries.push({act,kcal});
+        appData.lastIAKcal=0;
+        saveData();renderHomeData();showSection('view-home');
+        document.getElementById('t-preview').style.display='none';
+        document.getElementById('t-kcal-manual').value='';
+        document.getElementById('t-act').value='';
+        showToast("Séance enregistrée 💪");
+    }
 
+    function triggerImportMulti(mode){
+        if(currentImgs.length>=4)return showAlert("Maximum atteint","Tu peux ajouter jusqu'à 4 photos maximum.");
+        if(mode==='camera')document.getElementById('multi-camera-input').click();
+        else document.getElementById('multi-gallery-input').click();
+    }
+    function processMultiFile(input){
+        if(!input.files||!input.files[0])return;
+        const file=input.files[0]; input.value="";
+        const reader=new FileReader();
+        reader.onload=(e)=>{const dataURL=e.target.result;if(!dataURL||!dataURL.startsWith("data:"))return showAlert("Erreur","Impossible de lire ce fichier.");const b64=dataURL.split(",")[1];currentImgs.push(b64);renderImagesGrid();};
+        reader.onerror=()=>showAlert("Erreur","Impossible de lire ce fichier.");
+        reader.readAsDataURL(file);
+    }
+    function removeImg(i){currentImgs.splice(i,1);renderImagesGrid();}
+    function renderImagesGrid(){
+        const grid=document.getElementById('images-grid');if(!grid)return;
+        grid.innerHTML='';
+        currentImgs.forEach((b64,i)=>{const div=document.createElement('div');div.className='img-thumb';div.innerHTML=`<img src="data:image/jpeg;base64,${b64}"><div class="img-thumb-remove" onclick="removeImg(${i})">×</div>`;grid.appendChild(div);});
+        const btns=document.querySelectorAll('#view-meal-form .add-photo-btn');
+        btns.forEach(b=>b.style.display=currentImgs.length>=4?'none':'');
+    }
+
+    let activeCategory='Déjeuner';
+    const MEAL_CATS=[
+        {key:'Petit Déjeuner',emoji:'☕',label:'Petit Déjeuner'},
+        {key:'Déjeuner',emoji:'☀️',label:'Déjeuner'},
+        {key:'Dîner',emoji:'🌙',label:'Dîner'},
+        {key:'Collation',emoji:'🍎',label:'Collation'},
+    ];
+
+    function getMealPct(key){
+        const day=appData.days[selectedDate]||{meals:[]};
+        const hasCollation=day.meals.some(m=>m.type==='Collation');
+        const splitWith={'Petit Déjeuner':0.25,'Déjeuner':0.35,'Dîner':0.30,'Collation':0.10};
+        const splitWithout={'Petit Déjeuner':0.28,'Déjeuner':0.40,'Dîner':0.32,'Collation':0};
+        const profileSplit=appData.profile?.mealSplit;
+        const profileFreq=appData.profile?.mealFreq||4;
+        if(profileFreq>=4||hasCollation)return(profileSplit&&profileSplit[key]!==undefined)?profileSplit[key]:(splitWith[key]??0);
+        else return splitWithout[key]??0;
+    }
+
+    function renderMealCategories(){
+        const grid=document.getElementById('meal-categories-grid');if(!grid)return;
+        const targets=appData.profile?appData.profile.targets:{cal:2000};
+        const day=appData.days[selectedDate]||{meals:[]};
+        grid.innerHTML='<div class="meal-cat-grid"></div>';
+        const inner=grid.querySelector('.meal-cat-grid');
+        MEAL_CATS.forEach(cat=>{
+            const idealKcal=Math.round(targets.cal*getMealPct(cat.key));
+            const meals=day.meals.filter(m=>m.type===cat.key);
+            const totalKcal=meals.reduce((s,m)=>s+m.kcal,0);
+            const count=meals.length;const hasMeal=count>0;
+            const card=document.createElement('div');
+            card.className='meal-cat-card'+(hasMeal?' has-meal':'');
+            card.innerHTML=`${count>0?`<div class="meal-cat-badge">${count}</div>`:''}
+                <div class="meal-cat-emoji">${cat.emoji}</div>
+                <div class="meal-cat-name">${cat.label}</div>
+                <div class="meal-cat-kcal">Idéal : <span>~${idealKcal} kcal</span></div>
+                ${hasMeal?`<div class="meal-cat-recorded">${totalKcal} kcal enregistrés</div>`:''}
+                <div class="meal-cat-add-icon">+</div>`;
+            card.onclick=()=>openMealForm(cat.key);
+            inner.appendChild(card);
+        });
+    }
+
+    function openMealForm(category){
+        activeCategory=category;
+        const cat=MEAL_CATS.find(c=>c.key===category);
+        document.getElementById('meal-form-title').textContent=cat.emoji+' '+cat.label;
+        const day=appData.days[selectedDate]||{meals:[]};
+        const existing=day.meals.map((m,i)=>({...m,_idx:i})).filter(m=>m.type===category);
+        const prevEl=document.getElementById('existing-meals-preview');
+        const prevList=document.getElementById('existing-meals-list');
+        if(existing.length>0){
+            prevEl.style.display='block';
+            prevList.innerHTML=existing.map(m=>`<div style="display:flex;justify-content:space-between;align-items:center;padding:8px 10px;background:var(--primary-light);border-radius:10px;margin-bottom:6px"><div><div style="font-weight:700;font-size:0.88rem">${cat.emoji} ${m.kcal} kcal</div><div style="font-size:0.72rem;color:var(--text-muted)">P:${m.prot}g G:${m.carb}g L:${m.fat}g</div></div><button class="meal-delete-btn" onclick="askDeleteMeal(${m._idx})">🗑️</button></div>`).join('');
+        }else{prevEl.style.display='none';}
+        clearImages();
+        document.getElementById('m-desc').value='';
+        cancelPreview('m-preview');
+        document.getElementById('loader-m').style.display='none';
+        document.getElementById('btn-analyze-meal').style.display='flex';
+        showSection('view-meal-form');
+    }
+
+    async function estimateMeal(){
+        const desc=document.getElementById('m-desc').value.trim();
+        if(!desc&&!currentImgs.length)return showAlert("Info","Ajoute une description ou une photo de ton repas.");
+        document.getElementById('loader-m').style.display='block';
+        document.getElementById('btn-analyze-meal').style.display='none';
+        document.getElementById('m-preview').style.display='none';
+        const profile=appData.profile;
+        const goalStr=profile?.goalDir==='loss'?'perte de poids':profile?.goalDir==='gain'?'prise de masse':'maintien';
+        const cat=MEAL_CATS.find(c=>c.key===activeCategory);
+        const idealKcal=cat?Math.round((profile?.targets?.cal||2000)*getMealPct(cat.key)):600;
+        const dietInfo=profile?.diet&&profile.diet!=='none'?`Régime: ${profile.diet}.`:'';
+        const allergiesInfo=profile?.allergies?`Allergies: ${profile.allergies}.`:'';
+        const hasPhoto=currentImgs.length>0;const hasDesc=desc.length>0;
+        let contextBlock='';
+        if(hasPhoto&&hasDesc)contextBlock=`Photo ET description: "${desc}". Combine les deux.`;
+        else if(hasPhoto)contextBlock=`${currentImgs.length} photo(s). Analyse visuellement.`;
+        else contextBlock=`Description: "${desc}".`;
+        const prompt=`${contextBlock} Type: ${activeCategory} (~${idealKcal} kcal). Objectif: ${goalStr}. ${dietInfo} ${allergiesInfo}
+healthScore: 1=peu adapté, 2=moyen, 3=bien adapté. Si ≤2, healthTips avec 2-3 conseils concrets séparés par \\n. Si 3, healthTips="".
+JSON: {"kcal":number,"prot":number,"carb":number,"fat":number,"healthScore":1|2|3,"healthLabel":string,"healthTips":string}`;
+        const res=await callGemini(prompt,true,currentImgs);
+        document.getElementById('loader-m').style.display='none';
+        if(res){
+            document.getElementById('m-kcal-val').value=res.kcal||0;
+            document.getElementById('m-prot-val').value=res.prot||0;
+            document.getElementById('m-carb-val').value=res.carb||0;
+            document.getElementById('m-fat-val').value=res.fat||0;
+            const emojis={1:'😟',2:'😐',3:'😊'};
+            document.getElementById('meal-health-emoji').textContent=emojis[res.healthScore]||'😐';
+            document.getElementById('meal-health-label').textContent=res.healthLabel||'';
+            const tipsEl=document.getElementById('meal-health-tips');
+            if(tipsEl){if(res.healthTips&&res.healthScore<3){tipsEl.style.display='block';tipsEl.innerHTML='<div style="font-weight:800;font-size:0.82rem;margin-bottom:4px">💡 Comment améliorer ce repas :</div>'+res.healthTips.split('\n').filter(Boolean).map(t=>`<div style="font-size:0.8rem;margin-top:3px">• ${t.replace(/^[-•]\s*/, '')}</div>`).join('');}else{tipsEl.style.display='none';}}
+            document.getElementById('m-preview').style.display='block';
+            appData.lastMacros=res;
+        }else{document.getElementById('btn-analyze-meal').style.display='flex';}
+    }
+
+    function saveMeal(){
+        if(!appData.days[selectedDate])appData.days[selectedDate]={meals:[],sport:0,sportEntries:[],closed:false};
+        const meal={type:activeCategory,desc:document.getElementById('m-desc').value.trim(),kcal:parseInt(document.getElementById('m-kcal-val').value)||0,prot:parseInt(document.getElementById('m-prot-val').value)||0,carb:parseInt(document.getElementById('m-carb-val').value)||0,fat:parseInt(document.getElementById('m-fat-val').value)||0,healthScore:appData.lastMacros?.healthScore||2,healthLabel:appData.lastMacros?.healthLabel||'',healthTips:appData.lastMacros?.healthTips||''};
+        appData.days[selectedDate].meals.push(meal);
+        saveData();clearImages();renderHomeData();renderMealCategories();
+        cancelPreview('m-preview');document.getElementById('m-desc').value='';
+        showSection('view-day');showToast("Repas ajouté ✅");
+    }
+
+    function clearImages(){currentImgs=[];renderImagesGrid();}
+
+    function editMeal(index){
+        const day=appData.days[selectedDate];if(!day)return;
+        const m=day.meals[index];if(!m)return;
+        openMealForm(m.type);
+        document.getElementById('m-desc').value=m.desc||'';
+        document.getElementById('m-kcal-val').value=m.kcal;
+        document.getElementById('m-prot-val').value=m.prot;
+        document.getElementById('m-carb-val').value=m.carb;
+        document.getElementById('m-fat-val').value=m.fat;
+        const emojis={1:'😟',2:'😐',3:'😊'};
+        document.getElementById('meal-health-emoji').textContent=emojis[m.healthScore]||'😐';
+        document.getElementById('meal-health-label').textContent=m.healthLabel||'';
+        document.getElementById('m-preview').style.display='block';
+        document.getElementById('btn-analyze-meal').style.display='none';
+        appData.lastMacros={kcal:m.kcal,prot:m.prot,carb:m.carb,fat:m.fat,healthScore:m.healthScore,healthLabel:m.healthLabel,healthTips:m.healthTips};
+        day.meals.splice(index,1);saveData();renderHomeData();renderMealCategories();
+    }
+
+    function askDeleteMeal(index){mealDeleteIndex=index;document.getElementById('modal-delete-meal').style.display='flex';}
+    function confirmDeleteMeal(){if(mealDeleteIndex!==null&&appData.days[selectedDate]){appData.days[selectedDate].meals.splice(mealDeleteIndex,1);mealDeleteIndex=null;saveData();renderHomeData();}closeDeleteModal();showToast("Repas supprimé");}
+    function closeDeleteModal(){document.getElementById('modal-delete-meal').style.display='none';mealDeleteIndex=null;}
+
+    function triggerBilan(){const day=appData.days[selectedDate]||{closed:false};if(day.closed){day.closed=false;day.aiSummary="";saveData();renderHomeData();return;}document.getElementById('modal-steps').style.display='flex';}
+    function cancelBilan(){document.getElementById('modal-steps').style.display='none';}
+    function cancelPreview(id){document.getElementById(id).style.display='none';if(id==='m-preview')document.getElementById('btn-analyze-meal').style.display='flex';}
+
+    function renderHomeData(){
+        const sumEl=document.getElementById('profile-summary');
+        if(sumEl&&appData.profile){
+            const p=appData.profile;
+            const goalLabels={loss:'Perte de poids',maintain:'Maintien',gain:'Prise de masse'};
+            const morphLabels={ecto:'Ectomorphe',meso:'Mésomorphe',endo:'Endomorphe'};
+            const chips=[];
+            if(p.targets?.cal)chips.push(`🔥 ${p.targets.cal} kcal/j`);
+            if(p.goalDir)chips.push(goalLabels[p.goalDir]||'');
+            if(p.weightTarget)chips.push(`🎯 ${p.weightTarget} kg`);
+            if(p.morph)chips.push(morphLabels[p.morph]||'');
+            const avgSleep=getAvgSleep7Days();
+            if(avgSleep!==7)chips.push(`😴 moy. ${avgSleep.toFixed(1)}h`);
+            sumEl.innerHTML=chips.filter(Boolean).map(c=>`<span class="profile-chip">${c}</span>`).join('');
+        }
+        const day=appData.days[selectedDate]||{meals:[],sport:0,closed:false,aiSummary:""};
+        const targets=appData.profile?appData.profile.targets:{cal:2000,prot:100,carb:200,fat:60};
+        let total={cal:0,prot:0,carb:0,fat:0};
+        day.meals.forEach(m=>{total.cal+=m.kcal;total.prot+=m.prot;total.carb+=(m.carb||0);total.fat+=(m.fat||0);});
+        const adjCal=targets.cal+(day.sport||0);
+        document.getElementById('h-cal').textContent=total.cal;
+        document.getElementById('h-target').textContent=adjCal;
+        document.getElementById('h-prot').textContent=total.prot;
+        document.getElementById('h-carb').textContent=total.carb;
+        document.getElementById('h-fat').textContent=total.fat;
+        document.getElementById('h-prot-target').textContent=targets.prot;
+        document.getElementById('h-carb-target').textContent=targets.carb;
+        document.getElementById('h-fat-target').textContent=targets.fat;
+        const remaining=adjCal-total.cal;
+        const statusEl=document.getElementById('h-cal-status');
+        if(total.cal===0)statusEl.textContent="Touche pour ajouter un repas";
+        else if(remaining>0)statusEl.textContent=`Il te reste ${remaining} kcal`;
+        else statusEl.textContent=`Objectif dépassé de ${Math.abs(remaining)} kcal`;
+        const setG=(id,v,t)=>{const el=document.getElementById(`g-${id}-fill`);if(el)el.style.strokeDashoffset=100-Math.min((v/(t||1))*100,100);};
+        setG('cal',total.cal,adjCal);setG('prot',total.prot,targets.prot);setG('carb',total.carb,targets.carb);setG('fat',total.fat,targets.fat);
+        document.getElementById('h-sport-val').textContent=(day.sport||0)>0?`+ ${day.sport} kcal brûlées`:"+ Ajouter une séance";
         renderWaterGlasses();
-
-        const sleepEl = document.getElementById('h-sleep-val');
-        if (sleepEl) {
-            const s = day.sleep;
-            sleepEl.textContent = s ? `${getSleepEmoji(s)} ${s.toFixed(1)}h` : '+ Saisir';
-        }
-
-        const chkIcon = document.getElementById('chk-bilan-icon');
-        if (day.closed) { chkIcon.textContent='✓'; chkIcon.style.background='var(--primary)'; chkIcon.style.color='white'; }
-        else { chkIcon.textContent=''; chkIcon.style.background='transparent'; }
-
-        const bText = document.getElementById('bilan-text');
-        if (day.closed && day.aiSummary) { bText.textContent=day.aiSummary; bText.style.display='block'; }
-        else { bText.style.display='none'; }
-
-        const mealIcons = { 'Petit Déjeuner':'☕','Déjeuner':'☀️','Dîner':'🌙','Collation':'🍎' };
-        const healthEmojis = { 1:'😟', 2:'😐', 3:'😊' };
-        const list = document.getElementById('home-meals-list');
-        list.innerHTML = '';
-        if (!day.meals.length) {
-            list.innerHTML = '<div style="text-align:center;padding:20px;color:var(--text-muted);font-size:0.9rem">Aucun repas enregistré pour ce jour</div>';
-        } else {
-            day.meals.forEach((m, i) => {
-                const el = document.createElement('div');
-                el.className = 'meal-item';
-                const descHtml = m.desc
-                    ? `<div class="meal-item-desc">📝 ${m.desc}</div>`
-                    : '<div class="meal-item-desc" style="color:var(--text-muted);opacity:0.6">Aucune description saisie</div>';
-                const tipsHtml = (m.healthTips && m.healthScore < 3)
-                    ? `<div class="meal-item-tips">💡 ${m.healthTips.split('\n').filter(Boolean).map(t => t.replace(/^[-•]\s*/, '')).join('<br>• ')}</div>`
-                    : '';
-                const macrosDetail = `
-                    <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:4px">
-                        <span style="font-size:0.75rem;font-weight:700;color:var(--prot-color)">🥩 ${m.prot}g prot.</span>
-                        <span style="font-size:0.75rem;font-weight:700;color:var(--carb-color)">🍞 ${m.carb}g gluc.</span>
-                        <span style="font-size:0.75rem;font-weight:700;color:var(--fat-color)">🥑 ${m.fat}g lip.</span>
-                    </div>`;
-                el.innerHTML = `
-                    <div style="display:flex;justify-content:space-between;align-items:center;width:100%">
-                        <div class="meal-item-left" style="flex:1;min-width:0">
-                            <div class="meal-type-icon">${mealIcons[m.type]||'🍽️'}</div>
-                            <div style="min-width:0">
-                                <div class="meal-item-name">${m.type}<span class="meal-chevron">▼</span></div>
-                                <div class="meal-item-kcal">${m.kcal} kcal</div>
-                            </div>
-                        </div>
-                        <div style="display:flex;align-items:center;gap:4px;flex-shrink:0">
-                            ${m.healthScore ? `<span style="font-size:1.2rem" title="${m.healthLabel||''}">${healthEmojis[m.healthScore]||''}</span>` : ''}
-                            <button class="meal-edit-btn" onclick="event.stopPropagation();editMeal(${i})" title="Modifier">✏️</button>
-                            <button class="meal-delete-btn" onclick="event.stopPropagation();askDeleteMeal(${i})" title="Supprimer">🗑️</button>
-                        </div>
-                    </div>
-                    <div class="meal-item-detail">
-                        ${descHtml}
-                        ${tipsHtml}
-                        ${macrosDetail}
-                    </div>`;
-                el.addEventListener('click', () => el.classList.toggle('expanded'));
+        const sleepEl=document.getElementById('h-sleep-val');
+        if(sleepEl){const s=day.sleep;sleepEl.textContent=s?`${getSleepEmoji(s)} ${s.toFixed(1)}h`:'+ Saisir';}
+        const chkIcon=document.getElementById('chk-bilan-icon');
+        if(day.closed){chkIcon.textContent='✓';chkIcon.style.background='var(--primary)';chkIcon.style.color='white';}
+        else{chkIcon.textContent='';chkIcon.style.background='transparent';}
+        const bText=document.getElementById('bilan-text');
+        if(day.closed&&day.aiSummary){bText.textContent=day.aiSummary;bText.style.display='block';}else{bText.style.display='none';}
+        const mealIcons={'Petit Déjeuner':'☕','Déjeuner':'☀️','Dîner':'🌙','Collation':'🍎'};
+        const healthEmojis={1:'😟',2:'😐',3:'😊'};
+        const list=document.getElementById('home-meals-list');
+        list.innerHTML='';
+        if(!day.meals.length){list.innerHTML='<div style="text-align:center;padding:20px;color:var(--text-muted);font-size:0.9rem">Aucun repas enregistré pour ce jour</div>';}
+        else{
+            day.meals.forEach((m,i)=>{
+                const el=document.createElement('div');el.className='meal-item';
+                const descHtml=m.desc?`<div class="meal-item-desc">📝 ${m.desc}</div>`:'<div class="meal-item-desc" style="opacity:0.6">Aucune description</div>';
+                const tipsHtml=(m.healthTips&&m.healthScore<3)?`<div class="meal-item-tips">💡 ${m.healthTips.split('\n').filter(Boolean).map(t=>t.replace(/^[-•]\s*/,'')).join('<br>• ')}</div>`:'';
+                const macrosDetail=`<div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:4px"><span style="font-size:0.75rem;font-weight:700;color:var(--prot-color)">🥩 ${m.prot}g</span><span style="font-size:0.75rem;font-weight:700;color:var(--carb-color)">🍞 ${m.carb}g</span><span style="font-size:0.75rem;font-weight:700;color:var(--fat-color)">🥑 ${m.fat}g</span></div>`;
+                el.innerHTML=`<div style="display:flex;justify-content:space-between;align-items:center;width:100%"><div class="meal-item-left" style="flex:1;min-width:0"><div class="meal-type-icon">${mealIcons[m.type]||'🍽️'}</div><div style="min-width:0"><div class="meal-item-name">${m.type}<span class="meal-chevron">▼</span></div><div class="meal-item-kcal">${m.kcal} kcal</div></div></div><div style="display:flex;align-items:center;gap:4px;flex-shrink:0">${m.healthScore?`<span style="font-size:1.2rem">${healthEmojis[m.healthScore]||''}</span>`:''}<button class="meal-edit-btn" onclick="event.stopPropagation();editMeal(${i})">✏️</button><button class="meal-delete-btn" onclick="event.stopPropagation();askDeleteMeal(${i})">🗑️</button></div></div><div class="meal-item-detail">${descHtml}${tipsHtml}${macrosDetail}</div>`;
+                el.addEventListener('click',()=>el.classList.toggle('expanded'));
                 list.appendChild(el);
             });
         }
     }
 
-    function triggerImport(mode, ctx='meal') {
-        importCtx = ctx;
-        if (mode === 'camera') document.getElementById('camera-input').click();
-        else document.getElementById('gallery-input').click();
-    }
-    function processFile(input) {
-        if (input.files && input.files[0]) {
-            const reader = new FileReader();
-            reader.onload = (e) => { const b64 = e.target.result.split(',')[1]; analyzeMenu(b64); };
-            reader.readAsDataURL(input.files[0]);
-        }
-        input.value = "";
+    function triggerImport(mode,ctx='meal'){importCtx=ctx;if(mode==='camera')document.getElementById('camera-input').click();else document.getElementById('gallery-input').click();}
+    function processFile(input){if(input.files&&input.files[0]){const reader=new FileReader();reader.onload=(e)=>{const b64=e.target.result.split(',')[1];analyzeMenu(b64);};reader.readAsDataURL(input.files[0]);}input.value="";}
+
+    async function analyzeMenu(b64){
+        const resDiv=document.getElementById('scan-res');const loader=document.getElementById('loader-scan');
+        resDiv.style.display='none';loader.style.display='block';
+        const res=await callGemini("Analyse ce menu de restaurant. Conseille les 2 plats les plus sains en expliquant brièvement pourquoi. Sois concis et bienveillant.",false,[b64]);
+        loader.style.display='none';if(res){resDiv.textContent=res;resDiv.style.display='block';}
     }
 
-    async function analyzeMenu(b64) {
-        const resDiv = document.getElementById('scan-res');
-        const loader = document.getElementById('loader-scan');
-        resDiv.style.display = 'none'; loader.style.display = 'block';
-        const res = await callGemini("Analyse ce menu de restaurant. Conseille les 2 plats les plus sains en expliquant brièvement pourquoi. Sois concis et bienveillant.", false, [b64]);
-        loader.style.display = 'none';
-        if (res) { resDiv.textContent = res; resDiv.style.display = 'block'; }
+    async function generateRecipe(){
+        const ing=document.getElementById('fridge-in').value.trim();
+        if(!ing)return showAlert("Ingrédients manquants","Liste ce que tu as dans ton frigo !");
+        const resDiv=document.getElementById('recipe-res');const loader=document.getElementById('loader-recipe');
+        resDiv.style.display='none';loader.style.display='block';
+        const res=await callGemini(`Propose une recette saine, simple et rapide avec ces ingrédients: ${ing}. Inclus les étapes et une estimation des calories.`);
+        loader.style.display='none';if(res){resDiv.textContent=res;resDiv.style.display='block';}
     }
 
-    async function generateRecipe() {
-        const ing = document.getElementById('fridge-in').value.trim();
-        if (!ing) return showAlert("Ingrédients manquants","Liste ce que tu as dans ton frigo !");
-        const resDiv = document.getElementById('recipe-res');
-        const loader = document.getElementById('loader-recipe');
-        resDiv.style.display = 'none'; loader.style.display = 'block';
-        const res = await callGemini(`Propose une recette saine, simple et rapide avec ces ingrédients: ${ing}. Inclus les étapes et une estimation des calories.`);
-        loader.style.display = 'none';
-        if (res) { resDiv.textContent = res; resDiv.style.display = 'block'; }
+    function getWaterTarget(){
+        const p=appData.profile;if(!p)return 8;
+        let ml=p.weight*35;
+        if(parseFloat(p.activity)>=1.55)ml+=500;
+        if(p.stress==='high'||p.stress==='very_high')ml+=250;
+        if(p.goalDir==='loss')ml+=250;
+        return Math.max(6,Math.min(12,Math.round(ml/250)));
     }
 
-    function getWaterTarget() {
-        const p = appData.profile;
-        if (!p) return 8;
-        let ml = p.weight * 35;
-        if (parseFloat(p.activity) >= 1.55) ml += 500;
-        if (p.stress === 'high' || p.stress === 'very_high') ml += 250;
-        if (p.goalDir === 'loss') ml += 250;
-        return Math.max(6, Math.min(12, Math.round(ml / 250)));
+    function renderWaterGlasses(){
+        const day=appData.days[selectedDate]||{};
+        const filled=day.water||0;const target=getWaterTarget();
+        const liters=(filled*0.25).toFixed(2).replace(/\.?0+$/,'')||'0';
+        const pct=Math.round(Math.min((filled/target)*100,100));
+        const elCur=document.getElementById('w-current');const elLit=document.getElementById('w-liters');const elPct=document.getElementById('w-pct');const elTgt=document.getElementById('w-target');const elTgtL=document.getElementById('w-target-l');const pfill=document.getElementById('water-progress-fill');const msgEl=document.getElementById('water-msg');
+        if(elCur)elCur.textContent=filled;if(elLit)elLit.textContent=liters;if(elPct)elPct.textContent=pct;if(elTgt)elTgt.textContent=target;if(elTgtL)elTgtL.textContent=(target*0.25).toFixed(2).replace(/\.?0+$/,'');if(pfill)pfill.style.width=pct+'%';
+        if(msgEl){if(filled===0)msgEl.textContent="Pense à t'hydrater ! 💧";else if(filled<target*0.4)msgEl.textContent="Continue, tu es bien parti ! 🌊";else if(filled<target*0.7)msgEl.textContent="Bonne progression ! 👍";else if(filled<target)msgEl.textContent="Plus que "+(target-filled)+" verre(s) !";else msgEl.textContent="Objectif atteint ! 🎉";}
     }
 
-    function renderWaterGlasses() {
-        var day    = appData.days[selectedDate] || {};
-        var filled = day.water || 0;
-        var target = getWaterTarget();
-        var liters = (filled * 0.25).toFixed(2).replace(/\.?0+$/, '') || '0';
-        var pct    = Math.round(Math.min((filled / target) * 100, 100));
-        var elCur = document.getElementById('w-current');
-        var elLit = document.getElementById('w-liters');
-        var elPct = document.getElementById('w-pct');
-        var elTgt = document.getElementById('w-target');
-        var elTgtL = document.getElementById('w-target-l');
-        var pfill  = document.getElementById('water-progress-fill');
-        var msgEl  = document.getElementById('water-msg');
-        if (elCur)  elCur.textContent  = filled;
-        if (elLit)  elLit.textContent  = liters;
-        if (elPct)  elPct.textContent  = pct;
-        if (elTgt)  elTgt.textContent  = target;
-        if (elTgtL) elTgtL.textContent = (target * 0.25).toFixed(2).replace(/\.?0+$/, '');
-        if (pfill)  pfill.style.width  = pct + '%';
-        if (msgEl) {
-            if      (filled === 0)          msgEl.textContent = "Pense à t'hydrater ! 💧";
-            else if (filled < target * 0.4) msgEl.textContent = "Continue, tu es bien parti ! 🌊";
-            else if (filled < target * 0.7) msgEl.textContent = "Bonne progression ! 👍";
-            else if (filled < target)       msgEl.textContent = "Plus que " + (target - filled) + " verre(s) !";
-            else                            msgEl.textContent = "Objectif atteint ! 🎉";
-        }
+    function changeWater(delta){
+        if(!appData.days[selectedDate])appData.days[selectedDate]={meals:[],sport:0,sportEntries:[],closed:false};
+        const day=appData.days[selectedDate];
+        day.water=Math.max(0,Math.min(20,(day.water||0)+delta));
+        saveData();renderWaterGlasses();
     }
 
-    function changeWater(delta) {
-        if (!appData.days[selectedDate]) {
-            appData.days[selectedDate] = { meals:[], sport:0, sportEntries:[], closed:false };
-        }
-        var day = appData.days[selectedDate];
-        day.water = Math.max(0, Math.min(20, (day.water || 0) + delta));
-        saveData();
-        renderWaterGlasses();
+    function checkWeeklyReport(){
+        const today=new Date();if(today.getDay()!==0)return;
+        const weekKey='weekly_report_'+getWeekKey();
+        if(localStorage.getItem(weekKey))return;
+        let totalMeals=0,unhealthyMeals=0,mediumMeals=0,goodMeals=0;
+        for(let i=0;i<7;i++){const d=new Date(today);d.setDate(today.getDate()-i);const ds=d.toISOString().split('T')[0];const day=appData.days[ds];if(day)day.meals.forEach(m=>{totalMeals++;if(m.healthScore===1)unhealthyMeals++;else if(m.healthScore===2)mediumMeals++;else if(m.healthScore===3)goodMeals++;});}
+        if(totalMeals<3)return;
+        const goodPct=Math.round((goodMeals/totalMeals)*100);const mediumPct=Math.round((mediumMeals/totalMeals)*100);const badPct=Math.round((unhealthyMeals/totalMeals)*100);
+        let globalEmoji,globalMsg;
+        if(goodPct>=70){globalEmoji='🟢';globalMsg='Excellente semaine, continue comme ça !';}
+        else if(goodPct>=50){globalEmoji='🟡';globalMsg='Bonne semaine, quelques ajustements possibles.';}
+        else if(badPct>30){globalEmoji='🔴';globalMsg='Semaine difficile, concentre-toi sur la qualité des repas.';}
+        else{globalEmoji='🟠';globalMsg='Semaine correcte, tu peux encore progresser !';}
+        const reportHtml=`<div style="text-align:center;font-size:2.5rem;margin-bottom:8px">${globalEmoji}</div><div style="font-weight:800;text-align:center;margin-bottom:14px">${globalMsg}</div><div style="background:var(--bg-body);border-radius:12px;padding:12px 14px"><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px"><span style="font-size:0.88rem">😊 Adaptés</span><strong style="color:var(--success)">${goodPct}%</strong></div><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px"><span style="font-size:0.88rem">😐 Moyens</span><strong style="color:#d69e2e">${mediumPct}%</strong></div><div style="display:flex;justify-content:space-between;align-items:center"><span style="font-size:0.88rem">😟 Peu adaptés</span><strong style="color:var(--danger)">${badPct}%</strong></div></div><div style="font-size:0.75rem;color:var(--text-muted);margin-top:8px;text-align:center">${totalMeals} repas analysés cette semaine</div>`;
+        document.getElementById('weekly-report-content').innerHTML=reportHtml;
+        document.getElementById('modal-weekly-report').style.display='flex';
+        localStorage.setItem(weekKey,'1');
     }
 
-    function checkWeeklyReport() {
-        const today = new Date();
-        if (today.getDay() !== 0) return;
-        const weekKey = 'weekly_report_' + getWeekKey();
-        if (localStorage.getItem(weekKey)) return;
-        let totalMeals = 0, unhealthyMeals = 0, mediumMeals = 0, goodMeals = 0;
-        for (let i = 0; i < 7; i++) {
-            const d = new Date(today);
-            d.setDate(today.getDate() - i);
-            const ds = d.toISOString().split('T')[0];
-            const day = appData.days[ds];
-            if (day) {
-                day.meals.forEach(m => {
-                    totalMeals++;
-                    if      (m.healthScore === 1) unhealthyMeals++;
-                    else if (m.healthScore === 2) mediumMeals++;
-                    else if (m.healthScore === 3) goodMeals++;
-                });
-            }
-        }
-        if (totalMeals < 3) return;
-        const goodPct    = Math.round((goodMeals    / totalMeals) * 100);
-        const mediumPct  = Math.round((mediumMeals  / totalMeals) * 100);
-        const badPct     = Math.round((unhealthyMeals / totalMeals) * 100);
-        let globalEmoji, globalMsg;
-        if (goodPct >= 70) { globalEmoji = '🟢'; globalMsg = 'Excellente semaine, continue comme ça !'; }
-        else if (goodPct >= 50) { globalEmoji = '🟡'; globalMsg = 'Bonne semaine, quelques ajustements possibles.'; }
-        else if (badPct > 30) { globalEmoji = '🔴'; globalMsg = 'Semaine difficile, concentre-toi sur la qualité des repas.'; }
-        else { globalEmoji = '🟠'; globalMsg = 'Semaine correcte, tu peux encore progresser !'; }
-        let weeklyTips = [];
-        for (let i = 0; i < 7; i++) {
-            const d = new Date(today); d.setDate(today.getDate() - i);
-            const ds = d.toISOString().split('T')[0];
-            const dayData = appData.days[ds];
-            if (dayData) dayData.meals.forEach(m => {
-                if (m.healthScore === 1 && m.healthTips) weeklyTips.push(m.healthTips);
-            });
-        }
-        weeklyTips = [...new Set(weeklyTips)].slice(0, 3);
-        const tipsHtml = weeklyTips.length > 0
-            ? `<div style="margin-top:12px;background:rgba(128,90,213,0.08);border-left:3px solid var(--primary);border-radius:0 10px 10px 0;padding:10px 12px">
-                <div style="font-weight:800;font-size:0.8rem;margin-bottom:6px">💡 Axes d'amélioration :</div>
-                ${weeklyTips.map(t => `<div style="font-size:0.78rem;margin-top:4px">• ${t.replace(/^[-•]\s*/, '')}</div>`).join('')}
-               </div>` : '';
-        const reportHtml = `
-            <div style="text-align:center;font-size:2.5rem;margin-bottom:8px">${globalEmoji}</div>
-            <div style="font-weight:800;text-align:center;margin-bottom:14px">${globalMsg}</div>
-            <div style="background:var(--bg-body);border-radius:12px;padding:12px 14px">
-                <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
-                    <span style="font-size:0.88rem">😊 Repas adaptés</span>
-                    <div style="display:flex;align-items:center;gap:8px">
-                        <div style="width:80px;height:6px;background:rgba(0,0,0,0.08);border-radius:6px;overflow:hidden">
-                            <div style="width:${goodPct}%;height:100%;background:var(--success);border-radius:6px"></div>
-                        </div>
-                        <strong style="color:var(--success);min-width:40px;text-align:right">${goodPct}%</strong>
-                    </div>
-                </div>
-                <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
-                    <span style="font-size:0.88rem">😐 Repas moyens</span>
-                    <div style="display:flex;align-items:center;gap:8px">
-                        <div style="width:80px;height:6px;background:rgba(0,0,0,0.08);border-radius:6px;overflow:hidden">
-                            <div style="width:${mediumPct}%;height:100%;background:#d69e2e;border-radius:6px"></div>
-                        </div>
-                        <strong style="color:#d69e2e;min-width:40px;text-align:right">${mediumPct}%</strong>
-                    </div>
-                </div>
-                <div style="display:flex;justify-content:space-between;align-items:center">
-                    <span style="font-size:0.88rem">😟 Peu adaptés</span>
-                    <div style="display:flex;align-items:center;gap:8px">
-                        <div style="width:80px;height:6px;background:rgba(0,0,0,0.08);border-radius:6px;overflow:hidden">
-                            <div style="width:${badPct}%;height:100%;background:var(--danger);border-radius:6px"></div>
-                        </div>
-                        <strong style="color:var(--danger);min-width:40px;text-align:right">${badPct}%</strong>
-                    </div>
-                </div>
-            </div>
-            <div style="font-size:0.75rem;color:var(--text-muted);margin-top:8px;text-align:center">${totalMeals} repas analysés cette semaine</div>
-            ${tipsHtml}
-        `;
-        document.getElementById('weekly-report-content').innerHTML = reportHtml;
-        document.getElementById('modal-weekly-report').style.display = 'flex';
-        localStorage.setItem(weekKey, '1');
+    function getWeekKey(){const d=new Date();const jan1=new Date(d.getFullYear(),0,1);const week=Math.ceil(((d-jan1)/86400000+jan1.getDay()+1)/7);return d.getFullYear()+'_w'+week;}
+
+    let sleepInputVal=7.0;
+    function openSleepModal(){const day=appData.days[selectedDate]||{};sleepInputVal=day.sleep||7.0;document.getElementById('sleep-input-val').textContent=sleepInputVal.toFixed(1);updateSleepQualityMsg();document.getElementById('modal-sleep').style.display='flex';}
+    function closeSleepModal(){document.getElementById('modal-sleep').style.display='none';}
+    function adjustSleep(delta){sleepInputVal=Math.min(12,Math.max(2,sleepInputVal+delta));document.getElementById('sleep-input-val').textContent=sleepInputVal.toFixed(1);updateSleepQualityMsg();}
+    function updateSleepQualityMsg(){const el=document.getElementById('sleep-quality-msg');if(sleepInputVal<5){el.textContent='🔴 Très insuffisant';el.style.color='var(--danger)';}else if(sleepInputVal<6.5){el.textContent='🟠 Insuffisant';el.style.color='#e67e22';}else if(sleepInputVal<7.5){el.textContent='🟡 Correct';el.style.color='#d69e2e';}else if(sleepInputVal<=9){el.textContent='🟢 Optimal !';el.style.color='var(--success)';}else{el.textContent='🔵 Très long';el.style.color='var(--primary)';}}
+    function saveSleepEntry(){if(!appData.days[selectedDate])appData.days[selectedDate]={meals:[],sport:0,sportEntries:[],closed:false};appData.days[selectedDate].sleep=sleepInputVal;saveData();closeSleepModal();renderHomeData();showToast(`Sommeil enregistré : ${sleepInputVal.toFixed(1)}h 😴`);}
+    function getSleepEmoji(h){if(!h)return '';if(h<5)return '🔴';if(h<6.5)return '🟠';if(h<7.5)return '🟡';if(h<=9)return '🟢';return '🔵';}
+    function getAvgSleep7Days(){const today=new Date();let total=0,count=0;for(let i=0;i<7;i++){const d=new Date(today);d.setDate(today.getDate()-i);const ds=d.toISOString().split('T')[0];const s=appData.days[ds]?.sleep;if(s){total+=s;count++;}}return count>0?total/count:7;}
+
+    function checkWeightReminder(){const lastPrompt=appData.lastWeightPrompt;const today=getTodayStr();if(!lastPrompt){appData.lastWeightPrompt=today;saveData();return;}const diffDays=Math.floor((new Date(today)-new Date(lastPrompt))/(1000*60*60*24));if(diffDays>=7)setTimeout(()=>{document.getElementById('modal-weight').style.display='flex';},1500);}
+
+    function saveWeightEntry(){
+        const val=parseFloat(document.getElementById('input-weight-val').value);
+        if(isNaN(val)||val<30||val>300)return showAlert("Poids invalide","Entre un poids valide.");
+        if(!appData.weightHistory)appData.weightHistory=[];
+        appData.weightHistory.push({date:getTodayStr(),weight:val});
+        appData.lastWeightPrompt=getTodayStr();
+        if(appData.profile)appData.profile.weight=val;
+        saveData();closeWeightModal();renderWeightChart();showToast("Poids enregistré ⚖️");
+    }
+    function closeWeightModal(){document.getElementById('modal-weight').style.display='none';appData.lastWeightPrompt=getTodayStr();saveData();}
+
+    function renderWeightChart(){
+        const history=appData.weightHistory||[];
+        const emptyEl=document.getElementById('weight-empty');const canvas=document.getElementById('weight-chart');const listEl=document.getElementById('weight-list');
+        if(history.length<2){emptyEl.style.display='block';canvas.style.display='none';listEl.innerHTML='';return;}
+        emptyEl.style.display='none';canvas.style.display='block';
+        const ctx=canvas.getContext('2d');const W=canvas.offsetWidth||300;const H=120;canvas.width=W;canvas.height=H;ctx.clearRect(0,0,W,H);
+        const weights=history.map(e=>e.weight);const minW=Math.min(...weights)-1;const maxW=Math.max(...weights)+1;
+        const pad={l:30,r:10,t:10,b:20};const chartW=W-pad.l-pad.r;const chartH=H-pad.t-pad.b;
+        const toX=(i)=>pad.l+(i/(history.length-1))*chartW;const toY=(w)=>pad.t+(1-(w-minW)/(maxW-minW))*chartH;
+        const isDark=document.body.classList.contains('dark-mode');const lineColor=isDark?'#4fd1c5':'#38b2ac';
+        const grad=ctx.createLinearGradient(0,pad.t,0,H);grad.addColorStop(0,isDark?'rgba(79,209,197,0.3)':'rgba(56,178,172,0.2)');grad.addColorStop(1,'rgba(0,0,0,0)');
+        ctx.beginPath();ctx.moveTo(toX(0),H);history.forEach((e,i)=>ctx.lineTo(toX(i),toY(e.weight)));ctx.lineTo(toX(history.length-1),H);ctx.closePath();ctx.fillStyle=grad;ctx.fill();
+        ctx.beginPath();history.forEach((e,i)=>{if(i===0)ctx.moveTo(toX(i),toY(e.weight));else ctx.lineTo(toX(i),toY(e.weight));});ctx.strokeStyle=lineColor;ctx.lineWidth=2.5;ctx.lineJoin='round';ctx.stroke();
+        history.forEach((e,i)=>{ctx.beginPath();ctx.arc(toX(i),toY(e.weight),4,0,Math.PI*2);ctx.fillStyle=lineColor;ctx.fill();});
+        ctx.fillStyle=isDark?'#a0aec0':'#718096';ctx.font='10px Nunito, sans-serif';ctx.textAlign='right';ctx.fillText(maxW.toFixed(1),pad.l-4,pad.t+6);ctx.fillText(minW.toFixed(1),pad.l-4,H-pad.b);
+        listEl.innerHTML='';const sorted=[...history].reverse();
+        sorted.forEach((e,i)=>{const prev=sorted[i+1];let deltaHtml='';if(prev){const diff=(e.weight-prev.weight).toFixed(1);const cls=diff>0?'weight-delta-pos':diff<0?'weight-delta-neg':'weight-delta-0';const sign=diff>0?'+':'';deltaHtml=`<span class="${cls}">${sign}${diff} kg</span>`;}listEl.innerHTML+=`<div class="weight-entry"><span>${formatDate(e.date)}</span><div style="display:flex;gap:10px;align-items:center">${deltaHtml}<span style="font-weight:800">${e.weight} kg</span></div></div>`;});
     }
 
-    function getWeekKey() {
-        const d = new Date();
-        const jan1 = new Date(d.getFullYear(), 0, 1);
-        const week = Math.ceil(((d - jan1) / 86400000 + jan1.getDay() + 1) / 7);
-        return d.getFullYear() + '_w' + week;
+    function toggleHistory(){
+        historyOpen=!historyOpen;const list=document.getElementById('history-list');const chevron=document.getElementById('history-chevron');
+        list.style.display=historyOpen?'block':'none';chevron.style.transform=historyOpen?'rotate(180deg)':'rotate(0deg)';
+        if(historyOpen){list.innerHTML='';const keys=Object.keys(appData.days).sort().reverse();if(!keys.length){list.innerHTML='<div style="color:var(--text-muted);font-size:0.85rem">Aucun historique pour l\'instant.</div>';return;}keys.forEach(d=>{const day=appData.days[d];const total=day.meals.reduce((s,m)=>s+m.kcal,0);const el=document.createElement('div');el.className='card';el.style.cssText='padding:12px;cursor:pointer;margin-bottom:8px;display:flex;justify-content:space-between;align-items:center';el.innerHTML=`<div><div style="font-weight:800">${formatDate(d)}</div><div style="font-size:0.8rem;color:var(--text-muted)">${day.meals.length} repas · ${day.closed?'✅ Clôturé':'⏳ En cours'}</div></div><div style="font-weight:900;color:var(--primary)">${total} kcal</div>`;el.onclick=()=>{selectedDate=d;renderWeek();renderHomeData();showSection('view-home');};list.appendChild(el);});}
     }
 
-    let sleepInputVal = 7.0;
+    function formatDate(ds){const d=new Date(ds+'T12:00:00');return d.toLocaleDateString('fr-FR',{weekday:'long',day:'numeric',month:'long'});}
 
-    function openSleepModal() {
-        const day = appData.days[selectedDate] || {};
-        sleepInputVal = day.sleep || 7.0;
-        document.getElementById('sleep-input-val').textContent = sleepInputVal.toFixed(1);
-        updateSleepQualityMsg();
-        document.getElementById('modal-sleep').style.display = 'flex';
-    }
-
-    function closeSleepModal() { document.getElementById('modal-sleep').style.display = 'none'; }
-
-    function adjustSleep(delta) {
-        sleepInputVal = Math.min(12, Math.max(2, sleepInputVal + delta));
-        document.getElementById('sleep-input-val').textContent = sleepInputVal.toFixed(1);
-        updateSleepQualityMsg();
-    }
-
-    function updateSleepQualityMsg() {
-        const el = document.getElementById('sleep-quality-msg');
-        if (sleepInputVal < 5) { el.textContent = '🔴 Très insuffisant — impact fort sur métabolisme & appétit'; el.style.color = 'var(--danger)'; }
-        else if (sleepInputVal < 6.5) { el.textContent = '🟠 Insuffisant — la faim sera plus difficile à contrôler'; el.style.color = '#e67e22'; }
-        else if (sleepInputVal < 7.5) { el.textContent = '🟡 Correct — un peu plus aiderait la récupération'; el.style.color = '#d69e2e'; }
-        else if (sleepInputVal <= 9) { el.textContent = '🟢 Optimal — bonne récupération, métabolisme au top !'; el.style.color = 'var(--success)'; }
-        else { el.textContent = '🔵 Très long — vérifie ta qualité de sommeil'; el.style.color = 'var(--primary)'; }
-    }
-
-    function saveSleepEntry() {
-        if (!appData.days[selectedDate]) {
-            appData.days[selectedDate] = { meals:[], sport:0, sportEntries:[], closed:false };
-        }
-        appData.days[selectedDate].sleep = sleepInputVal;
-        saveData(); closeSleepModal(); renderHomeData();
-        showToast(`Sommeil enregistré : ${sleepInputVal.toFixed(1)}h 😴`);
-    }
-
-    function getSleepEmoji(h) {
-        if (!h) return '';
-        if (h < 5) return '🔴';
-        if (h < 6.5) return '🟠';
-        if (h < 7.5) return '🟡';
-        if (h <= 9) return '🟢';
-        return '🔵';
-    }
-
-    function getAvgSleep7Days() {
-        const today = new Date();
-        let total = 0, count = 0;
-        for (let i = 0; i < 7; i++) {
-            const d = new Date(today);
-            d.setDate(today.getDate() - i);
-            const ds = d.toISOString().split('T')[0];
-            const s = appData.days[ds]?.sleep;
-            if (s) { total += s; count++; }
-        }
-        return count > 0 ? total / count : 7;
-    }
-
-    function checkWeightReminder() {
-        const lastPrompt = appData.lastWeightPrompt;
-        const today = getTodayStr();
-        if (!lastPrompt) { appData.lastWeightPrompt = today; saveData(); return; }
-        const diffDays = Math.floor((new Date(today) - new Date(lastPrompt)) / (1000*60*60*24));
-        if (diffDays >= 7) {
-            setTimeout(() => { document.getElementById('modal-weight').style.display = 'flex'; }, 1500);
-        }
-    }
-
-    function saveWeightEntry() {
-        const val = parseFloat(document.getElementById('input-weight-val').value);
-        if (isNaN(val) || val < 30 || val > 300) return showAlert("Poids invalide","Entre un poids valide.");
-        if (!appData.weightHistory) appData.weightHistory = [];
-        appData.weightHistory.push({ date: getTodayStr(), weight: val });
-        appData.lastWeightPrompt = getTodayStr();
-        if (appData.profile) appData.profile.weight = val;
-        saveData(); closeWeightModal(); renderWeightChart();
-        showToast("Poids enregistré ⚖️");
-    }
-
-    function closeWeightModal() {
-        document.getElementById('modal-weight').style.display = 'none';
-        appData.lastWeightPrompt = getTodayStr();
-        saveData();
-    }
-
-    function renderWeightChart() {
-        const history = appData.weightHistory || [];
-        const emptyEl = document.getElementById('weight-empty');
-        const canvas = document.getElementById('weight-chart');
-        const listEl = document.getElementById('weight-list');
-        if (history.length < 2) { emptyEl.style.display='block'; canvas.style.display='none'; listEl.innerHTML=''; return; }
-        emptyEl.style.display = 'none';
-        canvas.style.display = 'block';
-        const ctx = canvas.getContext('2d');
-        const W = canvas.offsetWidth || 300;
-        const H = 120;
-        canvas.width = W; canvas.height = H;
-        ctx.clearRect(0,0,W,H);
-        const weights = history.map(e=>e.weight);
-        const minW = Math.min(...weights) - 1;
-        const maxW = Math.max(...weights) + 1;
-        const pad = { l:30, r:10, t:10, b:20 };
-        const chartW = W - pad.l - pad.r;
-        const chartH = H - pad.t - pad.b;
-        const toX = (i) => pad.l + (i/(history.length-1)) * chartW;
-        const toY = (w) => pad.t + (1 - (w-minW)/(maxW-minW)) * chartH;
-        const isDark = document.body.classList.contains('dark-mode');
-        const lineColor = isDark ? '#4fd1c5' : '#38b2ac';
-        const grad = ctx.createLinearGradient(0, pad.t, 0, H);
-        grad.addColorStop(0, isDark ? 'rgba(79,209,197,0.3)' : 'rgba(56,178,172,0.2)');
-        grad.addColorStop(1, 'rgba(0,0,0,0)');
-        ctx.beginPath();
-        ctx.moveTo(toX(0), H);
-        history.forEach((e,i) => ctx.lineTo(toX(i), toY(e.weight)));
-        ctx.lineTo(toX(history.length-1), H);
-        ctx.closePath();
-        ctx.fillStyle = grad;
-        ctx.fill();
-        ctx.beginPath();
-        history.forEach((e,i) => { if(i===0) ctx.moveTo(toX(i),toY(e.weight)); else ctx.lineTo(toX(i),toY(e.weight)); });
-        ctx.strokeStyle = lineColor;
-        ctx.lineWidth = 2.5;
-        ctx.lineJoin = 'round';
-        ctx.stroke();
-        history.forEach((e,i) => {
-            ctx.beginPath();
-            ctx.arc(toX(i), toY(e.weight), 4, 0, Math.PI*2);
-            ctx.fillStyle = lineColor;
-            ctx.fill();
-        });
-        ctx.fillStyle = isDark ? '#a0aec0' : '#718096';
-        ctx.font = '10px Nunito, sans-serif';
-        ctx.textAlign = 'right';
-        ctx.fillText(maxW.toFixed(1), pad.l-4, pad.t+6);
-        ctx.fillText(minW.toFixed(1), pad.l-4, H-pad.b);
-        listEl.innerHTML = '';
-        const sorted = [...history].reverse();
-        sorted.forEach((e, i) => {
-            const prev = sorted[i+1];
-            let deltaHtml = '';
-            if (prev) {
-                const diff = (e.weight - prev.weight).toFixed(1);
-                const cls = diff > 0 ? 'weight-delta-pos' : diff < 0 ? 'weight-delta-neg' : 'weight-delta-0';
-                const sign = diff > 0 ? '+' : '';
-                deltaHtml = `<span class="${cls}">${sign}${diff} kg</span>`;
-            }
-            listEl.innerHTML += `<div class="weight-entry"><span>${formatDate(e.date)}</span><div style="display:flex;gap:10px;align-items:center">${deltaHtml}<span style="font-weight:800">${e.weight} kg</span></div></div>`;
-        });
-    }
-
-    function toggleHistory() {
-        historyOpen = !historyOpen;
-        const list = document.getElementById('history-list');
-        const chevron = document.getElementById('history-chevron');
-        list.style.display = historyOpen ? 'block' : 'none';
-        chevron.style.transform = historyOpen ? 'rotate(180deg)' : 'rotate(0deg)';
-        if (historyOpen) {
-            list.innerHTML = '';
-            const keys = Object.keys(appData.days).sort().reverse();
-            if (!keys.length) { list.innerHTML='<div style="color:var(--text-muted);font-size:0.85rem">Aucun historique pour l\'instant.</div>'; return; }
-            keys.forEach(d => {
-                const day = appData.days[d];
-                const total = day.meals.reduce((s,m)=>s+m.kcal,0);
-                const el = document.createElement('div');
-                el.className = 'card';
-                el.style.cssText = 'padding:12px;cursor:pointer;margin-bottom:8px;display:flex;justify-content:space-between;align-items:center';
-                el.innerHTML = `<div><div style="font-weight:800">${formatDate(d)}</div><div style="font-size:0.8rem;color:var(--text-muted)">${day.meals.length} repas • ${day.closed?'✅ Clôturé':'⏳ En cours'}</div></div><div style="font-weight:900;color:var(--primary)">${total} kcal</div>`;
-                el.onclick = () => { selectedDate=d; renderWeek(); renderHomeData(); showSection('view-home'); };
-                list.appendChild(el);
-            });
-        }
-    }
-
-    function formatDate(ds) {
-        const d = new Date(ds+'T12:00:00');
-        return d.toLocaleDateString('fr-FR',{weekday:'long',day:'numeric',month:'long'});
-    }
-
-    function showSection(id) {
-        const current = document.querySelector('.view-section.active');
-        if (current && current.id !== id) navHistory.push(current.id);
-        document.querySelectorAll('.view-section').forEach(v => v.classList.remove('active'));
+    function showSection(id){
+        const current=document.querySelector('.view-section.active');
+        if(current&&current.id!==id)navHistory.push(current.id);
+        document.querySelectorAll('.view-section').forEach(v=>v.classList.remove('active'));
         document.getElementById(id).classList.add('active');
-        document.getElementById('btn-back').style.visibility = id==='view-home' ? 'hidden' : 'visible';
-        if (id === 'view-menu') renderWeightChart();
-        if (id === 'view-day') renderMealCategories();
+        document.getElementById('btn-back').style.visibility=id==='view-home'?'hidden':'visible';
+        if(id==='view-menu')renderWeightChart();
+        if(id==='view-day')renderMealCategories();
         window.scrollTo(0,0);
     }
-    function goBack() {
-        if (navHistory.length > 0) { const prev=navHistory.pop(); showSection(prev); navHistory.pop(); }
-        else { showSection('view-home'); }
-    }
+    function goBack(){if(navHistory.length>0){const prev=navHistory.pop();showSection(prev);navHistory.pop();}else{showSection('view-home');}}
 
-    function toggleTheme() { appData.theme=(appData.theme==='light'?'dark':'light'); applyTheme(); saveData(); showToast(appData.theme==='dark'?"Mode sombre activé 🌙":"Mode clair activé ☀️"); }
-    function applyTheme() { document.body.classList.toggle('dark-mode', appData.theme==='dark'); }
-    function saveData() { localStorage.setItem('nutri_v5_pro_complete', JSON.stringify(appData)); }
-    function saveApiKey() { appData.apiKey=document.getElementById('api-key-in').value.trim(); saveData(); showToast("Clé API enregistrée 🔑"); }
-    function resetApp() {
-        showAlert("⚠️ Attention","Pour tout effacer, ferme cette alerte puis clique à nouveau sur Reset.");
-        if (!window._resetConfirm) { window._resetConfirm=true; setTimeout(()=>{window._resetConfirm=false;},5000); return; }
-        localStorage.clear(); location.reload();
+    function toggleTheme(){appData.theme=(appData.theme==='light'?'dark':'light');applyTheme();saveData();showToast(appData.theme==='dark'?"Mode sombre activé 🌙":"Mode clair activé ☀️");}
+    function applyTheme(){document.body.classList.toggle('dark-mode',appData.theme==='dark');}
+    function saveApiKey(){appData.apiKey=document.getElementById('api-key-in').value.trim();saveData();showToast("Clé API enregistrée 🔑");}
+    function resetApp(){
+        if(!window._resetConfirm){window._resetConfirm=true;showAlert("⚠️ Attention","Clique encore une fois sur Reset pour confirmer la suppression de toutes tes données.");setTimeout(()=>{window._resetConfirm=false;},5000);return;}
+        localStorage.clear();location.reload();
     }
-    function showAlert(t,m) { document.getElementById('alert-title').textContent=t; document.getElementById('alert-msg').textContent=m; document.getElementById('modal-alert').style.display='flex'; }
-    function closeAlert() { document.getElementById('modal-alert').style.display='none'; }
-    function showToast(msg) { const t=document.getElementById('toast'); t.textContent=msg; t.classList.add('show'); setTimeout(()=>t.classList.remove('show'),2500); }
+    function showAlert(t,m){document.getElementById('alert-title').textContent=t;document.getElementById('alert-msg').textContent=m;document.getElementById('modal-alert').style.display='flex';}
+    function closeAlert(){document.getElementById('modal-alert').style.display='none';}
+    function showToast(msg){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2500);}
 </script>
 </body>
 </html>
