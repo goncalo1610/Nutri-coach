@@ -1,1 +1,994 @@
+From: <Saved by Blink>
+Snapshot-Content-Location: https://goncalo1610.github.io/Nutri-coach/
+Subject: NUTRI+ Coach
+Date: Thu, 5 Mar 2026 21:49:00 +0100
+MIME-Version: 1.0
+Content-Type: multipart/related;
+	type="text/html";
+	boundary="----MultipartBoundary--ErmlwJkS6mirmOgL5J7tD6HBYrBkPeYG9hklQ9XRsj----"
 
+
+------MultipartBoundary--ErmlwJkS6mirmOgL5J7tD6HBYrBkPeYG9hklQ9XRsj----
+Content-Type: text/html
+Content-ID: <frame-0792B557D2EBF503DCBAC124B0801AB6@mhtml.blink>
+Content-Transfer-Encoding: binary
+Content-Location: https://goncalo1610.github.io/Nutri-coach/
+
+<!DOCTYPE html><html lang="fr"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8"><link rel="stylesheet" type="text/css" href="cid:css-a69af40e-626f-490a-9cab-6c1e41b39de3@mhtml.blink" />
+    
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>NUTRI+ Coach</title>
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&amp;display=swap" rel="stylesheet">
+    
+</head>
+<body class="dark-mode">
+
+<!-- ===== Ã‰CRAN DE CONNEXION ===== -->
+<div id="login-screen" class="hidden">
+    <div class="login-box">
+        <div class="login-logo">ğŸ¥—</div>
+        <div class="login-title">NUTRI+</div>
+        <div class="login-subtitle">Coach IA</div>
+        <div class="login-desc">Connecte-toi pour sauvegarder tes donnÃ©es dans le cloud et y accÃ©der depuis n'importe quel appareil.</div>
+        <button class="btn-google">
+            <svg class="google-icon" viewBox="0 0 24 24">
+                <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"></path>
+                <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"></path>
+                <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"></path>
+                <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"></path>
+            </svg>
+            Continuer avec Google
+        </button>
+        <div class="login-privacy">ğŸ”’ Tes donnÃ©es sont privÃ©es et sÃ©curisÃ©es</div>
+    </div>
+</div>
+
+<div id="app-container">
+    <header>
+        <button class="header-btn" id="btn-back" style="visibility:hidden">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M15 18l-6-6 6-6"></path></svg>
+        </button>
+        <div class="header-title">
+            <span style="display:flex;align-items:center;gap:6px">
+                NUTRI+
+                <span id="cloud-status" class="cloud-badge synced">â˜ï¸ Sync</span>
+            </span>
+            <span class="header-subtitle">Coach IA</span>
+        </div>
+        <div id="header-avatar" style="cursor:pointer"><img src="https://lh3.googleusercontent.com/a/ACg8ocLmpRXLHAZ-fq1pS1rRoKdxb--kJgAoayfhDpc6v1N6cTOh7o9b=s96-c" class="user-avatar" alt="avatar"></div>
+    </header>
+
+    <div id="toast" class="toast">DonnÃ©es chargÃ©es depuis le cloud â˜ï¸</div>
+
+    <div id="modal-alert" class="modal-overlay">
+        <div class="modal-box"><h3 id="alert-title">Info</h3><p id="alert-msg">...</p><button>D'accord</button></div>
+    </div>
+
+    <div id="modal-steps" class="modal-overlay">
+        <div class="modal-box">
+            <h3>ğŸ Fin de journÃ©e</h3><p>Combien de pas as-tu fait aujourd'hui ?</p>
+            <input type="number" id="input-steps-val" placeholder="Ex: 8000" style="text-align:center;font-size:1.3rem;font-weight:900;border-color:var(--primary);margin-bottom:14px">
+            <button class="gemini-btn">Valider le bilan âœ¨</button>
+            <button class="secondary" style="margin-top:8px">Continuer sans les pas</button>
+            <button class="outline" style="margin-top:10px">Annuler</button>
+        </div>
+    </div>
+
+    <div id="modal-delete-meal" class="modal-overlay">
+        <div class="modal-box"><h3>ğŸ—‘ï¸ Supprimer ?</h3><p>Veux-tu vraiment supprimer ce repas ?</p>
+            <button class="danger">Supprimer</button>
+            <button class="outline" style="margin-top:8px">Annuler</button>
+        </div>
+    </div>
+
+    <div id="modal-sleep" class="modal-overlay">
+        <div class="modal-box">
+            <div style="font-size:2rem;margin-bottom:6px">ğŸ˜´</div>
+            <h3>Sommeil de la nuit</h3>
+            <p>Combien d'heures as-tu dormi cette nuit ?</p>
+            <div style="display:flex;align-items:center;justify-content:center;gap:12px;margin-bottom:18px">
+                <button style="width:44px;height:44px;border-radius:50%;font-size:1.3rem;padding:0;background:var(--primary-light);color:var(--primary);border:2px solid var(--primary)">âˆ’</button>
+                <div style="text-align:center;min-width:70px">
+                    <div id="sleep-input-val" style="font-size:2.8rem;font-weight:900;color:var(--primary);line-height:1">7.0</div>
+                    <div style="font-size:0.72rem;font-weight:700;color:var(--text-muted)">heures</div>
+                </div>
+                <button style="width:44px;height:44px;border-radius:50%;font-size:1.3rem;padding:0;background:var(--primary-light);color:var(--primary);border:2px solid var(--primary)">+</button>
+            </div>
+            <div id="sleep-quality-msg" style="font-size:0.82rem;font-weight:700;text-align:center;margin-bottom:14px;min-height:20px"></div>
+            <button class="gemini-btn">Enregistrer ğŸ’¾</button>
+            <button class="outline" style="margin-top:8px">Annuler</button>
+        </div>
+    </div>
+
+    <div id="modal-weekly-report" class="modal-overlay">
+        <div class="modal-box">
+            <div style="font-size:2rem;margin-bottom:6px">ğŸ“Š</div>
+            <h3>Bilan de la semaine</h3>
+            <div id="weekly-report-content" style="margin:12px 0;font-size:0.88rem;line-height:1.7"></div>
+            <button class="gemini-btn">Compris ğŸ’ª</button>
+        </div>
+    </div>
+
+    <div id="modal-weight" class="modal-overlay">
+        <div class="modal-box">
+            <h3>âš–ï¸ Mise Ã  jour du poids</h3>
+            <p>Une semaine s'est Ã©coulÃ©e ! Entre ton poids actuel pour suivre ta progression.</p>
+            <input type="number" id="input-weight-val" placeholder="Ex: 72.5" step="0.1" style="text-align:center;font-size:1.5rem;font-weight:900;border-color:var(--primary);margin-bottom:14px">
+            <button class="gemini-btn">Enregistrer mon poids</button>
+            <button class="outline" style="margin-top:8px">Plus tard</button>
+        </div>
+    </div>
+
+    <!-- 0. PROFIL -->
+    <div id="view-profile" class="view-section">
+        <h2>Ton Profil ğŸ‘¤</h2>
+        <div class="profile-section-title">ğŸ“‹ Informations de base</div>
+        <div class="card">
+            <label>PrÃ©nom</label>
+            <input type="text" id="p-name" placeholder="Ton prÃ©nom">
+            <div class="grid-2">
+                <div><label>Poids actuel (kg)</label><input type="number" id="p-weight" value="70" min="30" max="300" step="0.1"></div>
+                <div><label>Taille (cm)</label><input type="number" id="p-height" value="175" min="100" max="250"></div>
+            </div>
+            <div class="grid-2">
+                <div><label>Ã‚ge</label><input type="number" id="p-age" value="30" min="10" max="100"></div>
+                <div>
+                    <label>Sexe</label>
+                    <select id="p-sex"><option value="male">Homme</option><option value="female">Femme</option></select>
+                </div>
+            </div>
+            <label>Morphotype <span class="profile-hint">influence la rÃ©partition des macros</span></label>
+            <div class="morph-selector" id="morph-selector">
+                <div class="morph-opt" data-val="ecto">
+                    <div class="morph-icon">ğŸ¦´</div>
+                    <div class="morph-name">Ectomorphe</div>
+                    <div class="morph-desc">Mince, du mal Ã  prendre du poids</div>
+                </div>
+                <div class="morph-opt" data-val="meso">
+                    <div class="morph-icon">ğŸ’ª</div>
+                    <div class="morph-name">MÃ©somorphe</div>
+                    <div class="morph-desc">MusclÃ© naturellement, poids stable</div>
+                </div>
+                <div class="morph-opt selected" data-val="endo">
+                    <div class="morph-icon">ğŸ”¥</div>
+                    <div class="morph-name">Endomorphe</div>
+                    <div class="morph-desc">Tendance Ã  stocker, prise facile</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="profile-section-title">ğŸ¯ Objectif</div>
+        <div class="card">
+            <label>Direction</label>
+            <select id="p-goal-dir">
+                <option value="loss">ğŸƒ Perdre du poids</option>
+                <option value="maintain">âš–ï¸ Maintenir mon poids</option>
+                <option value="gain">ğŸ’ª Prise de masse</option>
+            </select>
+            <div id="goal-target-block" style="display: block;">
+                <div class="grid-2">
+                    <div><label>Poids cible (kg)</label><input type="number" id="p-weight-target" placeholder="Ex: 72" step="0.1" min="30" max="300"></div>
+                    <div><label>DÃ©lai (semaines)</label><input type="number" id="p-goal-weeks" placeholder="Ex: 12" min="1" max="104"></div>
+                </div>
+                <div id="goal-calc-preview" class="goal-calc-box" style="display: block;"><div>ğŸ“‰ Ã‰cart : <span class="gcb-val">-3.4 kg</span> en 50 semaines</div><div>Ajustement : <span class="gcb-val">-75 kcal/jour</span></div></div>
+            </div>
+        </div>
+
+        <div class="profile-section-title">ğŸƒ ActivitÃ© &amp; Mode de vie</div>
+        <div class="card">
+            <label>Niveau d'activitÃ© physique</label>
+            <select id="p-activity">
+                <option value="1.2">SÃ©dentaire â€” bureau, presque pas de sport</option>
+                <option value="1.375" selected="">LÃ©gÃ¨rement actif â€” 1-3 sÃ©ances/sem.</option>
+                <option value="1.55">ModÃ©rÃ©ment actif â€” 3-5 sÃ©ances/sem.</option>
+                <option value="1.725">TrÃ¨s actif â€” sport quotidien intensif</option>
+            </select>
+            <label>FrÃ©quence de repas souhaitÃ©e</label>
+            <select id="p-meal-freq">
+                <option value="3">3 repas / jour (classique)</option>
+                <option value="4" selected="">4 repas / jour (+ 1 collation)</option>
+                <option value="5">5 repas / jour (+ 2 collations)</option>
+                <option value="2">2 repas / jour (intermittent)</option>
+            </select>
+            <label>Niveau de stress</label>
+            <select id="p-stress">
+                <option value="low">Faible ğŸ˜Œ</option>
+                <option value="medium" selected="">ModÃ©rÃ© ğŸ˜</option>
+                <option value="high">Ã‰levÃ© ğŸ˜¤</option>
+                <option value="very_high">TrÃ¨s Ã©levÃ© ğŸ¤¯</option>
+            </select>
+        </div>
+
+        <div class="profile-section-title">ğŸ¥— Alimentation &amp; Restrictions</div>
+        <div class="card">
+            <label>RÃ©gime alimentaire</label>
+            <select id="p-diet">
+                <option value="none">Aucun rÃ©gime particulier</option>
+                <option value="vegetarian">ğŸ¥¦ VÃ©gÃ©tarien</option>
+                <option value="vegan">ğŸŒ± Vegan</option>
+                <option value="gluten_free">ğŸŒ¾ Sans gluten</option>
+                <option value="halal">â˜ªï¸ Halal</option>
+                <option value="keto">ğŸ¥‘ Keto / Low carb</option>
+                <option value="paleo">ğŸ¥© PalÃ©o</option>
+            </select>
+            <label>Allergies / IntolÃ©rances</label>
+            <input type="text" id="p-allergies" placeholder="Ex: lactose, arachides, fruits de mer...">
+            <label>Niveau en cuisine</label>
+            <select id="p-cooking">
+                <option value="beginner">ğŸ‘¶ DÃ©butant â€” recettes simples</option>
+                <option value="intermediate" selected="">ğŸ§‘â€ğŸ³ IntermÃ©diaire</option>
+                <option value="advanced">ğŸ‘¨â€ğŸ³ ConfirmÃ© â€” j'aime cuisiner</option>
+            </select>
+        </div>
+
+        <div class="profile-section-title">ğŸ¤– Contexte pour l'IA</div>
+        <div class="card">
+            <label>DÃ©cris ton quotidien</label>
+            <textarea id="p-lifestyle" rows="4" style="resize:none" placeholder="Ex: Je travaille dans un bureau 9h-18h, je fais de la musculation 3x/semaine..."></textarea>
+        </div>
+
+        <button class="gemini-btn" style="margin-bottom:20px">Enregistrer mon profil ğŸ’¾</button>
+    </div>
+
+    <!-- 1. HOME -->
+    <div id="view-home" class="view-section active">
+        <h2>Bonjour <span id="home-user-name">GonÃ§alo</span> ğŸ‘‹</h2>
+        <div class="profile-summary" id="profile-summary"><span class="profile-chip">ğŸ”¥ 2493 kcal/j</span><span class="profile-chip">Perte de poids</span><span class="profile-chip">ğŸ¯ 72 kg</span><span class="profile-chip">Endomorphe</span><span class="profile-chip">ğŸ˜´ moy. 7.6h</span></div>
+        <div id="week-container"><div class="week-card"><div class="wc-day">Ven</div><div class="wc-num">27</div><div style="width:5px;height:5px;border-radius:50%;background:var(--primary);margin:3px auto 0"></div></div><div class="week-card"><div class="wc-day">Sam</div><div class="wc-num">28</div><div style="width:5px;height:5px;border-radius:50%;background:var(--primary);margin:3px auto 0"></div></div><div class="week-card"><div class="wc-day">Dim</div><div class="wc-num">1</div><div style="width:5px;height:5px;border-radius:50%;background:var(--primary);margin:3px auto 0"></div></div><div class="week-card"><div class="wc-day">Lun</div><div class="wc-num">2</div><div style="width:5px;height:5px;border-radius:50%;background:var(--primary);margin:3px auto 0"></div></div><div class="week-card"><div class="wc-day">Mar</div><div class="wc-num">3</div><div style="width:5px;height:5px;border-radius:50%;background:var(--primary);margin:3px auto 0"></div></div><div class="week-card"><div class="wc-day">Mer</div><div class="wc-num">4</div><div style="width:5px;height:5px;border-radius:50%;background:var(--primary);margin:3px auto 0"></div></div><div class="week-card active-day-card"><div class="wc-day">Jeu</div><div class="wc-num">5</div><div style="width:5px;height:5px;border-radius:50%;background:var(--primary);margin:3px auto 0"></div></div></div>
+
+        <div class="card calorie-card">
+            <div style="display:flex;justify-content:space-between;align-items:center">
+                <div>
+                    <div style="font-size:0.7rem;font-weight:800;text-transform:uppercase;color:var(--text-muted);letter-spacing:1px;margin-bottom:4px">Calories du jour</div>
+                    <div style="font-size:2.2rem;font-weight:900;color:var(--primary);letter-spacing:-1px">
+                        <span id="h-cal">1939</span>
+                        <span style="font-size:0.95rem;font-weight:600;color:var(--text-muted)"> / <span id="h-target">2493</span> kcal</span>
+                    </div>
+                    <div id="h-cal-status" style="font-size:0.8rem;font-weight:700;margin-top:4px;color:var(--text-muted)">Il te reste 554 kcal</div>
+                </div>
+                <div class="gauge-wrapper" style="width:80px;height:80px">
+                    <svg viewBox="0 0 36 36" class="gauge-svg">
+                        <path class="gauge-bg" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"></path>
+                        <path id="g-cal-fill" class="gauge-fill" stroke="var(--primary)" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" style="stroke-dashoffset: 22.2222;"></path>
+                    </svg>
+                    <div class="gauge-icon" style="font-size:1.5rem">ğŸ”¥</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="grid-3" style="margin-bottom:12px">
+            <div class="card macro-card-v3" style="margin:0">
+                <span style="font-size:0.62rem;color:var(--text-muted);font-weight:800;text-transform:uppercase">ProtÃ©ines</span>
+                <div class="gauge-wrapper" style="width:38px;height:38px">
+                    <svg viewBox="0 0 36 36" class="gauge-svg"><path class="gauge-bg" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"></path><path id="g-prot-fill" class="gauge-fill" stroke="var(--prot-color)" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" style="stroke-dashoffset: 22.0238;"></path></svg>
+                    <div class="gauge-icon" style="font-size:0.95rem">ğŸ¥©</div>
+                </div>
+                <div style="font-weight:800;color:var(--prot-color);font-size:0.88rem"><span id="h-prot">131</span>g</div>
+                <div class="macro-val-target">/ <span id="h-prot-target">168</span>g</div>
+            </div>
+            <div class="card macro-card-v3" style="margin:0">
+                <span style="font-size:0.62rem;color:var(--text-muted);font-weight:800;text-transform:uppercase">Glucides</span>
+                <div class="gauge-wrapper" style="width:38px;height:38px">
+                    <svg viewBox="0 0 36 36" class="gauge-svg"><path class="gauge-bg" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"></path><path id="g-carb-fill" class="gauge-fill" stroke="var(--carb-color)" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" style="stroke-dashoffset: 18.5567;"></path></svg>
+                    <div class="gauge-icon" style="font-size:0.95rem">ğŸ</div>
+                </div>
+                <div style="font-weight:800;color:var(--carb-color);font-size:0.88rem"><span id="h-carb">237</span>g</div>
+                <div class="macro-val-target">/ <span id="h-carb-target">291</span>g</div>
+            </div>
+            <div class="card macro-card-v3" style="margin:0">
+                <span style="font-size:0.62rem;color:var(--text-muted);font-weight:800;text-transform:uppercase">Lipides</span>
+                <div class="gauge-wrapper" style="width:38px;height:38px">
+                    <svg viewBox="0 0 36 36" class="gauge-svg"><path class="gauge-bg" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"></path><path id="g-fat-fill" class="gauge-fill" stroke="var(--fat-color)" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" style="stroke-dashoffset: 27.3973;"></path></svg>
+                    <div class="gauge-icon" style="font-size:0.95rem">ğŸ¥‘</div>
+                </div>
+                <div style="font-weight:800;color:var(--fat-color);font-size:0.88rem"><span id="h-fat">53</span>g</div>
+                <div class="macro-val-target">/ <span id="h-fat-target">73</span>g</div>
+            </div>
+        </div>
+
+        <div class="grid-2" style="margin-bottom:14px">
+            <div class="card" style="cursor:pointer;display:flex;align-items:center;gap:10px;margin:0;border:1.5px dashed rgba(128,90,213,0.3);background:rgba(128,90,213,0.03)">
+                <div style="width:38px;height:38px;border-radius:10px;background:rgba(128,90,213,0.12);display:flex;align-items:center;justify-content:center;font-size:1.2rem;flex-shrink:0">ğŸ˜´</div>
+                <div style="min-width:0">
+                    <div style="font-size:0.6rem;font-weight:800;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.5px">Sommeil</div>
+                    <div id="h-sleep-val" style="font-weight:800;font-size:0.88rem;color:var(--secondary);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">ğŸŸ¢ 8.5h</div>
+                </div>
+            </div>
+            <div class="card" style="cursor:pointer;display:flex;align-items:center;gap:10px;margin:0;border:1.5px dashed rgba(56,178,172,0.3);background:rgba(56,178,172,0.03)">
+                <div style="width:38px;height:38px;border-radius:10px;background:rgba(56,178,172,0.12);display:flex;align-items:center;justify-content:center;font-size:1.2rem;flex-shrink:0">ğŸ‹ï¸</div>
+                <div style="min-width:0">
+                    <div style="font-size:0.6rem;font-weight:800;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.5px">Sport</div>
+                    <div id="h-sport-val" style="font-weight:800;font-size:0.88rem;color:var(--primary);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">+ Ajouter une sÃ©ance</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="card water-card">
+            <div class="water-header">
+                <div class="water-title">ğŸ’§ Hydratation</div>
+                <div class="water-stats">Objectif : <span id="w-target">12</span> verres Â· <span id="w-target-l">3</span>L</div>
+            </div>
+            <div class="water-controls">
+                <button class="water-pm-btn minus">âˆ’</button>
+                <div class="water-count-display">
+                    <div class="water-count-num"><span id="w-current">9</span></div>
+                    <div class="water-count-sub"><span id="w-liters">2.25</span>L Â· <span id="w-pct">75</span>%</div>
+                </div>
+                <button class="water-pm-btn">+</button>
+            </div>
+            <div class="water-progress-track"><div class="water-progress-fill" id="water-progress-fill" style="width: 75%;"></div></div>
+            <div class="water-footer">
+                <div class="water-msg" id="water-msg">Plus que 3 verre(s) !</div>
+            </div>
+        </div>
+
+        <div class="section-title">Repas du jour</div>
+        <div id="home-meals-list"><div class="meal-item"><div style="display:flex;justify-content:space-between;align-items:center;width:100%"><div class="meal-item-left" style="flex:1;min-width:0"><div class="meal-type-icon">â˜•</div><div style="min-width:0"><div class="meal-item-name">Petit DÃ©jeuner<span class="meal-chevron">â–¼</span></div><div class="meal-item-kcal">394 kcal</div></div></div><div style="display:flex;align-items:center;gap:4px;flex-shrink:0"><span style="font-size:1.2rem">ğŸ˜</span><button class="meal-edit-btn">âœï¸</button><button class="meal-delete-btn">ğŸ—‘ï¸</button></div></div><div class="meal-item-detail"><div class="meal-item-desc">ğŸ“ Overnight oats 
+Ingredients :
+-50g de farine d'avoine 
+-25g de whey
+-une cuillÃ¨re Ã  soupe de skyr
+-10ml de lait
+-une cuillÃ¨re Ã  cafÃ© de beurre de cacahuÃ¨te et 2 carrÃ© de chocolat noir 70%
+-5 framboises</div><div class="meal-item-tips">ğŸ’¡ Pour atteindre votre objectif de 698 kcal, vous pourriez augmenter les portions de farine d'avoine (ex: 80-90g) et/ou de whey.<br>â€¢ Ajoutez des sources saines de graisses et de fibres comme des noix, des graines de chia (15-20g) ou un fruit plus consÃ©quent comme une banane.</div><div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:4px"><span style="font-size:0.75rem;font-weight:700;color:var(--prot-color)">ğŸ¥© 31g</span><span style="font-size:0.75rem;font-weight:700;color:var(--carb-color)">ğŸ 39g</span><span style="font-size:0.75rem;font-weight:700;color:var(--fat-color)">ğŸ¥‘ 12g</span></div></div></div><div class="meal-item"><div style="display:flex;justify-content:space-between;align-items:center;width:100%"><div class="meal-item-left" style="flex:1;min-width:0"><div class="meal-type-icon">â˜€ï¸</div><div style="min-width:0"><div class="meal-item-name">DÃ©jeuner<span class="meal-chevron">â–¼</span></div><div class="meal-item-kcal">1020 kcal</div></div></div><div style="display:flex;align-items:center;gap:4px;flex-shrink:0"><span style="font-size:1.2rem">ğŸ˜</span><button class="meal-edit-btn">âœï¸</button><button class="meal-delete-btn">ğŸ—‘ï¸</button></div></div><div class="meal-item-detail"><div class="meal-item-desc">ğŸ“ PÃ¢tes avec poitrine de poulet sauce crÃ¨me et curcuma 
+En dessert un bol de kiwi</div><div class="meal-item-tips">ğŸ’¡ 1. RÃ©duisez la portion de pÃ¢tes d'environ un quart pour diminuer l'apport calorique et glucidique.<br>â€¢ 2. AllÃ©gez la sauce en utilisant une crÃ¨me Ã  faible teneur en matiÃ¨res grasses (5-7%) ou en la coupant avec du bouillon de volaille.<br>â€¢ 3. IntÃ©grez des lÃ©gumes non fÃ©culents (brocolis, Ã©pinards, courgettes) Ã  votre plat de pÃ¢tes pour augmenter la satiÃ©tÃ© et l'apport en fibres et vitamines sans ajouter beaucoup de calories.</div><div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:4px"><span style="font-size:0.75rem;font-weight:700;color:var(--prot-color)">ğŸ¥© 75g</span><span style="font-size:0.75rem;font-weight:700;color:var(--carb-color)">ğŸ 119g</span><span style="font-size:0.75rem;font-weight:700;color:var(--fat-color)">ğŸ¥‘ 30g</span></div></div></div><div class="meal-item"><div style="display:flex;justify-content:space-between;align-items:center;width:100%"><div class="meal-item-left" style="flex:1;min-width:0"><div class="meal-type-icon">ğŸŒ™</div><div style="min-width:0"><div class="meal-item-name">DÃ®ner<span class="meal-chevron">â–¼</span></div><div class="meal-item-kcal">525 kcal</div></div></div><div style="display:flex;align-items:center;gap:4px;flex-shrink:0"><span style="font-size:1.2rem">ğŸ˜</span><button class="meal-edit-btn">âœï¸</button><button class="meal-delete-btn">ğŸ—‘ï¸</button></div></div><div class="meal-item-detail"><div class="meal-item-desc">ğŸ“ PÃ¢tes et saumon fumÃ© crÃ¨me et sauce tomate avec des haricots verts cuits Ã  l'eau</div><div class="meal-item-tips">ğŸ’¡ Pour rÃ©duire l'apport en sel, prÃ©fÃ©rez du saumon frais (cuit Ã  la vapeur ou au four) plutÃ´t que du saumon fumÃ©.<br>â€¢ Utilisez une crÃ¨me trÃ¨s lÃ©gÃ¨re (moins de 10% de matiÃ¨re grasse) ou remplacez une partie de la crÃ¨me par du yaourt grec nature ou du fromage blanc pour allÃ©ger davantage la sauce.<br>â€¢ Continuez Ã  privilÃ©gier une grande portion de lÃ©gumes pour la satiÃ©tÃ© et les fibres.</div><div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:4px"><span style="font-size:0.75rem;font-weight:700;color:var(--prot-color)">ğŸ¥© 25g</span><span style="font-size:0.75rem;font-weight:700;color:var(--carb-color)">ğŸ 79g</span><span style="font-size:0.75rem;font-weight:700;color:var(--fat-color)">ğŸ¥‘ 11g</span></div></div></div></div>
+
+        <div class="card" style="margin-top:6px">
+            <div style="display:flex;align-items:center;gap:12px;cursor:pointer">
+                <div id="chk-bilan-icon" style="width: 26px; height: 26px; border-radius: 8px; border: 2px solid var(--primary); display: flex; align-items: center; justify-content: center; flex-shrink: 0; transition: 0.2s; font-size: 1rem; background: transparent;"></div>
+                <div><div style="font-weight:800">ClÃ´turer la journÃ©e</div><div style="font-size:0.78rem;color:var(--text-muted)">Analyse IA + sauvegarde cloud â˜ï¸</div></div>
+            </div>
+            <div id="loader-bilan" class="loader" style="display: none;">ğŸ§  Le coach analyse ta journÃ©e...</div>
+            <div id="bilan-text" class="coach-message" style="display:none"></div>
+        </div>
+    </div>
+
+    <!-- 2. SPORT -->
+    <div id="view-training" class="view-section">
+        <h2>ğŸ‹ï¸ Sport</h2>
+        <div class="section-title">Raccourcis</div>
+        <div class="shortcuts-container" id="sport-shortcuts"><div class="shortcut-item">Crossfit (60min) <span class="remove">Ã—</span></div><div class="shortcut-item">Padel (90min) <span class="remove">Ã—</span></div><div class="shortcut-item">Musculation (60min) <span class="remove">Ã—</span></div></div>
+        <div class="card">
+            <label>ActivitÃ©</label><input type="text" id="t-act" placeholder="Course Ã  pied, Musculation, VÃ©lo...">
+            <label>DurÃ©e (minutes)</label><input type="number" id="t-dur" value="45" min="1">
+            <label>Calories montre âŒš (optionnel)</label><input type="number" id="t-kcal-manual" placeholder="Laisser vide pour utiliser l'IA">
+            <div id="loader-sport" class="loader" style="display: none;">ğŸ§  Estimation de l'IA en cours...</div>
+            <div style="display:grid;grid-template-columns:1fr auto;gap:10px;margin-top:6px">
+                <button class="gemini-btn">Estimation IA âœ¨</button>
+                <button class="outline small" title="Raccourci" style="width:50px;font-size:1.2rem">â­</button>
+            </div>
+            <div id="t-preview" style="display:none;text-align:center;margin-top:16px;padding:16px;background:var(--primary-light);border-radius:12px">
+                <div style="font-size:0.75rem;font-weight:700;color:var(--text-muted);text-transform:uppercase;letter-spacing:1px">Estimation IA</div>
+                <div style="font-size:1.8rem;font-weight:900;color:var(--primary);margin:4px 0"><span id="t-kcal-ia">0</span> kcal</div>
+                <button class="outline small" style="margin:0 auto">Annuler</button>
+            </div>
+            <button style="background:var(--success);margin-top:16px">âœ… Valider la sÃ©ance</button>
+        </div>
+    </div>
+
+    <!-- 3. SÃ‰LECTION CATÃ‰GORIE REPAS -->
+    <div id="view-day" class="view-section">
+        <h2>ğŸ½ï¸ Ajouter un repas</h2>
+        <p style="font-size:0.85rem;color:var(--text-muted);margin:-8px 0 16px 0">SÃ©lectionne une catÃ©gorie pour saisir ton repas</p>
+        <div id="meal-categories-grid"></div>
+    </div>
+
+    <!-- 3b. FORMULAIRE SAISIE REPAS -->
+    <div id="view-meal-form" class="view-section">
+        <h2 id="meal-form-title">â˜• Petit DÃ©jeuner</h2>
+        <div class="card">
+            <div id="existing-meals-preview" style="display:none; margin-bottom:14px">
+                <div class="section-title" style="margin-top:0">DÃ©jÃ  enregistrÃ©s aujourd'hui</div>
+                <div id="existing-meals-list"></div>
+            </div>
+            <label>Photos du repas <span style="font-weight:600;text-transform:none;font-size:0.75rem;color:var(--primary)">(jusqu'Ã  4)</span></label>
+            <div style="display:flex;gap:10px;margin-bottom:6px;flex-shrink:0">
+                <div class="add-photo-btn"><span>ğŸ“¸</span>Photo</div>
+                <div class="add-photo-btn"><span>ğŸ–¼ï¸</span>Galerie</div>
+            </div>
+            <div class="images-grid" id="images-grid"></div>
+            <label>Description du repas</label>
+            <textarea id="m-desc" placeholder="Ex: 150g de poulet grillÃ©, riz basmati, salade verte..." rows="3" style="resize:none"></textarea>
+            <div id="loader-m" class="loader" style="display: none;">ğŸ” L'IA analyse ton repas...</div>
+            <div id="m-preview" style="display:none" class="card">
+                <div style="display:flex;align-items:center;gap:12px;margin-bottom:10px">
+                    <div id="meal-health-emoji" style="font-size:2.5rem;line-height:1">ğŸ˜Š</div>
+                    <div>
+                        <div style="font-weight:800;font-size:1rem">RÃ©sultats de l'analyse</div>
+                        <div id="meal-health-label" style="font-size:0.82rem;color:var(--text-muted);font-weight:600"></div>
+                    </div>
+                </div>
+                <div id="meal-health-tips" style="display:none;background:rgba(214,158,46,0.1);border-left:3px solid #d69e2e;border-radius:8px;padding:10px 12px;margin-bottom:12px;color:var(--text-color)"></div>
+                <div class="grid-2">
+                    <div><label>Calories (kcal)</label><input type="number" id="m-kcal-val"></div>
+                    <div><label>ProtÃ©ines (g)</label><input type="number" id="m-prot-val"></div>
+                </div>
+                <div class="grid-2">
+                    <div><label>Glucides (g)</label><input type="number" id="m-carb-val"></div>
+                    <div><label>Lipides (g)</label><input type="number" id="m-fat-val"></div>
+                </div>
+                <div class="grid-2" style="margin-top:6px">
+                    <button style="background:var(--success)">âœ… Valider</button>
+                    <button class="outline">Annuler</button>
+                </div>
+            </div>
+            <button class="gemini-btn" id="btn-analyze-meal">ğŸ” Analyser avec l'IA</button>
+        </div>
+    </div>
+
+    <!-- 4. OUTILS -->
+    <div id="view-menu" class="view-section">
+        <h2>ğŸ› ï¸ Outils Coach</h2>
+        <div class="card">
+            <h3>ğŸ½ï¸ Scan Menu Restaurant</h3>
+            <p style="font-size:0.85rem;color:var(--text-muted);margin:0 0 12px 0">Prends en photo un menu, l'IA te conseille les plats les plus sains.</p>
+            <div class="grid-2">
+                <button class="secondary">ğŸ“¸ Photo</button>
+                <button class="secondary">ğŸ–¼ï¸ Galerie</button>
+            </div>
+            <div id="loader-scan" class="loader" style="display: none;">ğŸ” Analyse du menu...</div>
+            <div id="scan-res" class="coach-message" style="display:none"></div>
+        </div>
+        <div class="card">
+            <h3>ğŸ‘¨â€ğŸ³ IdÃ©e Recette</h3>
+            <p style="font-size:0.85rem;color:var(--text-muted);margin:0 0 10px 0">Dis-moi ce que tu as dans ton frigo !</p>
+            <label>IngrÃ©dients disponibles</label>
+            <input type="text" id="fridge-in" placeholder="Ex: poulet, courgettes, riz...">
+            <button class="gemini-btn">ğŸ³ Trouver une recette</button>
+            <div id="loader-recipe" class="loader" style="display: none;">ğŸ§  CrÃ©ation de la recette...</div>
+            <div id="recipe-res" class="coach-message" style="display:none"></div>
+        </div>
+        <div class="card">
+            <h3>âš–ï¸ Ã‰volution du poids</h3>
+            <div id="weight-chart-container">
+                <div id="weight-empty" style="text-align: center; color: var(--text-muted); font-size: 0.85rem; padding: 10px; display: none;">Aucune donnÃ©e pour l'instant.</div>
+                <canvas id="weight-chart" class="weight-chart" style="display: block;" width="300" height="120"></canvas>
+                <div id="weight-list" style="margin-top:10px"><div class="weight-entry"><span>dimanche 1 mars</span><div style="display:flex;gap:10px;align-items:center"><span class="weight-delta-neg">-1.0 kg</span><span style="font-weight:800">75.4 kg</span></div></div><div class="weight-entry"><span>mercredi 25 fÃ©vrier</span><div style="display:flex;gap:10px;align-items:center"><span class="weight-delta-neg">-0.6 kg</span><span style="font-weight:800">76.4 kg</span></div></div><div class="weight-entry"><span>lundi 23 fÃ©vrier</span><div style="display:flex;gap:10px;align-items:center"><span style="font-weight:800">77 kg</span></div></div></div>
+            </div>
+        </div>
+        <div class="card" style="cursor:pointer">
+            <div style="display:flex;justify-content:space-between;align-items:center">
+                <h3 style="margin:0">ğŸ“… Historique</h3>
+                <svg id="history-chevron" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" style="transition:transform 0.2s"><path d="M6 9l6 6 6-6"></path></svg>
+            </div>
+            <div id="history-list" style="display:none;margin-top:12px"></div>
+        </div>
+    </div>
+
+    <!-- 5. RÃ‰GLAGES -->
+    <div id="view-settings" class="view-section">
+        <h2>âš™ï¸ RÃ©glages</h2>
+
+        <!-- Compte Firebase -->
+        <div class="card" style="background:var(--primary-light);border:1.5px solid var(--primary)">
+            <div style="display:flex;align-items:center;gap:12px">
+                <div id="settings-avatar" style="flex-shrink:0"><img src="https://lh3.googleusercontent.com/a/ACg8ocLmpRXLHAZ-fq1pS1rRoKdxb--kJgAoayfhDpc6v1N6cTOh7o9b=s96-c" style="width:48px;height:48px;border-radius:50%;object-fit:cover;border:2px solid var(--primary)"></div>
+                <div style="flex:1;min-width:0">
+                    <div id="settings-user-name" style="font-weight:900;font-size:1rem">GonÃ§alo Azevedo</div>
+                    <div id="settings-user-email" style="font-size:0.78rem;color:var(--text-muted);font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">goncalo1610@gmail.com</div>
+                    <div style="font-size:0.68rem;color:var(--primary);font-weight:800;margin-top:2px">â˜ï¸ DonnÃ©es synchronisÃ©es</div>
+                </div>
+            </div>
+            <button class="danger" style="margin-top:14px;padding:10px">Se dÃ©connecter</button>
+        </div>
+
+        <div class="card">
+            <h3>ğŸ”‘ ClÃ© API Gemini</h3>
+            <p style="font-size:0.82rem;color:var(--text-muted)">Obtiens ta clÃ© gratuite sur <strong>aistudio.google.com</strong></p>
+            <label>Ta clÃ© API</label>
+            <input type="password" id="api-key-in" placeholder="Colle ta clÃ© ici...">
+            <button>Enregistrer la clÃ©</button>
+        </div>
+        <div class="card">
+            <button class="outline">ğŸ‘¤ Modifier mon profil</button>
+            <button class="outline" style="margin-top:10px">ğŸŒ™ ThÃ¨me Sombre / Clair</button>
+            <button class="outline" style="margin-top:10px">âš–ï¸ Saisir mon poids</button>
+            <button class="danger" style="margin-top:20px">âš ï¸ Tout effacer et recommencer</button>
+        </div>
+        <div class="card" style="text-align:center;padding:20px">
+            <div style="font-size:0.75rem;color:var(--text-muted)">NUTRI+ Coach v4.0 â˜ï¸ Firebase</div>
+        </div>
+    </div>
+
+    <input type="file" id="camera-input" accept="image/*" capture="environment" style="display:none">
+    <input type="file" id="gallery-input" accept="image/*" style="display:none">
+    <input type="file" id="multi-camera-input" accept="image/*" capture="environment" style="display:none">
+    <input type="file" id="multi-gallery-input" accept="image/*" style="display:none">
+
+    <nav class="bottom-nav">
+        <div class="nav-item">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg>
+            <span>Accueil</span>
+        </div>
+        <div class="nav-fab-wrapper"><div class="nav-fab">â•</div></div>
+        <div class="nav-item">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-2 2 2 2 0 01-2-2v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83 0 2 2 0 010-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 01-2-2 2 2 0 012-2h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 010-2.83 2 2 0 012.83 0l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 012-2 2 2 0 012 2v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 0 2 2 0 010 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 012 2 2 2 0 01-2 2h-.09a1.65 1.65 0 00-1.51 1z"></path></svg>
+            <span>RÃ©glages</span>
+        </div>
+    </nav>
+</div>
+
+<!-- ===== FIREBASE SDK ===== -->
+
+
+
+
+
+<iframe ng-non-bindable="" frameborder="0" hspace="0" marginheight="0" marginwidth="0" scrolling="no" tabindex="-1" vspace="0" width="100%" aria-hidden="true" id="I0_1772743672685" name="I0_1772743672685" src="cid:frame-DDD80878A8576F23CA8EE728F42DBD2A@mhtml.blink" style="position: absolute; top: -100px; width: 1px; height: 1px;"></iframe></body></html>
+------MultipartBoundary--ErmlwJkS6mirmOgL5J7tD6HBYrBkPeYG9hklQ9XRsj----
+Content-Type: image/jpeg
+Content-Transfer-Encoding: binary
+Content-Location: https://lh3.googleusercontent.com/a/ACg8ocLmpRXLHAZ-fq1pS1rRoKdxb--kJgAoayfhDpc6v1N6cTOh7o9b=s96-c
+
+ÿØÿà JFIF      ÿá *Exif  II*     1           Picasa  ÿÛ „ 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+	
+
+
+
+
+ÿÀ  ` ` ÿÄ              	 ÿÄ >      !1Ağ"#2aq±	Q¡‘ÁÑBR’²ñ%4CEbr‚ÿÄ             ÿÄ 1         !1"AQaq¡2‘±ÁÑğ#3RáñÿÚ   ? ¸âcš Ö )ŠEqÁ€Aâ §´àS•äE`3Y˜.œúÚútÛ¦'*lÓÉ¤RÆÍlÙC+8åA$ HĞ_®"Ö€ÔÒa áÄ–,1ğ `‹ >&bÂ¦°
+Ûûz
+x¥¥ÂSÓFÓJçá]˜Ú÷°éÏ¦¸ ÊMú~!{rz¹?²êM=L8UE—*óys	x171µĞ €*°½¸SXË<›yÂ+§Œ¼mµk¦–yê'šW9¤|×åğ–8•#@=*¨‘­®ªº‘ëØÏ ¡9nŞí÷ë¶(ä½,ùJ¹ÍR=€Ò2î¢Og_4aÕ[R±V£"+)îiß—7´;Wİeáí„K"ja~’pØÚåO49ˆ†p/Š†“Üšä‡C	† k Xğ ãáá²@Ò<EQEƒ RÅÇ±ÁAILÖ‡jI2LŠW‰7À"CpH‡< ³lÁ?­8òØ·În×ÉXÚ¡äy@&¡QÎ·¾UÚé¯.w$œcV¿›mGƒ°µèšxRì°[ËıhR(QÖô€·½ï}.I¹»|ZóÆtªÎO-›‘·§„†¼¯ì©Tçˆg±‡Äï}-r~gQ¦=!wRfW«Ñô¦·EJŞæäf´5;:y”Ç `×áÅ #-”ê¶!ÑZùÍ÷m.úìÆ|œ}ıŠ¡‰G85;u#zš*‰2ñk(éª$ÈcÏ,(Òeê	˜›¨ëF°Ú3SÊ|<!àÅ!ÍÃÄƒHğF˜`S/ÄCÃÆJœ‡şjª.%ı*O²8‡-µiV'`ßİáÛLú¹<S“ò=(­Ub¼ÆÔó/³i\FììWÒåİÿ †ámq×[¥ïŒ8YJk/îvo¤©Òj;¿DLŞUJq ‘²[[y]¾–Åz”4<3N•Ê¬µE¦ôüÉlºrQİŒ—6
+­!?åVµúcÒ£©º)×é
+t»/Ÿ"Ş‡¨ë¨êDxÇÇd`UÀƒ\_B[\\ƒk¦.Q£*5x1.®!^“K•¿Ğ¼W¤dl¢§şİH¬,D*äF„rş£sø™ÍÇ„HÆ/¦ 3Ş‚Xğsˆñ1†$xªá +'Mˆò¾Ë±i*…_@Y™’ù4r»jF„5Ö¥z®/GsOØ×±µë!*«˜Ê>˜yÏàƒüU»¥¯±ˆ2·ÂK…¿;¨©¦×™¹Îo®šƒ™J¤^õsògK+Jº¥…ê³ùC‹u»–"¢×u`TT]yêMùz›®¼€¯Ri¼G2İ
+ÅÏ‘Vn~©Şy)Ê´ÙÈ:‰?QÌJñà¹+Èæ6ù€A³J­5´ÓùjZÕŸöÚç½gòí×N´Õ>ÒÑq	•H[d†äŞI,?0®œ—P­Š‹Jìäğ¹´—VÔ¾,w7É”EMìÍ|”èœ;œì@ºçÓAÄ 6Qp¤‘~¸Ô¥S¬N^lç/­•½Eş)ïïï’ÃdïıÍÇÓÅ &>ûûsÀ™;ï¿¦‘& ‚à5\Hƒd?æÃîxsLPª®–!ÉÍ…ô™Bµ¬s³f^S“jIm¿Èéz*æ„éÉï&¾dXûÉ DŸ«YU-Í‰$j,}"ìuÒÀÛ1&ø:Õ^)-ğ7©wÏ³VvJ‰½ézõ@EÅÇQ©Ğ4ÁúycSDWMO–F'…·éBÕ2%ªÌ™™6BA¤1¿KüÆ&í¦’–
+°½¥­¨É¯øÌJuø•”ŞÄj5åpÂÇç~G®†™`W7”3NòÁ]K2¡9D¾†Ë`Ëq®Ÿ@-}zqÈtÂ¸«ª/¹/§ı,CGß`bÁ˜"wß\0l :BwØÄ€÷&$ˆ3Ğ0ûÈğëÏKQ`"cât!ãOşT|±GRhõ¥=RğeÚ^ZØÔ	ŒrÆd¶š1mS2İO¤ó[ƒ¡[­ñ€§ÔÉíÎæ4¡s—Æ}Ã¼¸êŒ¦Óˆµ@ŒçaGK40W9—2™‡Ë×0RF{Ü¯¯]SVböîİä»+ÊÅ(KŒ¼¥ìŞSççâ2üg¸:PÜ-–(šOT¯OI([Ôªª/–Ö,ªªlÖ`
+™*òOTŞ}Éå+Æ™SŒ–®üñçÀGˆhiiÂÁHIVrÚ›İ™Bª¹\äòKaSÕRZ¥ÉréĞ˜qÉ5yTŒŠ£`r˜Y:ëk:k Æ¬NX¶N½ò¿íÏ€Éßí€ˆï¾_l :BbD[`²` x¾ïß× 
+ ‹¾Ï¿Ëó Í­şï«¦«Ù`>Ë5RCVUHT©ˆ”©s[ÜÎê™Ì©1|Q«N3›ƒÚXÛÏ&å­J”©Æ¢Ş9ßËâŞ:¦œZ)™ƒfÃV%Iaıá—ÿ "Î‚úâ…:2†ÌëÕ«œ1›ã=âRÃærYF\Ù‹íbÖço•Á¸ÁÔNs^z÷t¡M¥ÉøsÆYTUWœ«,¼8É½¡Yse•´¸âA{Šs·p4£¯D<7õş{œ•mNŸY>÷·¡v¼äiXP²ÆÀ†WW[\pÀØA:XŠÃÜ¡’ÑÍ$Æ#–û·ôúá IÃÀÀ½÷ß×ò>Â‚Î@D˜’TlI° u7 aL<É~'*Z=‹Ã®®^ -ı™·¥Œ‹okÔDÙƒTDEˆQo’^Ş—×«¥U{¥4Ú4,tpå¼y£^;!"ä<Ï›PtÓãJ1 ÛdóägÙóS¸J‰°®¿¥œ|ºc–é4á_RğG]ÑMN†—âÆ—w=;¸¥šh’ÿ 
+ûÈ-Ğ…o„ª‹5Ã§vÚí$üûÈÕ±Òû¥áÜ3è·VK^¡ä™®VôB§¡Èº5ºf,>C¬¥rßÂ±÷!5ÓÏÛè(ßöÊ)@ù¹™aÿ XşXv×^Œ‡H$¨üÑîÌö×ÙNNÏ•xmpĞÊœzg¿\¹‘ĞßRc’"M‰Ílt²§rs	´h&ä?]—PV=µ±T1
+&RÕ:Brr‹LK1ÑÖHQAf©°©:n·=UOåRÖFê¯#Å*‡GB$Eauueb¬§£ƒ¦+4{'™c=÷û}ğ®^f¿M›³šjjı«jÀÍƒÕ€¬¯`ÓH„Ù¡‡09&¦`@³N‹–ï‚»—™Ûãó¶ö“1Úu³IÂ x4XİBÁXÏã+¸–k-#‘sv4ã2)¯o‡æß°×ŒG’°Óóò6û[Q€	£ÊÎú½Š¦Ò0Ul±ÊÇÒ°?(ê.E²BËÈd!É÷V9·Öİ|2¹_ÌV7]D÷ø_?¹£cc<‹ªú†‡•ÿ ¦9=:NÙvÖŸv/k„9‰°Ó>"tûğS/:Ş%xèÑö@&¨µ­Æ‘}Üw·8b$›^KtÓ£èÚ:bê>ş=S¥kfjšîç×ı/¹Z³—ïöÆÉ†$„ü°!æã|Ñí–×Ùõ'ÙÉÌôÒ^j	I½É:bMóÄğHM®Ä\9ÓR$›FŸyyóÓ±öŸ'>Ë´ä9<‡2NÖÿ ¡(P²ƒ­£a÷¿º"ÌÔgIÇĞöS2iT³34ŒÌò3HÌÄ»ÈÌK;³1,ÎìIf$³’I'kcÀI4šÛô?—òûü¿< 9ÕƒÔƒòpwˆ6uĞıÛ 0`+~†ü¾ÿ ¯Këˆ‚4ŸÈß™D«‰h«üBŠ0"v75°¥‚½É¹¨€XH	%—,€›Ê#æï­º·®<?fv=xª.ª_÷_º&O1›éƒgQÉPà4ÇÜÓGÈÍ3Ã^í,^B5«Zí”Ôiéîïô5¯.Uµ'>şñf<í]¥$òLÅ¦ŞiXüR<ŒZG6êìIĞ[ôÇg¢’]ÇÎå'&äù{üÄÈŸ,2 }ğÀ.œéóÏ³„úçB¬ŒÊèÊèÊJ:2UÕ”‚®¬V2›AY¡Q%õï\ sc:_©Ğwùg8¯¢üuÂ ÙŸĞı° ©X„[äE¿~GëËó²‰¶j)äjI'Ä‘0ø£eäÂà‚:2Q”•"ÌÀÆPRN/‚pœ Ô¢ğĞşßşÿ ê¶¤é$È8#X¢ŒÑBYPÔÉ}3´ÒÜîÄJlP–¯oB4cˆóâ\»»Ì”¥Â[/¿Ô½Ÿõ'¿á‹EY1 
+áığ Gî0€T—ñïöÃÿÙ
+------MultipartBoundary--ErmlwJkS6mirmOgL5J7tD6HBYrBkPeYG9hklQ9XRsj----
+Content-Type: text/css
+Content-Transfer-Encoding: binary
+Content-Location: https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&display=swap
+
+@charset "utf-8";
+
+@font-face { font-family: Nunito; font-style: normal; font-weight: 400; font-display: swap; src: url("https://fonts.gstatic.com/s/nunito/v32/XRXV3I6Li01BKofIOOaBTMnFcQIG.woff2") format("woff2"); unicode-range: U+460-52F, U+1C80-1C8A, U+20B4, U+2DE0-2DFF, U+A640-A69F, U+FE2E-FE2F; }
+
+@font-face { font-family: Nunito; font-style: normal; font-weight: 400; font-display: swap; src: url("https://fonts.gstatic.com/s/nunito/v32/XRXV3I6Li01BKofIMeaBTMnFcQIG.woff2") format("woff2"); unicode-range: U+301, U+400-45F, U+490-491, U+4B0-4B1, U+2116; }
+
+@font-face { font-family: Nunito; font-style: normal; font-weight: 400; font-display: swap; src: url("https://fonts.gstatic.com/s/nunito/v32/XRXV3I6Li01BKofIOuaBTMnFcQIG.woff2") format("woff2"); unicode-range: U+102-103, U+110-111, U+128-129, U+168-169, U+1A0-1A1, U+1AF-1B0, U+300-301, U+303-304, U+308-309, U+323, U+329, U+1EA0-1EF9, U+20AB; }
+
+@font-face { font-family: Nunito; font-style: normal; font-weight: 400; font-display: swap; src: url("https://fonts.gstatic.com/s/nunito/v32/XRXV3I6Li01BKofIO-aBTMnFcQIG.woff2") format("woff2"); unicode-range: U+100-2BA, U+2BD-2C5, U+2C7-2CC, U+2CE-2D7, U+2DD-2FF, U+304, U+308, U+329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF; }
+
+@font-face { font-family: Nunito; font-style: normal; font-weight: 400; font-display: swap; src: url("https://fonts.gstatic.com/s/nunito/v32/XRXV3I6Li01BKofINeaBTMnFcQ.woff2") format("woff2"); unicode-range: U+0-FF, U+131, U+152-153, U+2BB-2BC, U+2C6, U+2DA, U+2DC, U+304, U+308, U+329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD; }
+
+@font-face { font-family: Nunito; font-style: normal; font-weight: 600; font-display: swap; src: url("https://fonts.gstatic.com/s/nunito/v32/XRXV3I6Li01BKofIOOaBTMnFcQIG.woff2") format("woff2"); unicode-range: U+460-52F, U+1C80-1C8A, U+20B4, U+2DE0-2DFF, U+A640-A69F, U+FE2E-FE2F; }
+
+@font-face { font-family: Nunito; font-style: normal; font-weight: 600; font-display: swap; src: url("https://fonts.gstatic.com/s/nunito/v32/XRXV3I6Li01BKofIMeaBTMnFcQIG.woff2") format("woff2"); unicode-range: U+301, U+400-45F, U+490-491, U+4B0-4B1, U+2116; }
+
+@font-face { font-family: Nunito; font-style: normal; font-weight: 600; font-display: swap; src: url("https://fonts.gstatic.com/s/nunito/v32/XRXV3I6Li01BKofIOuaBTMnFcQIG.woff2") format("woff2"); unicode-range: U+102-103, U+110-111, U+128-129, U+168-169, U+1A0-1A1, U+1AF-1B0, U+300-301, U+303-304, U+308-309, U+323, U+329, U+1EA0-1EF9, U+20AB; }
+
+@font-face { font-family: Nunito; font-style: normal; font-weight: 600; font-display: swap; src: url("https://fonts.gstatic.com/s/nunito/v32/XRXV3I6Li01BKofIO-aBTMnFcQIG.woff2") format("woff2"); unicode-range: U+100-2BA, U+2BD-2C5, U+2C7-2CC, U+2CE-2D7, U+2DD-2FF, U+304, U+308, U+329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF; }
+
+@font-face { font-family: Nunito; font-style: normal; font-weight: 600; font-display: swap; src: url("https://fonts.gstatic.com/s/nunito/v32/XRXV3I6Li01BKofINeaBTMnFcQ.woff2") format("woff2"); unicode-range: U+0-FF, U+131, U+152-153, U+2BB-2BC, U+2C6, U+2DA, U+2DC, U+304, U+308, U+329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD; }
+
+@font-face { font-family: Nunito; font-style: normal; font-weight: 700; font-display: swap; src: url("https://fonts.gstatic.com/s/nunito/v32/XRXV3I6Li01BKofIOOaBTMnFcQIG.woff2") format("woff2"); unicode-range: U+460-52F, U+1C80-1C8A, U+20B4, U+2DE0-2DFF, U+A640-A69F, U+FE2E-FE2F; }
+
+@font-face { font-family: Nunito; font-style: normal; font-weight: 700; font-display: swap; src: url("https://fonts.gstatic.com/s/nunito/v32/XRXV3I6Li01BKofIMeaBTMnFcQIG.woff2") format("woff2"); unicode-range: U+301, U+400-45F, U+490-491, U+4B0-4B1, U+2116; }
+
+@font-face { font-family: Nunito; font-style: normal; font-weight: 700; font-display: swap; src: url("https://fonts.gstatic.com/s/nunito/v32/XRXV3I6Li01BKofIOuaBTMnFcQIG.woff2") format("woff2"); unicode-range: U+102-103, U+110-111, U+128-129, U+168-169, U+1A0-1A1, U+1AF-1B0, U+300-301, U+303-304, U+308-309, U+323, U+329, U+1EA0-1EF9, U+20AB; }
+
+@font-face { font-family: Nunito; font-style: normal; font-weight: 700; font-display: swap; src: url("https://fonts.gstatic.com/s/nunito/v32/XRXV3I6Li01BKofIO-aBTMnFcQIG.woff2") format("woff2"); unicode-range: U+100-2BA, U+2BD-2C5, U+2C7-2CC, U+2CE-2D7, U+2DD-2FF, U+304, U+308, U+329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF; }
+
+@font-face { font-family: Nunito; font-style: normal; font-weight: 700; font-display: swap; src: url("https://fonts.gstatic.com/s/nunito/v32/XRXV3I6Li01BKofINeaBTMnFcQ.woff2") format("woff2"); unicode-range: U+0-FF, U+131, U+152-153, U+2BB-2BC, U+2C6, U+2DA, U+2DC, U+304, U+308, U+329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD; }
+
+@font-face { font-family: Nunito; font-style: normal; font-weight: 800; font-display: swap; src: url("https://fonts.gstatic.com/s/nunito/v32/XRXV3I6Li01BKofIOOaBTMnFcQIG.woff2") format("woff2"); unicode-range: U+460-52F, U+1C80-1C8A, U+20B4, U+2DE0-2DFF, U+A640-A69F, U+FE2E-FE2F; }
+
+@font-face { font-family: Nunito; font-style: normal; font-weight: 800; font-display: swap; src: url("https://fonts.gstatic.com/s/nunito/v32/XRXV3I6Li01BKofIMeaBTMnFcQIG.woff2") format("woff2"); unicode-range: U+301, U+400-45F, U+490-491, U+4B0-4B1, U+2116; }
+
+@font-face { font-family: Nunito; font-style: normal; font-weight: 800; font-display: swap; src: url("https://fonts.gstatic.com/s/nunito/v32/XRXV3I6Li01BKofIOuaBTMnFcQIG.woff2") format("woff2"); unicode-range: U+102-103, U+110-111, U+128-129, U+168-169, U+1A0-1A1, U+1AF-1B0, U+300-301, U+303-304, U+308-309, U+323, U+329, U+1EA0-1EF9, U+20AB; }
+
+@font-face { font-family: Nunito; font-style: normal; font-weight: 800; font-display: swap; src: url("https://fonts.gstatic.com/s/nunito/v32/XRXV3I6Li01BKofIO-aBTMnFcQIG.woff2") format("woff2"); unicode-range: U+100-2BA, U+2BD-2C5, U+2C7-2CC, U+2CE-2D7, U+2DD-2FF, U+304, U+308, U+329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF; }
+
+@font-face { font-family: Nunito; font-style: normal; font-weight: 800; font-display: swap; src: url("https://fonts.gstatic.com/s/nunito/v32/XRXV3I6Li01BKofINeaBTMnFcQ.woff2") format("woff2"); unicode-range: U+0-FF, U+131, U+152-153, U+2BB-2BC, U+2C6, U+2DA, U+2DC, U+304, U+308, U+329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD; }
+
+@font-face { font-family: Nunito; font-style: normal; font-weight: 900; font-display: swap; src: url("https://fonts.gstatic.com/s/nunito/v32/XRXV3I6Li01BKofIOOaBTMnFcQIG.woff2") format("woff2"); unicode-range: U+460-52F, U+1C80-1C8A, U+20B4, U+2DE0-2DFF, U+A640-A69F, U+FE2E-FE2F; }
+
+@font-face { font-family: Nunito; font-style: normal; font-weight: 900; font-display: swap; src: url("https://fonts.gstatic.com/s/nunito/v32/XRXV3I6Li01BKofIMeaBTMnFcQIG.woff2") format("woff2"); unicode-range: U+301, U+400-45F, U+490-491, U+4B0-4B1, U+2116; }
+
+@font-face { font-family: Nunito; font-style: normal; font-weight: 900; font-display: swap; src: url("https://fonts.gstatic.com/s/nunito/v32/XRXV3I6Li01BKofIOuaBTMnFcQIG.woff2") format("woff2"); unicode-range: U+102-103, U+110-111, U+128-129, U+168-169, U+1A0-1A1, U+1AF-1B0, U+300-301, U+303-304, U+308-309, U+323, U+329, U+1EA0-1EF9, U+20AB; }
+
+@font-face { font-family: Nunito; font-style: normal; font-weight: 900; font-display: swap; src: url("https://fonts.gstatic.com/s/nunito/v32/XRXV3I6Li01BKofIO-aBTMnFcQIG.woff2") format("woff2"); unicode-range: U+100-2BA, U+2BD-2C5, U+2C7-2CC, U+2CE-2D7, U+2DD-2FF, U+304, U+308, U+329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF; }
+
+@font-face { font-family: Nunito; font-style: normal; font-weight: 900; font-display: swap; src: url("https://fonts.gstatic.com/s/nunito/v32/XRXV3I6Li01BKofINeaBTMnFcQ.woff2") format("woff2"); unicode-range: U+0-FF, U+131, U+152-153, U+2BB-2BC, U+2C6, U+2DA, U+2DC, U+304, U+308, U+329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD; }
+------MultipartBoundary--ErmlwJkS6mirmOgL5J7tD6HBYrBkPeYG9hklQ9XRsj----
+Content-Type: text/css
+Content-Transfer-Encoding: binary
+Content-Location: cid:css-a69af40e-626f-490a-9cab-6c1e41b39de3@mhtml.blink
+
+@charset "utf-8";
+
+:root { --bg-body: #f0f4f8; --bg-app: #ffffff; --text-color: #1a202c; --text-muted: #718096; --card-bg: #ffffff; --primary: #38b2ac; --primary-light: rgba(56,178,172,0.12); --secondary: #805ad5; --prot-color: #e53e3e; --carb-color: #38a169; --fat-color: #d69e2e; --danger: #e53e3e; --success: #38a169; --radius: 18px; --shadow: 0 4px 14px rgba(0,0,0,0.08); --shadow-lg: 0 8px 30px rgba(0,0,0,0.12); --nav-height: 65px; --header-height: 62px; --cal-card-gradient: linear-gradient(135deg, #e6fffa 0%, #b2f5ea 100%); }
+
+body.dark-mode { --bg-body: #0d1117; --bg-app: #161b22; --text-color: #e2e8f0; --text-muted: #a0aec0; --card-bg: #21262d; --primary: #4fd1c5; --primary-light: rgba(79,209,197,0.15); --cal-card-gradient: linear-gradient(135deg, #1a2a2a 0%, #0d2626 100%); }
+
+* { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+
+body { margin: 0px; padding-right: 0px; padding-bottom: 0px; padding-left: 0px; font-family: Nunito, sans-serif; background-color: var(--bg-body); color: var(--text-color); padding-top: env(safe-area-inset-top); min-height: 100vh; }
+
+#app-container { max-width: 600px; margin: 0px auto; background-color: var(--bg-app); min-height: 100vh; position: relative; box-shadow: rgba(0, 0, 0, 0.08) 0px 0px 40px; padding-bottom: calc(var(--nav-height) + 80px + env(safe-area-inset-bottom)); }
+
+header { height: var(--header-height); padding: 0px 16px; display: flex; align-items: center; justify-content: space-between; position: sticky; top: 0px; z-index: 50; background: rgba(255, 255, 255, 0.92); backdrop-filter: blur(12px); border-bottom: 1px solid rgba(0, 0, 0, 0.06); }
+
+body.dark-mode header { background: rgba(22, 27, 34, 0.92); border-bottom: 1px solid rgba(255, 255, 255, 0.08); }
+
+.header-title { font-size: 1.15rem; font-weight: 900; display: flex; flex-direction: column; align-items: center; line-height: 1.1; letter-spacing: -0.5px; }
+
+.header-subtitle { font-size: 0.62rem; font-weight: 700; color: var(--primary); text-transform: uppercase; letter-spacing: 1.5px; }
+
+.header-btn { background: transparent; border: none; color: var(--text-color); width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; cursor: pointer; border-radius: 50%; transition: background 0.2s; }
+
+.header-btn:hover { background: var(--primary-light); }
+
+.view-section { display: none; padding: 20px 16px; animation: 0.28s ease-out 0s 1 normal none running fadeIn; }
+
+.view-section.active { display: block; }
+
+@keyframes fadeIn { 
+  0% { opacity: 0; transform: translateY(6px); }
+  100% { opacity: 1; transform: translateY(0px); }
+}
+
+.card { background-color: var(--card-bg); border-radius: var(--radius); padding: 16px; margin-bottom: 14px; box-shadow: var(--shadow); border: 1px solid rgba(0, 0, 0, 0.03); transition: transform 0.15s; }
+
+body.dark-mode .card { border: 1px solid rgba(255, 255, 255, 0.06); }
+
+.calorie-card { cursor: pointer; background: var(--cal-card-gradient) !important; }
+
+.calorie-card:active { transform: scale(0.99); }
+
+h2 { font-weight: 900; font-size: 1.4rem; margin: 0px 0px 16px; letter-spacing: -0.5px; }
+
+h3 { font-weight: 800; font-size: 1.05rem; margin: 0px 0px 12px; }
+
+label { font-size: 0.78rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px; display: block; margin-bottom: 4px; }
+
+input, select, textarea { width: 100%; padding: 13px 14px; margin: 0px 0px 14px; border: 1.5px solid rgba(0, 0, 0, 0.08); border-radius: 12px; background: var(--bg-body); color: var(--text-color); font-size: 15px; font-family: Nunito, sans-serif; font-weight: 600; outline: none; transition: border-color 0.2s; }
+
+input:focus, select:focus, textarea:focus { border-color: var(--primary); }
+
+body.dark-mode input, body.dark-mode textarea, body.dark-mode select { border-color: rgba(255, 255, 255, 0.1); background: rgb(13, 17, 23); color: var(--text-color); }
+
+button { width: 100%; padding: 15px; border: none; border-radius: 12px; background-color: var(--primary); color: white; font-size: 15px; font-weight: 800; font-family: Nunito, sans-serif; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; transition: transform 0.12s; }
+
+button:active { transform: scale(0.97); }
+
+button.secondary { background-color: rgb(113, 128, 150); }
+
+button.danger { background-color: var(--danger); }
+
+button.gemini-btn { background: linear-gradient(135deg,var(--primary) 0%,var(--secondary) 100%); box-shadow: rgba(56, 178, 172, 0.3) 0px 4px 14px; }
+
+body.dark-mode button.gemini-btn { background: linear-gradient(135deg, rgb(79, 209, 197) 0%, rgb(45, 106, 79) 100%); }
+
+button.outline { background: transparent; border: 2px solid rgba(0, 0, 0, 0.15); color: var(--text-color); box-shadow: none; }
+
+body.dark-mode button.outline { border-color: var(--primary); color: var(--primary); }
+
+button.small { padding: 8px 14px; width: auto; font-size: 0.82rem; border-radius: 8px; }
+
+.gauge-wrapper { position: relative; display: flex; align-items: center; justify-content: center; }
+
+.gauge-svg { transform: rotate(-90deg); width: 100%; height: 100%; }
+
+.gauge-bg { fill: none; stroke: rgba(0, 0, 0, 0.07); stroke-width: 3.5; }
+
+body.dark-mode .gauge-bg { stroke: rgba(255, 255, 255, 0.08); }
+
+.gauge-fill { fill: none; stroke-width: 3.5; stroke-dasharray: 100, 100; stroke-dashoffset: 100; transition: stroke-dashoffset 0.9s cubic-bezier(0.34, 1.56, 0.64, 1); stroke-linecap: round; }
+
+.gauge-icon { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); }
+
+.bottom-nav { position: fixed; bottom: 0px; left: 0px; right: 0px; max-width: 600px; margin: 0px auto; background: rgba(255, 255, 255, 0.94); backdrop-filter: blur(14px); display: flex; justify-content: space-around; align-items: center; height: calc(var(--nav-height) + env(safe-area-inset-bottom)); padding-bottom: env(safe-area-inset-bottom); box-shadow: rgba(0, 0, 0, 0.06) 0px -1px 0px; z-index: 100; }
+
+body.dark-mode .bottom-nav { background: rgba(22, 27, 34, 0.96); border-top: 1px solid rgba(255, 255, 255, 0.08); }
+
+.nav-item { flex: 1 1 0%; display: flex; flex-direction: column; align-items: center; color: var(--text-muted); font-size: 0.72rem; font-weight: 700; cursor: pointer; padding: 6px 0px; transition: color 0.2s; }
+
+.nav-item.active { color: var(--primary); }
+
+.nav-fab-wrapper { position: relative; top: -22px; width: 58px; height: 58px; }
+
+.nav-fab { width: 100%; height: 100%; background: linear-gradient(135deg,var(--primary),var(--secondary)); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; box-shadow: rgba(56, 178, 172, 0.45) 0px 6px 20px; font-size: 1.5rem; transition: transform 0.15s; }
+
+.nav-fab:active { transform: scale(0.93); }
+
+.loader { display: none; text-align: center; padding: 16px; color: var(--secondary); font-style: italic; font-size: 0.9rem; animation: 1.4s ease 0s infinite normal none running pulse; }
+
+@keyframes pulse { 
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.5; }
+}
+
+.coach-message { background: var(--primary-light); border-left: 4px solid var(--primary); color: var(--text-color); padding: 14px 16px; border-radius: 10px; margin-top: 10px; font-size: 0.95rem; line-height: 1.65; white-space: pre-wrap; font-weight: 600; }
+
+.modal-overlay { position: fixed; top: 0px; left: 0px; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.65); backdrop-filter: blur(5px); z-index: 1000; display: none; align-items: center; justify-content: center; padding: 20px; }
+
+.modal-box { background: var(--card-bg); padding: 28px 24px; border-radius: 24px; width: 100%; max-width: 340px; text-align: center; box-shadow: var(--shadow-lg); border: 1px solid rgba(255, 255, 255, 0.1); animation: 0.25s cubic-bezier(0.34, 1.56, 0.64, 1) 0s 1 normal none running popIn; }
+
+@keyframes popIn { 
+  0% { transform: scale(0.85); opacity: 0; }
+  100% { transform: scale(1); opacity: 1; }
+}
+
+.modal-box h3 { margin: 0px 0px 8px; }
+
+.modal-box p { color: var(--text-muted); font-size: 0.9rem; margin-bottom: 16px; }
+
+.shortcuts-container { display: flex; overflow-x: auto; gap: 8px; padding: 5px 0px 14px; scrollbar-width: none; }
+
+.shortcuts-container::-webkit-scrollbar { display: none; }
+
+.shortcut-item { flex: 0 0 auto; background: var(--primary-light); padding: 8px 12px; border-radius: 20px; border: 1.5px solid var(--primary); color: var(--primary); font-size: 0.8rem; font-weight: 700; cursor: pointer; display: flex; align-items: center; gap: 5px; transition: transform 0.15s; }
+
+.shortcut-item:active { transform: scale(0.95); }
+
+.shortcut-item .remove { color: var(--danger); font-size: 1.1rem; margin-left: 4px; line-height: 1; }
+
+.images-grid { display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 14px; }
+
+.img-thumb { position: relative; width: 90px; height: 90px; }
+
+.img-thumb img { width: 100%; height: 100%; object-fit: cover; border-radius: 12px; border: 2.5px solid var(--primary); }
+
+.img-thumb-remove { position: absolute; top: -8px; right: -8px; background: var(--danger); color: white; width: 24px; height: 24px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 0.9rem; font-weight: bold; cursor: pointer; border: 2px solid white; z-index: 10; }
+
+.add-photo-btn { width: 90px; height: 90px; border-radius: 12px; border: 2px dashed var(--primary); background: var(--primary-light); display: flex; flex-direction: column; align-items: center; justify-content: center; cursor: pointer; color: var(--primary); font-size: 0.7rem; font-weight: 800; gap: 4px; flex-shrink: 0; }
+
+.add-photo-btn span { font-size: 1.4rem; }
+
+.profile-section-title { font-size: 0.7rem; font-weight: 900; color: var(--primary); text-transform: uppercase; letter-spacing: 1.5px; margin: 20px 0px 8px; }
+
+.profile-section-title:first-child { margin-top: 0px; }
+
+.profile-hint { font-weight: 600; text-transform: none; font-size: 0.72rem; color: var(--primary); letter-spacing: 0px; }
+
+.morph-selector { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-bottom: 14px; }
+
+.morph-opt { border: 2px solid rgba(0, 0, 0, 0.08); border-radius: 14px; padding: 10px 6px; text-align: center; cursor: pointer; transition: 0.2s; background: var(--bg-body); }
+
+body.dark-mode .morph-opt { border-color: rgba(255, 255, 255, 0.1); }
+
+.morph-opt.selected { border-color: var(--primary); background: var(--primary-light); }
+
+.morph-icon { font-size: 1.4rem; }
+
+.morph-name { font-size: 0.72rem; font-weight: 800; color: var(--text-color); margin-top: 3px; }
+
+.morph-desc { font-size: 0.62rem; color: var(--text-muted); font-weight: 600; margin-top: 2px; line-height: 1.3; }
+
+.goal-calc-box { background: linear-gradient(135deg,var(--primary-light),rgba(128,90,213,0.08)); border-radius: 12px; padding: 12px 14px; margin-top: 4px; font-size: 0.82rem; font-weight: 700; line-height: 1.8; border-left: 3px solid var(--primary); }
+
+.goal-calc-box .gcb-val { color: var(--primary); font-weight: 900; font-size: 1rem; }
+
+.goal-calc-box .gcb-warn { color: rgb(230, 126, 34); font-size: 0.75rem; font-weight: 700; }
+
+.profile-summary { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 12px; }
+
+.profile-chip { font-size: 0.7rem; font-weight: 700; padding: 4px 10px; border-radius: 20px; background: var(--primary-light); color: var(--primary); }
+
+.water-card { margin-bottom: 14px; }
+
+.water-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px; }
+
+.water-title { font-weight: 900; font-size: 0.95rem; }
+
+.water-stats { font-size: 0.8rem; font-weight: 700; color: var(--text-muted); }
+
+.water-stats span { color: rgb(56, 178, 172); font-weight: 900; }
+
+.water-glasses-row { display: flex; flex-wrap: wrap; gap: 8px; justify-content: flex-start; margin-bottom: 14px; }
+
+.water-controls { display: flex; align-items: center; justify-content: center; gap: 20px; margin-bottom: 14px; }
+
+.water-count-display { text-align: center; min-width: 80px; }
+
+.water-count-num { font-size: 2.4rem; font-weight: 900; color: rgb(56, 178, 172); line-height: 1; }
+
+.water-count-sub { font-size: 0.72rem; font-weight: 700; color: var(--text-muted); margin-top: 2px; }
+
+.water-pm-btn { width: 48px; height: 48px; border-radius: 50%; border: 2px solid rgb(56, 178, 172); background: rgba(56, 178, 172, 0.1); color: rgb(56, 178, 172); font-size: 1.6rem; font-weight: 900; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: 0.15s; line-height: 1; padding: 0px; flex-shrink: 0; }
+
+.water-pm-btn:active { transform: scale(0.88); background: rgba(56, 178, 172, 0.25); }
+
+.water-pm-btn.minus { border-color: rgba(56, 178, 172, 0.4); color: rgba(56, 178, 172, 0.6); background: none; }
+
+.water-progress-track { height: 6px; background: rgba(56, 178, 172, 0.15); border-radius: 10px; overflow: hidden; margin-bottom: 10px; }
+
+body.dark-mode .water-progress-track { background: rgba(79, 209, 197, 0.12); }
+
+.water-progress-fill { height: 100%; border-radius: 10px; background: linear-gradient(90deg, rgb(56, 178, 172), rgb(128, 90, 213)); transition: width 0.5s cubic-bezier(0.34, 1.56, 0.64, 1); }
+
+.water-footer { display: flex; justify-content: space-between; align-items: center; }
+
+.water-msg { font-size: 0.75rem; font-weight: 700; color: var(--text-muted); flex: 1 1 0%; }
+
+.meal-cat-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+
+.meal-cat-card { background: var(--card-bg); border-radius: 20px; padding: 20px 14px 16px; box-shadow: var(--shadow); border: 2px solid transparent; cursor: pointer; transition: 0.2s; text-align: center; position: relative; display: flex; flex-direction: column; align-items: center; gap: 6px; }
+
+.meal-cat-card:active { transform: scale(0.97); }
+
+.meal-cat-card.has-meal { border-color: var(--primary); background: var(--primary-light); }
+
+body.dark-mode .meal-cat-card { border: 2px solid rgba(255, 255, 255, 0.06); }
+
+body.dark-mode .meal-cat-card.has-meal { border-color: var(--primary); }
+
+.meal-cat-emoji { font-size: 2.2rem; line-height: 1; }
+
+.meal-cat-name { font-weight: 900; font-size: 0.95rem; letter-spacing: -0.3px; }
+
+.meal-cat-kcal { font-size: 0.72rem; font-weight: 700; color: var(--text-muted); }
+
+.meal-cat-kcal span { color: var(--primary); font-weight: 800; }
+
+.meal-cat-badge { position: absolute; top: -6px; right: -6px; background: var(--primary); color: white; font-size: 0.65rem; font-weight: 900; width: 20px; height: 20px; border-radius: 50%; display: flex; align-items: center; justify-content: center; border: 2px solid var(--bg-app); }
+
+.meal-cat-recorded { font-size: 0.7rem; color: var(--primary); font-weight: 700; margin-top: 2px; }
+
+.meal-cat-add-icon { width: 28px; height: 28px; border-radius: 50%; background: var(--primary); color: white; display: flex; align-items: center; justify-content: center; font-size: 1.1rem; margin-top: 4px; transition: transform 0.2s; }
+
+.meal-cat-card:active .meal-cat-add-icon { transform: scale(0.9); }
+
+.macro-card-v3 { padding: 12px 8px; margin: 0px; display: flex; flex-direction: column; align-items: center; gap: 4px; text-align: center; }
+
+.macro-val-target { font-size: 0.68rem; color: var(--text-muted); font-weight: 700; margin-top: 1px; }
+
+#week-container { display: flex; overflow-x: auto; gap: 8px; padding: 4px 16px 14px; margin: 0px -16px 4px; scrollbar-width: none; }
+
+#week-container::-webkit-scrollbar { display: none; }
+
+.week-card { min-width: 56px; flex: 0 0 auto; text-align: center; cursor: pointer; border: 2px solid transparent; border-radius: 14px; padding: 10px 6px; transition: 0.2s; background: var(--bg-body); }
+
+.week-card .wc-day { font-size: 0.68rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase; }
+
+.week-card .wc-num { font-size: 1.1rem; font-weight: 900; color: var(--text-color); margin-top: 2px; }
+
+.week-card.active-day-card { border-color: var(--primary); background: var(--primary-light); }
+
+.week-card.active-day-card .wc-num { color: var(--primary); }
+
+.meal-item { cursor: pointer; }
+
+.meal-item-detail { display: none; margin-top: 10px; padding-top: 10px; border-top: 1px solid rgba(0, 0, 0, 0.06); }
+
+body.dark-mode .meal-item-detail { border-color: rgba(255, 255, 255, 0.08); }
+
+.meal-item.expanded .meal-item-detail { display: block; }
+
+.meal-item-desc { font-size: 0.78rem; color: var(--text-muted); font-style: italic; line-height: 1.5; margin-bottom: 8px; }
+
+.meal-item-tips { font-size: 0.76rem; background: rgba(128, 90, 213, 0.08); border-left: 3px solid var(--primary); border-radius: 0px 8px 8px 0px; padding: 7px 10px; line-height: 1.6; margin-bottom: 8px; }
+
+.meal-edit-btn { background: none; border: none; width: 30px; height: 30px; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; color: var(--primary); font-size: 1rem; flex-shrink: 0; }
+
+.meal-chevron { font-size: 0.7rem; color: var(--text-muted); transition: transform 0.2s; margin-left: 2px; }
+
+.meal-item.expanded .meal-chevron { transform: rotate(180deg); }
+
+.meal-item { display: flex; align-items: center; justify-content: space-between; padding: 12px 14px; background: var(--card-bg); border-radius: 12px; margin-bottom: 8px; box-shadow: rgba(0, 0, 0, 0.05) 0px 2px 8px; border: 1px solid rgba(0, 0, 0, 0.03); }
+
+body.dark-mode .meal-item { border-color: rgba(255, 255, 255, 0.05); }
+
+.meal-item-left { display: flex; align-items: center; gap: 10px; flex: 1 1 0%; }
+
+.meal-type-icon { width: 38px; height: 38px; border-radius: 10px; background: var(--primary-light); display: flex; align-items: center; justify-content: center; font-size: 1.15rem; flex-shrink: 0; }
+
+.meal-item-name { font-weight: 700; font-size: 0.9rem; }
+
+.meal-item-kcal { font-size: 0.78rem; color: var(--text-muted); font-weight: 600; }
+
+.meal-delete-btn { background: none; border: none; width: 30px; height: 30px; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; color: var(--danger); font-size: 1.1rem; flex-shrink: 0; }
+
+.macros-mini { display: flex; gap: 6px; margin-top: 4px; flex-wrap: wrap; }
+
+.macro-tag { font-size: 0.68rem; font-weight: 700; padding: 2px 6px; border-radius: 6px; }
+
+.macro-tag.p { background: rgba(229, 62, 62, 0.12); color: var(--prot-color); }
+
+.macro-tag.c { background: rgba(56, 161, 105, 0.12); color: var(--carb-color); }
+
+.macro-tag.f { background: rgba(214, 158, 46, 0.12); color: var(--fat-color); }
+
+.meal-health-emoji { font-size: 1.5rem; flex-shrink: 0; margin-right: 4px; }
+
+.weight-chart { width: 100%; height: 120px; }
+
+.weight-entry { display: flex; justify-content: space-between; align-items: center; padding: 8px 0px; border-bottom: 1px solid rgba(0, 0, 0, 0.05); font-size: 0.85rem; }
+
+body.dark-mode .weight-entry { border-bottom-color: rgba(255, 255, 255, 0.05); }
+
+.weight-entry:last-child { border-bottom: none; }
+
+.weight-delta-pos { color: var(--danger); font-weight: 800; }
+
+.weight-delta-neg { color: var(--success); font-weight: 800; }
+
+.weight-delta-0 { color: var(--text-muted); font-weight: 800; }
+
+.section-title { font-size: 0.72rem; font-weight: 800; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1px; margin: 18px 0px 8px; }
+
+.grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+
+.grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+
+.toast { position: fixed; bottom: calc(var(--nav-height) + 20px + env(safe-area-inset-bottom)); left: 50%; transform: translateX(-50%) translateY(20px); background: rgb(26, 32, 44); color: white; padding: 10px 20px; border-radius: 20px; font-size: 0.85rem; font-weight: 700; z-index: 999; opacity: 0; transition: 0.3s; pointer-events: none; white-space: nowrap; }
+
+body.dark-mode .toast { background: rgb(226, 232, 240); color: rgb(26, 32, 44); }
+
+.toast.show { opacity: 1; transform: translateX(-50%) translateY(0px); }
+
+#login-screen { position: fixed; top: 0px; left: 0px; width: 100%; height: 100%; z-index: 2000; background: linear-gradient(135deg, rgb(230, 255, 250) 0%, rgb(240, 244, 248) 50%, rgb(233, 216, 253) 100%); display: flex; align-items: center; justify-content: center; padding: 24px; }
+
+body.dark-mode #login-screen { background: linear-gradient(135deg, rgb(13, 38, 38) 0%, rgb(13, 17, 23) 50%, rgb(26, 10, 46) 100%); }
+
+#login-screen.hidden { display: none; }
+
+.login-box { background: var(--bg-app); border-radius: 28px; padding: 40px 28px; width: 100%; max-width: 340px; text-align: center; box-shadow: rgba(0, 0, 0, 0.15) 0px 20px 60px; border: 1px solid rgba(255, 255, 255, 0.8); }
+
+body.dark-mode .login-box { border-color: rgba(255, 255, 255, 0.08); }
+
+.login-logo { font-size: 3rem; margin-bottom: 8px; }
+
+.login-title { font-size: 1.8rem; font-weight: 900; letter-spacing: -1px; margin-bottom: 4px; }
+
+.login-subtitle { font-size: 0.82rem; color: var(--text-muted); font-weight: 700; margin-bottom: 32px; text-transform: uppercase; letter-spacing: 1.5px; }
+
+.login-desc { font-size: 0.9rem; color: var(--text-muted); font-weight: 600; margin-bottom: 24px; line-height: 1.6; }
+
+.btn-google { width: 100%; padding: 16px; border-radius: 14px; background: rgb(255, 255, 255); color: rgb(60, 64, 67); font-size: 15px; font-weight: 800; font-family: Nunito, sans-serif; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 12px; box-shadow: rgba(0, 0, 0, 0.12) 0px 2px 12px; transition: 0.2s; border: 1.5px solid rgba(0, 0, 0, 0.08); }
+
+.btn-google:hover { box-shadow: rgba(0, 0, 0, 0.18) 0px 4px 20px; transform: translateY(-1px); }
+
+.btn-google:active { transform: scale(0.97); }
+
+.google-icon { width: 22px; height: 22px; flex-shrink: 0; }
+
+.login-privacy { font-size: 0.72rem; color: var(--text-muted); margin-top: 16px; font-weight: 600; }
+
+.cloud-badge { display: inline-flex; align-items: center; gap: 5px; font-size: 0.68rem; font-weight: 800; padding: 3px 8px; border-radius: 20px; margin-left: 6px; }
+
+.cloud-badge.synced { background: rgba(56, 178, 172, 0.15); color: var(--primary); }
+
+.cloud-badge.saving { background: rgba(128, 90, 213, 0.15); color: var(--secondary); animation: 1s ease 0s infinite normal none running pulse; }
+
+.cloud-badge.offline { background: rgba(113, 128, 150, 0.15); color: var(--text-muted); }
+
+.user-avatar { width: 32px; height: 32px; border-radius: 50%; object-fit: cover; border: 2px solid var(--primary); cursor: pointer; }
+
+.user-avatar-placeholder { width: 32px; height: 32px; border-radius: 50%; background: var(--primary-light); border: 2px solid var(--primary); display: flex; align-items: center; justify-content: center; font-size: 0.9rem; font-weight: 800; color: var(--primary); cursor: pointer; }
+------MultipartBoundary--ErmlwJkS6mirmOgL5J7tD6HBYrBkPeYG9hklQ9XRsj----
+Content-Type: text/html
+Content-ID: <frame-DDD80878A8576F23CA8EE728F42DBD2A@mhtml.blink>
+Content-Transfer-Encoding: binary
+Content-Location: https://nutri-plus-fbe2b.firebaseapp.com/__/auth/iframe?apiKey=AIzaSyCy-x2FWGauZI40hUuDk2XpQUD455Pdib8&appName=%5BDEFAULT%5D&v=10.12.0&eid=p&usegapi=1&jsh=m%3B%2F_%2Fscs%2Fabc-static%2F_%2Fjs%2Fk%3Dgapi.lb.fr.3RBR_3TMKBc.O%2Fd%3D1%2Frs%3DAHpOoo8KgjraTR3qeBVhVtXJAy_PTNN8og%2Fm%3D__features__#id=I0_1772743672685&_gfid=I0_1772743672685&parent=https%3A%2F%2Fgoncalo1610.github.io&pfname=&rpctoken=20129797
+
+<!DOCTYPE html><html><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+
+
+</head>
+<body marginwidth="0" marginheight="0">
+
+
+</body></html>
+------MultipartBoundary--ErmlwJkS6mirmOgL5J7tD6HBYrBkPeYG9hklQ9XRsj------
