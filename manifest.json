@@ -1,0 +1,29 @@
+{
+  "name": "NUTRI+ Coach",
+  "short_name": "NUTRI+",
+  "description": "Ton coach nutrition IA — suivi des repas, hydratation, sport et sommeil",
+  "start_url": "/Nutri-coach/",
+  "scope": "/Nutri-coach/",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#f0f4f8",
+  "theme_color": "#38b2ac",
+  "lang": "fr",
+  "categories": ["health", "fitness"],
+  "icons": [
+    {
+      "src": "icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ],
+  "screenshots": [],
+  "prefer_related_applications": false
+}
