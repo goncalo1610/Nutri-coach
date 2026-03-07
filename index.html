@@ -210,7 +210,8 @@
         .weight-delta-neg { color:var(--success); font-weight:800; }
         .weight-delta-0 { color:var(--text-muted); font-weight:800; }
         .section-title { font-size:0.72rem; font-weight:800; color:var(--text-muted); text-transform:uppercase; letter-spacing:1px; margin:18px 0 8px 0; }
-        .grid-2 { display:grid; grid-template-columns:1fr 1fr; gap:10px; }
+        .grid-2 { display:grid; grid-template-columns:1fr 1fr; gap:10px; min-width:0; }
+        .grid-2 > * { min-width:0; }
         .grid-3 { display:grid; grid-template-columns:repeat(3,1fr); gap:10px; }
         .toast { position:fixed; bottom:calc(var(--nav-height) + 20px + env(safe-area-inset-bottom)); left:50%; transform:translateX(-50%) translateY(20px); background:#1a202c; color:white; padding:10px 20px; border-radius:20px; font-size:0.85rem; font-weight:700; z-index:999; opacity:0; transition:all 0.3s; pointer-events:none; white-space:nowrap; }
         body.dark-mode .toast { background:#e2e8f0; color:#1a202c; }
@@ -553,16 +554,16 @@
             </div>
         </div>
         <div class="grid-2" style="margin-bottom:14px">
-            <div class="card" onclick="openSleepModal()" style="cursor:pointer;display:flex;align-items:center;gap:10px;margin:0;border:1.5px dashed rgba(128,90,213,0.3);background:rgba(128,90,213,0.03)">
+            <div class="card" onclick="openSleepModal()" style="cursor:pointer;display:flex;align-items:center;gap:10px;margin:0;border:1.5px dashed rgba(128,90,213,0.3);background:rgba(128,90,213,0.03);min-width:0;overflow:hidden">
                 <div style="width:38px;height:38px;border-radius:10px;background:rgba(128,90,213,0.12);display:flex;align-items:center;justify-content:center;font-size:1.2rem;flex-shrink:0">😴</div>
-                <div style="min-width:0">
+                <div style="min-width:0;flex:1">
                     <div style="font-size:0.6rem;font-weight:800;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.5px">Sommeil</div>
                     <div id="h-sleep-val" style="font-weight:800;font-size:0.88rem;color:var(--secondary);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">+ Saisir</div>
                 </div>
             </div>
-            <div class="card" onclick="openSportForm()" style="cursor:pointer;display:flex;align-items:center;gap:10px;margin:0;border:1.5px dashed rgba(56,178,172,0.3);background:rgba(56,178,172,0.03)">
+            <div class="card" onclick="openSportForm()" style="cursor:pointer;display:flex;align-items:center;gap:10px;margin:0;border:1.5px dashed rgba(56,178,172,0.3);background:rgba(56,178,172,0.03);min-width:0;overflow:hidden">
                 <div style="width:38px;height:38px;border-radius:10px;background:rgba(56,178,172,0.12);display:flex;align-items:center;justify-content:center;font-size:1.2rem;flex-shrink:0">🏋️</div>
-                <div style="min-width:0">
+                <div style="min-width:0;flex:1">
                     <div style="font-size:0.6rem;font-weight:800;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.5px">Sport</div>
                     <div id="h-sport-val" style="font-weight:800;font-size:0.88rem;color:var(--primary);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">+ Ajouter</div>
                 </div>
