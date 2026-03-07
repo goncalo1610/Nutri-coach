@@ -560,7 +560,7 @@
                     <div id="h-sleep-val" style="font-weight:800;font-size:0.88rem;color:var(--secondary);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">+ Saisir</div>
                 </div>
             </div>
-            <div class="card" onclick="showSection('view-training')" style="cursor:pointer;display:flex;align-items:center;gap:10px;margin:0;border:1.5px dashed rgba(56,178,172,0.3);background:rgba(56,178,172,0.03)">
+            <div class="card" onclick="openSportForm()" style="cursor:pointer;display:flex;align-items:center;gap:10px;margin:0;border:1.5px dashed rgba(56,178,172,0.3);background:rgba(56,178,172,0.03)">
                 <div style="width:38px;height:38px;border-radius:10px;background:rgba(56,178,172,0.12);display:flex;align-items:center;justify-content:center;font-size:1.2rem;flex-shrink:0">🏋️</div>
                 <div style="min-width:0">
                     <div style="font-size:0.6rem;font-weight:800;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.5px">Sport</div>
@@ -598,26 +598,64 @@
         </div>
     </div>
 
-    <!-- 2. SPORT -->
+    <!-- 2. SPORT — HISTORIQUE -->
     <div id="view-training" class="view-section">
-        <h2>🏋️ Sport</h2>
-        <div class="section-title">Raccourcis</div>
-        <div class="shortcuts-container" id="sport-shortcuts"></div>
-        <div class="card">
-            <label>Activité</label><input type="text" id="t-act" placeholder="Course à pied, Musculation, Vélo...">
-            <label>Durée (minutes)</label><input type="number" id="t-dur" value="45" min="1">
-            <label>Calories montre ⌚ (optionnel)</label><input type="number" id="t-kcal-manual" placeholder="Laisser vide pour utiliser l'IA">
-            <div id="loader-sport" class="loader">🧠 Estimation de l'IA en cours...</div>
-            <div style="display:grid;grid-template-columns:1fr auto;gap:10px;margin-top:6px">
-                <button class="gemini-btn" onclick="estimateSport()">Estimation IA ✨</button>
-                <button class="outline small" title="Raccourci" onclick="saveAsShortcut()" style="width:50px;font-size:1.2rem">⭐</button>
+        <h2>🏋️ Historique Sport</h2>
+
+        <!-- Résumé semaine -->
+        <div class="card" style="background:var(--cal-card-gradient);margin-bottom:14px">
+            <div style="font-size:0.7rem;font-weight:800;text-transform:uppercase;color:var(--text-muted);letter-spacing:1px;margin-bottom:6px">Cette semaine</div>
+            <div style="display:flex;justify-content:space-between;align-items:center">
+                <div>
+                    <div style="font-size:2rem;font-weight:900;color:var(--primary);letter-spacing:-1px"><span id="sport-week-kcal">0</span> <span style="font-size:0.9rem;font-weight:600;color:var(--text-muted)">kcal brûlées</span></div>
+                    <div style="font-size:0.82rem;font-weight:700;color:var(--text-muted);margin-top:2px"><span id="sport-week-sessions">0</span> séance(s) · <span id="sport-week-days">0</span> jour(s) actif(s)</div>
+                </div>
+                <div style="font-size:2.8rem">🔥</div>
             </div>
-            <div id="t-preview" style="display:none;text-align:center;margin-top:16px;padding:16px;background:var(--primary-light);border-radius:12px">
-                <div style="font-size:0.75rem;font-weight:700;color:var(--text-muted);text-transform:uppercase;letter-spacing:1px">Estimation IA</div>
-                <div style="font-size:1.8rem;font-weight:900;color:var(--primary);margin:4px 0"><span id="t-kcal-ia">0</span> kcal</div>
-                <button class="outline small" style="margin:0 auto" onclick="cancelPreview('t-preview')">Annuler</button>
+        </div>
+
+        <!-- Entrées du jour sélectionné -->
+        <div class="section-title" style="display:flex;justify-content:space-between;align-items:center">
+            <span id="sport-history-date-label">Aujourd'hui</span>
+            <span id="sport-today-total" style="color:var(--primary);font-weight:900;font-size:0.82rem"></span>
+        </div>
+        <div id="sport-today-list"></div>
+
+        <!-- Historique des 7 derniers jours -->
+        <div class="section-title" style="margin-top:20px">Les 7 derniers jours</div>
+        <div id="sport-week-list"></div>
+
+        <!-- Message si vide -->
+        <div id="sport-empty-state" style="display:none;text-align:center;padding:40px 20px">
+            <div style="font-size:3rem;margin-bottom:12px">🏃</div>
+            <div style="font-weight:800;font-size:1rem;margin-bottom:6px">Aucune séance enregistrée</div>
+            <div style="font-size:0.85rem;color:var(--text-muted)">Utilise la bulle 🏋️ sur l'accueil pour ajouter une séance</div>
+        </div>
+
+        <!-- Formulaire saisie masqué (appelé depuis accueil) -->
+        <div id="sport-form-inline" style="display:none">
+            <div class="card">
+                <h3>➕ Nouvelle séance</h3>
+                <div class="section-title" style="margin-top:0">Raccourcis</div>
+                <div class="shortcuts-container" id="sport-shortcuts"></div>
+                <label>Activité</label><input type="text" id="t-act" placeholder="Course à pied, Musculation, Vélo...">
+                <label>Durée (minutes)</label><input type="number" id="t-dur" value="45" min="1">
+                <label>Calories montre ⌚ (optionnel)</label><input type="number" id="t-kcal-manual" placeholder="Laisser vide pour utiliser l'IA">
+                <div id="loader-sport" class="loader">🧠 Estimation de l'IA en cours...</div>
+                <div style="display:grid;grid-template-columns:1fr auto;gap:10px;margin-top:6px">
+                    <button class="gemini-btn" onclick="estimateSport()">Estimation IA ✨</button>
+                    <button class="outline small" title="Raccourci" onclick="saveAsShortcut()" style="width:50px;font-size:1.2rem">⭐</button>
+                </div>
+                <div id="t-preview" style="display:none;text-align:center;margin-top:16px;padding:16px;background:var(--primary-light);border-radius:12px">
+                    <div style="font-size:0.75rem;font-weight:700;color:var(--text-muted);text-transform:uppercase;letter-spacing:1px">Estimation IA</div>
+                    <div style="font-size:1.8rem;font-weight:900;color:var(--primary);margin:4px 0"><span id="t-kcal-ia">0</span> kcal</div>
+                    <button class="outline small" style="margin:0 auto" onclick="cancelPreview('t-preview')">Annuler</button>
+                </div>
+                <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:16px">
+                    <button onclick="saveSport()" style="background:var(--success)">✅ Valider</button>
+                    <button class="outline" onclick="hideSportForm()">Annuler</button>
+                </div>
             </div>
-            <button onclick="saveSport()" style="background:var(--success);margin-top:16px">✅ Valider la séance</button>
         </div>
     </div>
 
@@ -754,7 +792,14 @@
             <span>Accueil</span>
         </div>
         <div class="nav-item" id="nav-training" onclick="showSection('view-training')">
-            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 4v16M18 4v16M3 8h4M17 8h4M3 16h4M17 16h4"/></svg>
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M6.5 6.5h11M6.5 17.5h11"/>
+                <rect x="2" y="8.5" width="3" height="7" rx="1.5"/>
+                <rect x="19" y="8.5" width="3" height="7" rx="1.5"/>
+                <rect x="5" y="10.5" width="2" height="3" rx="1"/>
+                <rect x="17" y="10.5" width="2" height="3" rx="1"/>
+                <line x1="7" y1="12" x2="17" y2="12" stroke-width="2.5"/>
+            </svg>
             <span>Sport</span>
         </div>
         <div class="nav-fab-wrapper">
@@ -1162,6 +1207,110 @@ Totaux: ${JSON.stringify({ calories_consommées: totalCal, objectif_ajusté: adj
     function loadShortcut(i){const s=appData.shortcuts[i];document.getElementById('t-act').value=s.act;document.getElementById('t-dur').value=s.dur;document.getElementById('t-preview').style.display='none';}
     function deleteShortcut(i){appData.shortcuts.splice(i,1);saveData();renderShortcuts();}
 
+    function openSportForm() {
+        showSection('view-training');
+        const formEl = document.getElementById('sport-form-inline');
+        formEl.style.display = 'block';
+        renderShortcuts();
+        document.getElementById('t-act').value = '';
+        document.getElementById('t-dur').value = '45';
+        document.getElementById('t-kcal-manual').value = '';
+        document.getElementById('t-preview').style.display = 'none';
+        setTimeout(() => formEl.scrollIntoView({behavior:'smooth', block:'start'}), 150);
+    }
+
+    function hideSportForm() {
+        document.getElementById('sport-form-inline').style.display = 'none';
+        document.getElementById('t-preview').style.display = 'none';
+    }
+
+    function renderSportHistory() {
+        const today = new Date();
+        // --- Résumé semaine ---
+        let weekKcal = 0, weekSessions = 0, weekDays = 0;
+        for (let i = 0; i < 7; i++) {
+            const d = new Date(today); d.setDate(today.getDate() - i);
+            const ds = d.toISOString().split('T')[0];
+            const day = appData.days[ds];
+            if (day && day.sport > 0) { weekKcal += day.sport; weekDays++; }
+            if (day && day.sportEntries) weekSessions += day.sportEntries.length;
+        }
+        document.getElementById('sport-week-kcal').textContent = weekKcal;
+        document.getElementById('sport-week-sessions').textContent = weekSessions;
+        document.getElementById('sport-week-days').textContent = weekDays;
+
+        // --- Séances du jour sélectionné ---
+        const todayLabel = document.getElementById('sport-history-date-label');
+        const isToday = selectedDate === getTodayStr();
+        todayLabel.textContent = isToday ? "Aujourd'hui" : formatDate(selectedDate);
+
+        const dayData = appData.days[selectedDate] || {};
+        const entries = dayData.sportEntries || [];
+        const todayTotal = document.getElementById('sport-today-total');
+        const todayList = document.getElementById('sport-today-list');
+
+        if (entries.length > 0) {
+            todayTotal.textContent = (dayData.sport || 0) + ' kcal';
+            todayList.innerHTML = entries.map((e, i) => `
+                <div style="display:flex;justify-content:space-between;align-items:center;padding:12px 14px;background:var(--card-bg);border-radius:12px;margin-bottom:8px;box-shadow:var(--shadow);border:1px solid rgba(0,0,0,0.03)">
+                    <div style="display:flex;align-items:center;gap:10px">
+                        <div style="width:38px;height:38px;border-radius:10px;background:rgba(56,178,172,0.12);display:flex;align-items:center;justify-content:center;font-size:1.2rem;flex-shrink:0">🏋️</div>
+                        <div>
+                            <div style="font-weight:700;font-size:0.92rem">${e.act}</div>
+                            <div style="font-size:0.75rem;color:var(--text-muted);font-weight:600">${e.kcal} kcal brûlées</div>
+                        </div>
+                    </div>
+                    <button onclick="deleteSportEntry('${selectedDate}',${i})" style="background:none;border:none;width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;cursor:pointer;color:var(--danger);font-size:1.1rem;padding:0;flex-shrink:0">🗑️</button>
+                </div>`).join('');
+        } else {
+            todayTotal.textContent = '';
+            todayList.innerHTML = `<div style="text-align:center;padding:16px;color:var(--text-muted);font-size:0.85rem;font-style:italic">Aucune séance ce jour</div>`;
+        }
+
+        // --- Historique 7 jours ---
+        const weekListEl = document.getElementById('sport-week-list');
+        let hasAny = weekKcal > 0;
+        let weekHtml = '';
+        for (let i = 0; i < 7; i++) {
+            const d = new Date(today); d.setDate(today.getDate() - i);
+            const ds = d.toISOString().split('T')[0];
+            const day = appData.days[ds];
+            if (!day || !day.sportEntries || day.sportEntries.length === 0) continue;
+            const dayLabel = i === 0 ? "Aujourd'hui" : i === 1 ? "Hier" : formatDate(ds);
+            weekHtml += `
+                <div style="margin-bottom:12px">
+                    <div style="font-size:0.7rem;font-weight:800;color:var(--text-muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:6px;display:flex;justify-content:space-between">
+                        <span>${dayLabel}</span><span style="color:var(--primary)">${day.sport} kcal</span>
+                    </div>
+                    ${day.sportEntries.map((e,idx) => `
+                        <div style="display:flex;justify-content:space-between;align-items:center;padding:10px 14px;background:var(--card-bg);border-radius:12px;margin-bottom:6px;box-shadow:0 2px 6px rgba(0,0,0,0.05)">
+                            <div style="display:flex;align-items:center;gap:10px">
+                                <span style="font-size:1.1rem">🏃</span>
+                                <div>
+                                    <div style="font-weight:700;font-size:0.88rem">${e.act}</div>
+                                    <div style="font-size:0.72rem;color:var(--text-muted)">${e.kcal} kcal</div>
+                                </div>
+                            </div>
+                        </div>`).join('')}
+                </div>`;
+        }
+        weekListEl.innerHTML = weekHtml || '';
+
+        // État vide global
+        document.getElementById('sport-empty-state').style.display = (!hasAny && entries.length === 0) ? 'block' : 'none';
+    }
+
+    function deleteSportEntry(date, index) {
+        const day = appData.days[date];
+        if (!day || !day.sportEntries) return;
+        const removed = day.sportEntries.splice(index, 1)[0];
+        day.sport = Math.max(0, (day.sport || 0) - (removed?.kcal || 0));
+        saveData();
+        renderHomeData();
+        renderSportHistory();
+        showToast("Séance supprimée 🗑️");
+    }
+
     async function estimateSport(){
         const act=document.getElementById('t-act').value.trim();const dur=document.getElementById('t-dur').value;
         if(!act)return showAlert("Activité manquante","Précise l'activité sportive.");
@@ -1181,7 +1330,9 @@ Totaux: ${JSON.stringify({ calories_consommées: totalCal, objectif_ajusté: adj
         if(!appData.days[selectedDate])appData.days[selectedDate]={meals:[],sport:0,sportEntries:[],closed:false};
         if(!appData.days[selectedDate].sportEntries)appData.days[selectedDate].sportEntries=[];
         appData.days[selectedDate].sport+=kcal;appData.days[selectedDate].sportEntries.push({act,kcal});
-        appData.lastIAKcal=0;saveData();renderHomeData();showSection('view-home');
+        appData.lastIAKcal=0;saveData();renderHomeData();
+        hideSportForm();
+        renderSportHistory();
         document.getElementById('t-preview').style.display='none';document.getElementById('t-kcal-manual').value='';document.getElementById('t-act').value='';
         showToast("Séance enregistrée 💪");
     }
@@ -1437,6 +1588,7 @@ JSON: {"kcal":number,"prot":number,"carb":number,"fat":number,"healthScore":1|2|
 
         if(id==='view-menu') renderWeightChart();
         if(id==='view-day') renderMealCategories();
+        if(id==='view-training') renderSportHistory();
         window.scrollTo(0,0);
     }
 
