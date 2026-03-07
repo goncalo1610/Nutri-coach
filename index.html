@@ -855,6 +855,9 @@
     };
 
     onAuthStateChanged(auth, async (user) => {
+        // Annuler le timeout de sécurité si Firebase répond
+        if (window._splashTimeout) { clearTimeout(window._splashTimeout); window._splashTimeout = null; }
+
         const splash = document.getElementById('splash-screen');
         const loader = document.getElementById('splash-loader');
         const loginBox = document.getElementById('login-box');
@@ -871,11 +874,28 @@
         }
     });
 
+    // ===== TIMEOUT DE SÉCURITÉ : si Firebase ne répond pas en 5s =====
+    window._splashTimeout = setTimeout(() => {
+        const splash = document.getElementById('splash-screen');
+        const loader = document.getElementById('splash-loader');
+        const loginBox = document.getElementById('login-box');
+        // Si le splash est encore visible, on bascule sur le login
+        if (splash && !splash.classList.contains('hidden')) {
+            console.warn("Firebase timeout — fallback sur données locales");
+            loader.style.display = 'none';
+            loginBox.classList.add('visible');
+        }
+    }, 5000);
+
     async function loadDataFromFirebase(uid) {
         setCloudStatus('saving');
         try {
-            const docRef = doc(db, "users", uid);
-            const docSnap = await getDoc(docRef);
+            // Timeout de 6s sur la requête Firestore
+            const firestorePromise = getDoc(doc(db, "users", uid));
+            const timeoutPromise = new Promise((_, reject) =>
+                setTimeout(() => reject(new Error("Firestore timeout")), 6000)
+            );
+            const docSnap = await Promise.race([firestorePromise, timeoutPromise]);
             if (docSnap.exists()) {
                 const cloudData = docSnap.data();
                 window.appData = { ...window.appData, ...cloudData };
@@ -885,7 +905,12 @@
             setCloudStatus('synced');
         } catch(e) {
             setCloudStatus('offline');
-            console.error("Erreur chargement Firebase:", e);
+            console.warn("Chargement Firebase échoué, données locales utilisées :", e.message);
+            // Charger les données locales si Firebase échoue
+            const saved = localStorage.getItem('nutri_v5_pro_complete');
+            if (saved) {
+                try { window.appData = { ...window.appData, ...JSON.parse(saved) }; } catch(_) {}
+            }
         }
         initApp();
     }
