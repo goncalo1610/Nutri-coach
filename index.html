@@ -1400,9 +1400,73 @@ healthScore: 1=peu adapté, 2=moyen, 3=bien adapté. Si ≤2, healthTips avec 2-
 JSON: {"kcal":number,"prot":number,"carb":number,"fat":number,"healthScore":1|2|3,"healthLabel":string,"healthTips":string}`;
         const res=await callGemini(prompt,true,currentImgs);
         document.getElementById('loader-m').style.display='none';
-        if(res){document.getElementById('m-kcal-val').value=res.kcal||0;document.getElementById('m-prot-val').value=res.prot||0;document.getElementById('m-carb-val').value=res.carb||0;document.getElementById('m-fat-val').value=res.fat||0;const emojis={1:'😟',2:'😐',3:'😊'};document.getElementById('meal-health-emoji').textContent=emojis[res.healthScore]||'😐';document.getElementById('meal-health-label').textContent=res.healthLabel||'';const tipsEl=document.getElementById('meal-health-tips');if(tipsEl){if(res.healthTips&&res.healthScore<3){tipsEl.style.display='block';tipsEl.innerHTML='<div style="font-weight:800;font-size:0.82rem;margin-bottom:4px">💡 Comment améliorer ce repas :</div>'+res.healthTips.split('\n').filter(Boolean).map(t=>`<div style="font-size:0.8rem;margin-top:3px">• ${t.replace(/^[-•]\s*/, '')}</div>`).join('');}else{tipsEl.style.display='none';}}document.getElementById('m-preview').style.display='block';appData.lastMacros=res;}else{document.getElementById('btn-analyze-meal').style.display='flex';}}
+        if(res){
+            // Arrondir les valeurs IA à des entiers propres
+            const kcal = Math.round(res.kcal || 0);
+            const prot = Math.round(res.prot || 0);
+            const carb = Math.round(res.carb || 0);
+            const fat  = Math.round(res.fat  || 0);
 
-    function saveMeal(){if(!appData.days[selectedDate])appData.days[selectedDate]={meals:[],sport:0,sportEntries:[],closed:false};const meal={type:activeCategory,desc:document.getElementById('m-desc').value.trim(),kcal:parseInt(document.getElementById('m-kcal-val').value)||0,prot:parseInt(document.getElementById('m-prot-val').value)||0,carb:parseInt(document.getElementById('m-carb-val').value)||0,fat:parseInt(document.getElementById('m-fat-val').value)||0,healthScore:appData.lastMacros?.healthScore||2,healthLabel:appData.lastMacros?.healthLabel||'',healthTips:appData.lastMacros?.healthTips||''};appData.days[selectedDate].meals.push(meal);saveData();clearImages();renderHomeData();renderMealCategories();cancelPreview('m-preview');document.getElementById('m-desc').value='';showSection('view-day');showToast("Repas ajouté ✅");}
+            // Contrôle de cohérence : recalcul depuis les macros si écart > 20%
+            const calFromMacros = (prot * 4) + (carb * 4) + (fat * 9);
+            const finalKcal = (kcal > 0 && calFromMacros > 0 && Math.abs(kcal - calFromMacros) / kcal > 0.20 && Math.abs(kcal - calFromMacros) > 50)
+                ? calFromMacros : kcal;
+
+            document.getElementById('m-kcal-val').value = finalKcal;
+            document.getElementById('m-prot-val').value = prot;
+            document.getElementById('m-carb-val').value = carb;
+            document.getElementById('m-fat-val').value  = fat;
+
+            const emojis={1:'😟',2:'😐',3:'😊'};
+            document.getElementById('meal-health-emoji').textContent=emojis[res.healthScore]||'😐';
+            document.getElementById('meal-health-label').textContent=res.healthLabel||'';
+            const tipsEl=document.getElementById('meal-health-tips');
+            if(tipsEl){
+                if(res.healthTips&&res.healthScore<3){
+                    tipsEl.style.display='block';
+                    tipsEl.innerHTML='<div style="font-weight:800;font-size:0.82rem;margin-bottom:4px">💡 Comment améliorer ce repas :</div>'+res.healthTips.split('\n').filter(Boolean).map(t=>`<div style="font-size:0.8rem;margin-top:3px">• ${t.replace(/^[-•]\s*/, '')}</div>`).join('');
+                } else { tipsEl.style.display='none'; }
+            }
+            document.getElementById('m-preview').style.display='block';
+            appData.lastMacros = {...res, kcal: finalKcal, prot, carb, fat};
+        } else { document.getElementById('btn-analyze-meal').style.display='flex'; }
+
+    function saveMeal(){
+        if(!appData.days[selectedDate]) appData.days[selectedDate]={meals:[],sport:0,sportEntries:[],closed:false};
+
+        // Lecture des valeurs saisies (parseFloat pour conserver les décimales)
+        const kcal  = Math.round(parseFloat(document.getElementById('m-kcal-val').value)  || 0);
+        const prot  = Math.round(parseFloat(document.getElementById('m-prot-val').value)  || 0);
+        const carb  = Math.round(parseFloat(document.getElementById('m-carb-val').value)  || 0);
+        const fat   = Math.round(parseFloat(document.getElementById('m-fat-val').value)   || 0);
+
+        // Vérification de cohérence : calories calculées depuis les macros
+        const calFromMacros = (prot * 4) + (carb * 4) + (fat * 9);
+        let finalKcal = kcal;
+
+        // Si l'écart est > 20% ET > 50 kcal, on recalcule depuis les macros (plus fiable)
+        if (kcal > 0 && Math.abs(kcal - calFromMacros) / kcal > 0.20 && Math.abs(kcal - calFromMacros) > 50) {
+            finalKcal = calFromMacros > 0 ? calFromMacros : kcal;
+            showToast(`⚠️ Calories recalculées : ${finalKcal} kcal`);
+        }
+
+        const meal = {
+            type: activeCategory,
+            desc: document.getElementById('m-desc').value.trim(),
+            kcal: finalKcal, prot, carb, fat,
+            healthScore: appData.lastMacros?.healthScore || 2,
+            healthLabel: appData.lastMacros?.healthLabel || '',
+            healthTips:  appData.lastMacros?.healthTips  || ''
+        };
+
+        appData.days[selectedDate].meals.push(meal);
+        appData.lastMacros = null; // reset pour éviter la contamination
+        saveData(); clearImages(); renderHomeData(); renderMealCategories();
+        cancelPreview('m-preview');
+        document.getElementById('m-desc').value='';
+        showSection('view-day');
+        showToast(`Repas ajouté ✅ — ${finalKcal} kcal · P:${prot}g G:${carb}g L:${fat}g`);
+    }
     function clearImages(){currentImgs=[];renderImagesGrid();}
 
     function editMeal(index){const day=appData.days[selectedDate];if(!day)return;const m=day.meals[index];if(!m)return;openMealForm(m.type);document.getElementById('m-desc').value=m.desc||'';document.getElementById('m-kcal-val').value=m.kcal;document.getElementById('m-prot-val').value=m.prot;document.getElementById('m-carb-val').value=m.carb;document.getElementById('m-fat-val').value=m.fat;const emojis={1:'😟',2:'😐',3:'😊'};document.getElementById('meal-health-emoji').textContent=emojis[m.healthScore]||'😐';document.getElementById('meal-health-label').textContent=m.healthLabel||'';document.getElementById('m-preview').style.display='block';document.getElementById('btn-analyze-meal').style.display='none';appData.lastMacros={kcal:m.kcal,prot:m.prot,carb:m.carb,fat:m.fat,healthScore:m.healthScore,healthLabel:m.healthLabel,healthTips:m.healthTips};day.meals.splice(index,1);saveData();renderHomeData();renderMealCategories();}
