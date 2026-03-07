@@ -906,13 +906,53 @@
             ]);
             if (docSnap.exists()) {
                 const cloudData = docSnap.data();
-                // Fusionner les données cloud avec les données locales
                 if (typeof appData !== 'undefined') {
+                    // Fusionner profondément les données cloud
                     Object.assign(appData, cloudData);
                     localStorage.setItem('nutri_v5_pro_complete', JSON.stringify(appData));
-                    // Rafraîchir l'affichage si l'app est déjà lancée
-                    if (typeof renderHomeData === 'function') renderHomeData();
+
+                    // Re-rendre TOUT l'app depuis les données cloud
+                    const p = appData.profile;
+                    if (p) {
+                        // Remplir les champs profil
+                        const fields = {
+                            'p-name': p.name, 'p-weight': p.weight, 'p-height': p.height,
+                            'p-age': p.age, 'p-sex': p.sex, 'p-activity': p.activity,
+                            'p-lifestyle': p.lifestyle, 'p-goal-dir': p.goalDir,
+                            'p-weight-target': p.weightTarget, 'p-goal-weeks': p.goalWeeks,
+                            'p-meal-freq': p.mealFreq, 'p-stress': p.stress,
+                            'p-diet': p.diet, 'p-allergies': p.allergies, 'p-cooking': p.cooking
+                        };
+                        Object.entries(fields).forEach(([id, val]) => {
+                            const el = document.getElementById(id);
+                            if (el && val !== undefined && val !== null) el.value = val;
+                        });
+                        if (p.morph && typeof selectMorph === 'function') selectMorph(p.morph);
+                        if (typeof updateGoalUI === 'function') updateGoalUI();
+                        if (document.getElementById('home-user-name')) {
+                            document.getElementById('home-user-name').textContent = p.name || '';
+                        }
+                    }
+                    if (appData.apiKey) {
+                        const apiEl = document.getElementById('api-key-in');
+                        if (apiEl) apiEl.value = appData.apiKey;
+                    }
+
+                    // Rafraîchir tout l'affichage
                     if (typeof renderWeek === 'function') renderWeek();
+                    if (typeof renderHomeData === 'function') renderHomeData();
+                    if (typeof renderShortcuts === 'function') renderShortcuts();
+                    if (typeof renderWeightChart === 'function') renderWeightChart();
+                    if (typeof applyTheme === 'function') applyTheme();
+
+                    // Si l'app était sur home mais vide (pas de profil au démarrage)
+                    // → afficher la bonne section maintenant qu'on a les données
+                    const activeSection = document.querySelector('.view-section.active');
+                    if (!activeSection || activeSection.id === 'view-home') {
+                        if (p && typeof showSection === 'function') showSection('view-home');
+                        else if (!p && typeof showSection === 'function') showSection('view-profile');
+                    }
+
                     if (typeof showToast === 'function') showToast("☁️ Données synchronisées");
                 }
             }
@@ -1005,17 +1045,25 @@
         document.getElementById('multi-camera-input').onchange = function(){ processMultiFile(this); };
         document.getElementById('multi-gallery-input').onchange = function(){ processMultiFile(this); };
 
-        // Fermer le splash après 1.2s d'animation et démarrer l'app
+        // Fermer le splash après 1.2s puis démarrer
         const splash = document.getElementById('splash-screen');
         setTimeout(() => {
             splash.classList.add('hidden');
-            setTimeout(() => { splash.classList.add('gone'); initApp(); }, 400);
+            setTimeout(() => {
+                splash.classList.add('gone');
+                // Si Firebase a déjà livré les données → initApp immédiat
+                // Sinon, on attend max 2s supplémentaires que Firebase réponde
+                if (appData.profile || !saved) {
+                    initApp();
+                } else {
+                    // Données locales présentes, Firebase pas encore répondu → lancer quand même
+                    initApp();
+                }
+            }, 400);
         }, 1200);
     });
 
     function initApp() {
-        if (window._appStarted) return; // guard anti double-appel
-        window._appStarted = true;
         document.querySelectorAll('.loader').forEach(l => l.style.display = 'none');
         if (appData.profile) document.getElementById('home-user-name').textContent = appData.profile.name;
         if (appData.apiKey) document.getElementById('api-key-in').value = appData.apiKey;
