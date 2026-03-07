@@ -1524,6 +1524,7 @@ JSON: {"kcal":number,"prot":number,"carb":number,"fat":number,"healthScore":1|2|
             document.getElementById('m-preview').style.display='block';
             appData.lastMacros = {...res, kcal: finalKcal, prot, carb, fat};
         } else { document.getElementById('btn-analyze-meal').style.display='flex'; }
+    }
 
     function saveMeal(){
         if(!appData.days[selectedDate]) appData.days[selectedDate]={meals:[],sport:0,sportEntries:[],closed:false};
