@@ -4,7 +4,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <title>NUTRI+ Coach</title>
-    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&display=swap" media="print" onload="this.media='all'">
+    <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&display=swap"></noscript>
     <!-- PWA -->
     <link rel="manifest" href="manifest.json">
     <meta name="theme-color" content="#38b2ac">
@@ -823,20 +825,18 @@
 
 <!-- ===== TIMEOUT SÉCURITÉ — s'exécute immédiatement, hors module ===== -->
 <script>
-    // Si Firebase (module ES) ne répond pas en 4 secondes → on affiche le login
+    // Sécurité : si après 4s le splash est encore là, on force la fermeture
     window._splashTimeout = setTimeout(function() {
         const splash = document.getElementById('splash-screen');
-        const loader = document.getElementById('splash-loader');
-        const loginBox = document.getElementById('login-box');
         if (splash && !splash.classList.contains('hidden') && !splash.classList.contains('gone')) {
-            console.warn('Firebase timeout — affichage écran connexion');
-            if (loader) loader.style.display = 'none';
-            if (loginBox) loginBox.classList.add('visible');
+            splash.classList.add('hidden');
+            setTimeout(() => splash.classList.add('gone'), 400);
+            if (typeof initApp === 'function') initApp();
         }
     }, 4000);
 </script>
 
-<!-- ===== FIREBASE SDK ===== -->
+<!-- ===== FIREBASE SDK — connexion en arrière-plan ===== -->
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
     import { getAuth, GoogleAuthProvider, signInWithPopup, signOut, onAuthStateChanged }
@@ -853,84 +853,80 @@
         appId: "1:38839404321:web:a95f0fa0de5439a3236060"
     };
 
-    const firebaseApp = initializeApp(firebaseConfig);
-    const auth = getAuth(firebaseApp);
-    const db = getFirestore(firebaseApp);
-    let currentUser = null;
+    let firebaseApp, auth, db, currentUser = null;
+
+    try {
+        firebaseApp = initializeApp(firebaseConfig);
+        auth = getAuth(firebaseApp);
+        db = getFirestore(firebaseApp);
+    } catch(e) {
+        console.error("Firebase init failed:", e);
+        // Firebase cassé → l'app tourne déjà sans lui, rien à faire
+    }
 
     window.signInWithGoogle = async function() {
+        if (!auth) return alert("Firebase non disponible.");
         const provider = new GoogleAuthProvider();
-        try {
-            await signInWithPopup(auth, provider);
-            // onAuthStateChanged va prendre la main et fermer le splash
-        }
-        catch(e) {
-            alert("Erreur de connexion : " + e.message);
-        }
+        try { await signInWithPopup(auth, provider); }
+        catch(e) { alert("Erreur de connexion : " + e.message); }
     };
 
     window.signOutUser = async function() {
+        if (!auth) return;
         await signOut(auth);
-        showToast("Déconnecté 👋");
+        if (typeof showToast === 'function') showToast("Déconnecté 👋");
+        // Recharger pour repartir propre
+        setTimeout(() => location.reload(), 800);
     };
 
-    onAuthStateChanged(auth, async (user) => {
-        // Firebase a répondu → annuler le timeout de sécurité
-        if (window._splashTimeout) {
-            clearTimeout(window._splashTimeout);
-            window._splashTimeout = null;
-        }
-
-        const splash = document.getElementById('splash-screen');
-        const loader = document.getElementById('splash-loader');
-        const loginBox = document.getElementById('login-box');
-
-        if (user) {
+    if (auth) {
+        onAuthStateChanged(auth, async (user) => {
             currentUser = user;
-            renderAvatar(user);
-            await loadDataFromFirebase(user.uid);
-            splash.classList.add('hidden');
-            setTimeout(() => splash.classList.add('gone'), 400);
-        } else {
-            currentUser = null;
-            if (loader) loader.style.display = 'none';
-            if (loginBox) loginBox.classList.add('visible');
-        }
-    });
+            if (user) {
+                // Mettre à jour l'avatar (l'app tourne déjà)
+                renderAvatar(user);
+                // Synchroniser les données en arrière-plan
+                syncFromFirebase(user.uid);
+            } else {
+                // Pas connecté → badge offline
+                setCloudStatus('offline');
+            }
+        });
+    }
 
-    async function loadDataFromFirebase(uid) {
+    async function syncFromFirebase(uid) {
         setCloudStatus('saving');
         try {
-            // Timeout de 6s sur la requête Firestore
-            const firestorePromise = getDoc(doc(db, "users", uid));
             const timeoutPromise = new Promise((_, reject) =>
-                setTimeout(() => reject(new Error("Firestore timeout")), 6000)
+                setTimeout(() => reject(new Error("timeout")), 8000)
             );
-            const docSnap = await Promise.race([firestorePromise, timeoutPromise]);
+            const docSnap = await Promise.race([
+                getDoc(doc(db, "users", uid)),
+                timeoutPromise
+            ]);
             if (docSnap.exists()) {
                 const cloudData = docSnap.data();
-                window.appData = { ...window.appData, ...cloudData };
-                localStorage.setItem('nutri_v5_pro_complete', JSON.stringify(window.appData));
-                showToast("Données chargées depuis le cloud ☁️");
+                // Fusionner les données cloud avec les données locales
+                if (typeof appData !== 'undefined') {
+                    Object.assign(appData, cloudData);
+                    localStorage.setItem('nutri_v5_pro_complete', JSON.stringify(appData));
+                    // Rafraîchir l'affichage si l'app est déjà lancée
+                    if (typeof renderHomeData === 'function') renderHomeData();
+                    if (typeof renderWeek === 'function') renderWeek();
+                    if (typeof showToast === 'function') showToast("☁️ Données synchronisées");
+                }
             }
             setCloudStatus('synced');
         } catch(e) {
             setCloudStatus('offline');
-            console.warn("Chargement Firebase échoué, données locales utilisées :", e.message);
-            // Charger les données locales si Firebase échoue
-            const saved = localStorage.getItem('nutri_v5_pro_complete');
-            if (saved) {
-                try { window.appData = { ...window.appData, ...JSON.parse(saved) }; } catch(_) {}
-            }
+            console.warn("Sync Firebase échoué:", e.message);
         }
-        initApp();
     }
 
     window.saveToFirebase = async function(data) {
-        if (!currentUser) return;
+        if (!currentUser || !db) return;
         setCloudStatus('saving');
         try {
-            const docRef = doc(db, "users", currentUser.uid);
             const dataToSave = JSON.parse(JSON.stringify(data));
             if (dataToSave.days) {
                 Object.keys(dataToSave.days).forEach(date => {
@@ -941,11 +937,10 @@
                     }
                 });
             }
-            await setDoc(docRef, dataToSave, { merge: true });
+            await setDoc(doc(db, "users", currentUser.uid), dataToSave, { merge: true });
             setCloudStatus('synced');
         } catch(e) {
             setCloudStatus('offline');
-            console.error("Erreur sauvegarde Firebase:", e);
         }
     };
 
@@ -991,10 +986,16 @@
 
     function getTodayStr() { return new Date().toISOString().split('T')[0]; }
 
-    window.onload = () => {
+    // DOMContentLoaded = démarre dès que le HTML est parsé, sans attendre fonts/images/Firebase
+    document.addEventListener('DOMContentLoaded', () => {
+        // Annuler le timeout de sécurité puisqu'on démarre normalement
+        if (window._splashTimeout) { clearTimeout(window._splashTimeout); window._splashTimeout = null; }
+
+        // Charger les données locales
         const saved = localStorage.getItem('nutri_v5_pro_complete');
         if (saved) { try { appData = JSON.parse(saved); } catch(e) {} }
         applyTheme();
+
         document.getElementById('camera-input').onchange = function(){ processFile(this); };
         ['p-weight-target','p-goal-weeks','p-weight'].forEach(id => {
             const el = document.getElementById(id);
@@ -1003,9 +1004,18 @@
         document.getElementById('gallery-input').onchange = function(){ processFile(this); };
         document.getElementById('multi-camera-input').onchange = function(){ processMultiFile(this); };
         document.getElementById('multi-gallery-input').onchange = function(){ processMultiFile(this); };
-    };
+
+        // Fermer le splash après 1.2s d'animation et démarrer l'app
+        const splash = document.getElementById('splash-screen');
+        setTimeout(() => {
+            splash.classList.add('hidden');
+            setTimeout(() => { splash.classList.add('gone'); initApp(); }, 400);
+        }, 1200);
+    });
 
     function initApp() {
+        if (window._appStarted) return; // guard anti double-appel
+        window._appStarted = true;
         document.querySelectorAll('.loader').forEach(l => l.style.display = 'none');
         if (appData.profile) document.getElementById('home-user-name').textContent = appData.profile.name;
         if (appData.apiKey) document.getElementById('api-key-in').value = appData.apiKey;
