@@ -821,6 +821,21 @@
     </nav>
 </div>
 
+<!-- ===== TIMEOUT SÉCURITÉ — s'exécute immédiatement, hors module ===== -->
+<script>
+    // Si Firebase (module ES) ne répond pas en 4 secondes → on affiche le login
+    window._splashTimeout = setTimeout(function() {
+        const splash = document.getElementById('splash-screen');
+        const loader = document.getElementById('splash-loader');
+        const loginBox = document.getElementById('login-box');
+        if (splash && !splash.classList.contains('hidden') && !splash.classList.contains('gone')) {
+            console.warn('Firebase timeout — affichage écran connexion');
+            if (loader) loader.style.display = 'none';
+            if (loginBox) loginBox.classList.add('visible');
+        }
+    }, 4000);
+</script>
+
 <!-- ===== FIREBASE SDK ===== -->
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
@@ -845,8 +860,13 @@
 
     window.signInWithGoogle = async function() {
         const provider = new GoogleAuthProvider();
-        try { await signInWithPopup(auth, provider); }
-        catch(e) { alert("Erreur de connexion : " + e.message); }
+        try {
+            await signInWithPopup(auth, provider);
+            // onAuthStateChanged va prendre la main et fermer le splash
+        }
+        catch(e) {
+            alert("Erreur de connexion : " + e.message);
+        }
     };
 
     window.signOutUser = async function() {
@@ -855,12 +875,16 @@
     };
 
     onAuthStateChanged(auth, async (user) => {
-        // Annuler le timeout de sécurité si Firebase répond
-        if (window._splashTimeout) { clearTimeout(window._splashTimeout); window._splashTimeout = null; }
+        // Firebase a répondu → annuler le timeout de sécurité
+        if (window._splashTimeout) {
+            clearTimeout(window._splashTimeout);
+            window._splashTimeout = null;
+        }
 
         const splash = document.getElementById('splash-screen');
         const loader = document.getElementById('splash-loader');
         const loginBox = document.getElementById('login-box');
+
         if (user) {
             currentUser = user;
             renderAvatar(user);
@@ -869,23 +893,10 @@
             setTimeout(() => splash.classList.add('gone'), 400);
         } else {
             currentUser = null;
-            loader.style.display = 'none';
-            loginBox.classList.add('visible');
+            if (loader) loader.style.display = 'none';
+            if (loginBox) loginBox.classList.add('visible');
         }
     });
-
-    // ===== TIMEOUT DE SÉCURITÉ : si Firebase ne répond pas en 5s =====
-    window._splashTimeout = setTimeout(() => {
-        const splash = document.getElementById('splash-screen');
-        const loader = document.getElementById('splash-loader');
-        const loginBox = document.getElementById('login-box');
-        // Si le splash est encore visible, on bascule sur le login
-        if (splash && !splash.classList.contains('hidden')) {
-            console.warn("Firebase timeout — fallback sur données locales");
-            loader.style.display = 'none';
-            loginBox.classList.add('visible');
-        }
-    }, 5000);
 
     async function loadDataFromFirebase(uid) {
         setCloudStatus('saving');
