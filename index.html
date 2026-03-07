@@ -319,13 +319,13 @@
             <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M15 18l-6-6 6-6"/></svg>
         </button>
         <div class="header-title">
-            <span style="display:flex;align-items:center;gap:6px">
-                NUTRI+
-                <span id="cloud-status" class="cloud-badge synced">☁️ Sync</span>
-            </span>
+            <span>NUTRI+</span>
             <span class="header-subtitle">Coach IA</span>
         </div>
-        <div id="header-avatar" onclick="showSection('view-settings')" style="cursor:pointer"></div>
+        <div style="display:flex;align-items:center;gap:6px">
+            <span id="cloud-status" class="cloud-badge synced">☁️ Sync</span>
+            <div id="header-avatar" onclick="showSection('view-settings')" style="cursor:pointer"></div>
+        </div>
     </header>
 
     <div id="toast" class="toast"></div>
