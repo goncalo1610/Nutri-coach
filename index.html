@@ -1871,10 +1871,175 @@ JSON: {"kcal":number,"prot":number,"carb":number,"fat":number,"healthScore":1|2|
     if ('serviceWorker' in navigator) {
         window.addEventListener('load', () => {
             navigator.serviceWorker.register('/Nutri-coach/sw.js')
-                .then(() => console.log('✅ Service Worker enregistré'))
+                .then(reg => {
+                    console.log('✅ Service Worker enregistré');
+                    window._swReg = reg;
+                    // Demander permission + planifier notifs au démarrage
+                    initNotifications(reg);
+                })
                 .catch(err => console.log('❌ SW erreur:', err));
         });
     }
-</script>
+
+    // ===== SYSTÈME DE NOTIFICATIONS =====
+
+    async function initNotifications(reg) {
+        if (!('Notification' in window)) return;
+
+        // Si permission pas encore demandée, on attend que l'utilisateur interagisse
+        if (Notification.permission === 'default') {
+            // On demande la permission de façon non intrusive après 3s
+            setTimeout(() => requestNotifPermission(reg), 3000);
+        } else if (Notification.permission === 'granted') {
+            scheduleNotifications(reg);
+        }
+    }
+
+    async function requestNotifPermission(reg) {
+        if (Notification.permission !== 'default') return;
+        const permission = await Notification.requestPermission();
+        if (permission === 'granted') {
+            scheduleNotifications(reg);
+            showToast("🔔 Notifications activées !");
+        }
+    }
+
+    function scheduleNotifications(reg) {
+        if (!reg || Notification.permission !== 'granted') return;
+
+        // Annuler les anciens timers si existants
+        if (window._notifTimers) window._notifTimers.forEach(t => clearTimeout(t));
+        window._notifTimers = [];
+
+        const now = new Date();
+
+        // ── NOTIF 1 : Clôture journée à 22h si pas clôturée ──
+        const tonight22h = new Date(now);
+        tonight22h.setHours(22, 0, 0, 0);
+        // Si 22h est déjà passée aujourd'hui, programmer pour demain
+        if (now >= tonight22h) tonight22h.setDate(tonight22h.getDate() + 1);
+        const msTo22h = tonight22h - now;
+
+        const timer1 = setTimeout(() => {
+            checkAndNotifyBilan(reg);
+            // Reprogrammer pour le lendemain (toutes les 24h)
+            const daily = setInterval(() => checkAndNotifyBilan(reg), 24 * 60 * 60 * 1000);
+            window._notifTimers.push(daily);
+        }, msTo22h);
+        window._notifTimers.push(timer1);
+
+        // ── NOTIF 2 : Bilan hebdo le dimanche à 9h ──
+        const nextSunday9h = getNextSunday9h(now);
+        const msToSunday = nextSunday9h - now;
+
+        const timer2 = setTimeout(() => {
+            sendWeeklyReportNotif(reg);
+            // Reprogrammer toutes les semaines (7 jours)
+            const weekly = setInterval(() => sendWeeklyReportNotif(reg), 7 * 24 * 60 * 60 * 1000);
+            window._notifTimers.push(weekly);
+        }, msToSunday);
+        window._notifTimers.push(timer2);
+
+        console.log(`🔔 Notif bilan: dans ${Math.round(msTo22h/60000)} min`);
+        console.log(`🔔 Notif hebdo: dans ${Math.round(msToSunday/3600000)}h`);
+    }
+
+    function getNextSunday9h(now) {
+        const d = new Date(now);
+        const day = d.getDay(); // 0=dim, 1=lun...
+        const daysUntilSunday = day === 0 ? 0 : 7 - day;
+        d.setDate(d.getDate() + daysUntilSunday);
+        d.setHours(9, 0, 0, 0);
+        // Si on est dimanche mais 9h déjà passée → dimanche prochain
+        if (now >= d) d.setDate(d.getDate() + 7);
+        return d;
+    }
+
+    function checkAndNotifyBilan(reg) {
+        const today = getTodayStr();
+        const day = appData.days[today];
+        const alreadyClosed = day && day.closed;
+        const hasMeals = day && day.meals && day.meals.length > 0;
+
+        // Notifier seulement si au moins 1 repas saisi ET pas encore clôturé
+        if (hasMeals && !alreadyClosed) {
+            sendNotification(reg, {
+                title: '🌙 NUTRI+ — Bilan du jour',
+                body: `Tu as ${day.meals.length} repas enregistré(s) mais la journée n'est pas encore clôturée. Pense à faire ton bilan ! 💪`,
+                icon: '/Nutri-coach/icon-192.png',
+                badge: '/Nutri-coach/icon-192.png',
+                tag: 'daily-bilan',
+                data: { section: 'view-home' }
+            });
+        }
+    }
+
+    function sendWeeklyReportNotif(reg) {
+        // Calculer un résumé rapide de la semaine
+        const today = new Date();
+        let totalMeals = 0, closedDays = 0, totalKcal = 0;
+        for (let i = 0; i < 7; i++) {
+            const d = new Date(today); d.setDate(today.getDate() - i);
+            const ds = d.toISOString().split('T')[0];
+            const day = appData.days[ds];
+            if (day) {
+                if (day.meals.length > 0) totalMeals += day.meals.length;
+                if (day.closed) closedDays++;
+                totalKcal += day.meals.reduce((s, m) => s + m.kcal, 0);
+            }
+        }
+
+        if (totalMeals === 0) return; // Pas de données cette semaine, pas de notif
+
+        const avgKcal = closedDays > 0 ? Math.round(totalKcal / 7) : 0;
+        const bodyText = totalMeals > 0
+            ? `${totalMeals} repas cette semaine · ${closedDays}/7 jours clôturés${avgKcal > 0 ? ` · ~${avgKcal} kcal/j en moyenne` : ''}. Ouvre l'app pour voir ton bilan complet ! 📊`
+            : 'Ouvre l\'app pour voir ton bilan de la semaine ! 📊';
+
+        sendNotification(reg, {
+            title: '📊 NUTRI+ — Bilan hebdomadaire',
+            body: bodyText,
+            icon: '/Nutri-coach/icon-192.png',
+            badge: '/Nutri-coach/icon-192.png',
+            tag: 'weekly-report',
+            data: { section: 'view-menu' }
+        });
+    }
+
+    function sendNotification(reg, options) {
+        if (!reg || Notification.permission !== 'granted') return;
+        try {
+            if (reg.active) {
+                reg.showNotification(options.title, {
+                    body: options.body,
+                    icon: options.icon,
+                    badge: options.badge,
+                    tag: options.tag,
+                    renotify: true,
+                    data: options.data,
+                    vibrate: [200, 100, 200]
+                });
+            } else {
+                // Fallback : notification directe si SW pas encore actif
+                new Notification(options.title, { body: options.body, icon: options.icon });
+            }
+        } catch(e) {
+            console.warn('Notif échouée:', e);
+        }
+    }
+
+    // ── Écouter les messages du Service Worker (clic notif → naviguer) ──
+    navigator.serviceWorker && navigator.serviceWorker.addEventListener('message', event => {
+        if (event.data?.type === 'NAVIGATE' && event.data?.section) {
+            showSection(event.data.section);
+        }
+    });
+
+    // ── Gérer l'ouverture via URL de notification ──
+    const urlParams = new URLSearchParams(window.location.search);
+    const notifSection = urlParams.get('notif');
+    if (notifSection) {
+        setTimeout(() => showSection(notifSection), 1500); // après initApp
+    }</script>
 </body>
 </html>
