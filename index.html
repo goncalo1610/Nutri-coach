@@ -163,6 +163,8 @@
         .meal-cat-card { background:var(--card-bg); border-radius:20px; padding:20px 14px 16px; box-shadow:var(--shadow); border:2px solid transparent; cursor:pointer; transition:all 0.2s; text-align:center; position:relative; display:flex; flex-direction:column; align-items:center; gap:6px; }
         .meal-cat-card:active { transform:scale(0.97); }
         .meal-cat-card.has-meal { border-color:var(--primary); background:var(--primary-light); }
+        .meal-cat-card.optional-cat { border-style:dashed; border-color:rgba(113,128,150,0.35); opacity:0.82; }
+        .meal-cat-card.optional-cat.has-meal { border-style:solid; border-color:var(--primary); opacity:1; background:var(--primary-light); }
         body.dark-mode .meal-cat-card { border:2px solid rgba(255,255,255,0.06); }
         body.dark-mode .meal-cat-card.has-meal { border-color:var(--primary); }
         .meal-cat-emoji { font-size:2.2rem; line-height:1; }
@@ -1105,7 +1107,7 @@
 Profil: ${p.name}, ${p.weight}kg, morphotype ${p.morph || 'meso'}. ${goalInfo} ${lifestyleInfo} ${dietInfo} ${stressInfo} ${sleepInfo} ${allergiesInfo}
 Objectifs: ${t.cal} kcal de base (${adjCal} kcal ajusté avec sport), ${t.prot}g protéines, ${t.carb}g glucides, ${t.fat}g lipides.
 Repas: ${JSON.stringify(day.meals.map(m => ({type:m.type, kcal:m.kcal, score:m.healthScore})))}.
-Totaux: ${JSON.stringify({ calories_consommées: totalCal, objectif_ajusté: adjCal, proteines: day.meals.reduce((s,m)=>s+m.prot,0), sport_kcal: day.sport||0, pas: day.steps||0, eau_litres: ((day.water||0)*0.25).toFixed(1) })}.`;
+Totaux: ${JSON.stringify({ calories_consommées: totalCal, objectif_ajusté: adjCal, proteines: day.meals.reduce((s,m)=>s+m.prot,0), sport_kcal: day.sport||0, pas: day.steps||0, eau_litres: ((day.water||0)*0.2).toFixed(1) })}.`;
         const txt = await callGemini(prompt, false);
         document.getElementById('loader-bilan').style.display = 'none';
         day.aiSummary = txt;
@@ -1479,24 +1481,21 @@ Totaux: ${JSON.stringify({ calories_consommées: totalCal, objectif_ajusté: adj
         const day = appData.days[selectedDate] || { meals: [] };
         const mealFreq = p ? p.mealFreq : 4;
 
-        // Déterminer quelles catégories afficher selon la fréquence
-        const visibleCats = MEAL_CATS.filter(cat => {
+        // Catégories planifiées (pct > 0) + Collation toujours visible (optionnelle si pct = 0)
+        const catsToRender = MEAL_CATS.filter(cat => {
             const pct = getMealPct(cat.key);
-            // Toujours montrer les catégories avec un % > 0
-            // Pour 2 repas : montrer PD + Déjeuner
-            // Pour 3 repas : montrer PD + Déjeuner + Dîner
-            // Pour 4 repas : tout montrer
-            // Pour 5 repas : tout montrer (collation x2)
-            return pct > 0;
+            return pct > 0 || cat.key === 'Collation'; // Collation toujours présente
         });
 
-        // Si aucune catégorie visible (profil pas encore configuré), tout montrer
-        const catsToRender = visibleCats.length > 0 ? visibleCats : MEAL_CATS;
+        // Si profil pas encore configuré → tout montrer
+        const finalCats = (catsToRender.length > 1 ? catsToRender : MEAL_CATS);
 
         grid.innerHTML = '<div class="meal-cat-grid"></div>';
         const inner = grid.querySelector('.meal-cat-grid');
 
-        catsToRender.forEach(cat => {
+        finalCats.forEach(cat => {
+            const pct = getMealPct(cat.key);
+            const isOptional = cat.key === 'Collation' && pct === 0; // collation hors plan
             const idealKcal = getIdealKcalForMeal(cat.key);
             const idealMacros = getIdealMacrosForMeal(cat.key);
             const meals = day.meals.filter(m => m.type === cat.key);
@@ -1505,9 +1504,9 @@ Totaux: ${JSON.stringify({ calories_consommées: totalCal, objectif_ajusté: adj
             const hasMeal = count > 0;
 
             const card = document.createElement('div');
-            card.className = 'meal-cat-card' + (hasMeal ? ' has-meal' : '');
+            card.className = 'meal-cat-card' + (hasMeal ? ' has-meal' : '') + (isOptional ? ' optional-cat' : '');
 
-            // Affichage des macros idéales si profil configuré
+            // Macros idéales (seulement si dans le plan)
             const macrosHtml = idealKcal > 0 ? `
                 <div class="meal-cat-macros">
                     <span class="mp">P:${idealMacros.prot}g</span>
@@ -1515,12 +1514,14 @@ Totaux: ${JSON.stringify({ calories_consommées: totalCal, objectif_ajusté: adj
                     <span class="mf">L:${idealMacros.fat}g</span>
                 </div>` : '';
 
-            // Affichage calories idéales
+            // Label selon contexte
             const kcalIdealHtml = idealKcal > 0
                 ? `<div class="meal-cat-kcal">Idéal : <span>~${idealKcal} kcal</span></div>${macrosHtml}`
-                : `<div class="meal-cat-kcal" style="color:var(--text-muted);font-style:italic">Configure ton profil</div>`;
+                : isOptional
+                    ? `<div class="meal-cat-kcal" style="color:var(--text-muted);font-style:italic;font-size:0.72rem">Optionnelle · hors plan</div>`
+                    : `<div class="meal-cat-kcal" style="color:var(--text-muted);font-style:italic">Configure ton profil</div>`;
 
-            // Statut si repas enregistrés
+            // Statut kcal enregistrés
             const recordedHtml = hasMeal
                 ? `<div class="meal-cat-recorded">${totalKcal} kcal enregistrés` +
                   (totalKcal > idealKcal * 1.15 && idealKcal > 0 ? ' ⚠️' : totalKcal > 0 ? ' ✅' : '') +
@@ -1530,7 +1531,7 @@ Totaux: ${JSON.stringify({ calories_consommées: totalCal, objectif_ajusté: adj
             card.innerHTML = `
                 ${count > 0 ? `<div class="meal-cat-badge">${count}</div>` : ''}
                 <div class="meal-cat-emoji">${cat.emoji}</div>
-                <div class="meal-cat-name">${cat.label}</div>
+                <div class="meal-cat-name">${cat.label}${isOptional ? ' <span style="font-size:0.65rem;opacity:0.6;font-weight:600">OPTIONNELLE</span>' : ''}</div>
                 ${kcalIdealHtml}
                 ${recordedHtml}
                 <div class="meal-cat-add-icon">+</div>`;
@@ -1809,8 +1810,9 @@ JSON: {"kcal":number,"prot":number,"carb":number,"fat":number,"healthScore":1|2|
     async function analyzeMenu(b64){const resDiv=document.getElementById('scan-res');const loader=document.getElementById('loader-scan');resDiv.style.display='none';loader.style.display='block';const res=await callGemini("Analyse ce menu de restaurant. Conseille les 2 plats les plus sains en expliquant brièvement pourquoi. Sois concis et bienveillant.",false,[b64]);loader.style.display='none';if(res){resDiv.textContent=res;resDiv.style.display='block';}}
     async function generateRecipe(){const ing=document.getElementById('fridge-in').value.trim();if(!ing)return showAlert("Ingrédients manquants","Liste ce que tu as dans ton frigo !");const resDiv=document.getElementById('recipe-res');const loader=document.getElementById('loader-recipe');resDiv.style.display='none';loader.style.display='block';const res=await callGemini(`Propose une recette saine, simple et rapide avec ces ingrédients: ${ing}. Inclus les étapes et une estimation des calories.`);loader.style.display='none';if(res){resDiv.textContent=res;resDiv.style.display='block';}}
 
-    function getWaterTarget(){const p=appData.profile;if(!p)return 8;let ml=p.weight*35;if(parseFloat(p.activity)>=1.55)ml+=500;if(p.stress==='high'||p.stress==='very_high')ml+=250;if(p.goalDir==='loss')ml+=250;return Math.max(6,Math.min(12,Math.round(ml/250)));}
-    function renderWaterGlasses(){const day=appData.days[selectedDate]||{};const filled=day.water||0;const target=getWaterTarget();const liters=(filled*0.25).toFixed(2).replace(/\.?0+$/,'')||'0';const pct=Math.round(Math.min((filled/target)*100,100));const elCur=document.getElementById('w-current');const elLit=document.getElementById('w-liters');const elPct=document.getElementById('w-pct');const elTgt=document.getElementById('w-target');const elTgtL=document.getElementById('w-target-l');const pfill=document.getElementById('water-progress-fill');const msgEl=document.getElementById('water-msg');if(elCur)elCur.textContent=filled;if(elLit)elLit.textContent=liters;if(elPct)elPct.textContent=pct;if(elTgt)elTgt.textContent=target;if(elTgtL)elTgtL.textContent=(target*0.25).toFixed(2).replace(/\.?0+$/,'');if(pfill)pfill.style.width=pct+'%';if(msgEl){if(filled===0)msgEl.textContent="Pense à t'hydrater ! 💧";else if(filled<target*0.4)msgEl.textContent="Continue, tu es bien parti ! 🌊";else if(filled<target*0.7)msgEl.textContent="Bonne progression ! 👍";else if(filled<target)msgEl.textContent="Plus que "+(target-filled)+" verre(s) !";else msgEl.textContent="Objectif atteint ! 🎉";}}
+    const WATER_STEP_L = 0.2; // 1 unité = 0.2L
+    function getWaterTarget(){const p=appData.profile;if(!p)return 10;let ml=p.weight*35;if(parseFloat(p.activity)>=1.55)ml+=500;if(p.stress==='high'||p.stress==='very_high')ml+=250;if(p.goalDir==='loss')ml+=250;return Math.max(7,Math.min(15,Math.round(ml/(WATER_STEP_L*1000))));}
+    function renderWaterGlasses(){const day=appData.days[selectedDate]||{};const filled=day.water||0;const target=getWaterTarget();const liters=(filled*WATER_STEP_L).toFixed(1).replace(/\.?0+$/,'')||'0';const pct=Math.round(Math.min((filled/target)*100,100));const elCur=document.getElementById('w-current');const elLit=document.getElementById('w-liters');const elPct=document.getElementById('w-pct');const elTgt=document.getElementById('w-target');const elTgtL=document.getElementById('w-target-l');const pfill=document.getElementById('water-progress-fill');const msgEl=document.getElementById('water-msg');if(elCur)elCur.textContent=filled;if(elLit)elLit.textContent=liters;if(elPct)elPct.textContent=pct;if(elTgt)elTgt.textContent=target;if(elTgtL)elTgtL.textContent=(target*WATER_STEP_L).toFixed(1).replace(/\.?0+$/,'');if(pfill)pfill.style.width=pct+'%';if(msgEl){if(filled===0)msgEl.textContent="Pense à t'hydrater ! 💧";else if(filled<target*0.4)msgEl.textContent="Continue, tu es bien parti ! 🌊";else if(filled<target*0.7)msgEl.textContent="Bonne progression ! 👍";else if(filled<target)msgEl.textContent="Plus que "+(target-filled)+" verre(s) !";else msgEl.textContent="Objectif atteint ! 🎉";}}
     function changeWater(delta){if(!appData.days[selectedDate])appData.days[selectedDate]={meals:[],sport:0,sportEntries:[],closed:false};const day=appData.days[selectedDate];day.water=Math.max(0,Math.min(20,(day.water||0)+delta));saveData();renderWaterGlasses();}
 
     function checkWeeklyReport(){const today=new Date();if(today.getDay()!==0)return;const weekKey='weekly_report_'+getWeekKey();if(localStorage.getItem(weekKey))return;let totalMeals=0,unhealthyMeals=0,mediumMeals=0,goodMeals=0;for(let i=0;i<7;i++){const d=new Date(today);d.setDate(today.getDate()-i);const ds=d.toISOString().split('T')[0];const day=appData.days[ds];if(day)day.meals.forEach(m=>{totalMeals++;if(m.healthScore===1)unhealthyMeals++;else if(m.healthScore===2)mediumMeals++;else if(m.healthScore===3)goodMeals++;});}if(totalMeals<3)return;const goodPct=Math.round((goodMeals/totalMeals)*100);const mediumPct=Math.round((mediumMeals/totalMeals)*100);const badPct=Math.round((unhealthyMeals/totalMeals)*100);let globalEmoji,globalMsg;if(goodPct>=70){globalEmoji='🟢';globalMsg='Excellente semaine, continue comme ça !';}else if(goodPct>=50){globalEmoji='🟡';globalMsg='Bonne semaine, quelques ajustements possibles.';}else if(badPct>30){globalEmoji='🔴';globalMsg='Semaine difficile, concentre-toi sur la qualité des repas.';}else{globalEmoji='🟠';globalMsg='Semaine correcte, tu peux encore progresser !';}const reportHtml=`<div style="text-align:center;font-size:2.5rem;margin-bottom:8px">${globalEmoji}</div><div style="font-weight:800;text-align:center;margin-bottom:14px">${globalMsg}</div><div style="background:var(--bg-body);border-radius:12px;padding:12px 14px"><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px"><span style="font-size:0.88rem">😊 Adaptés</span><strong style="color:var(--success)">${goodPct}%</strong></div><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px"><span style="font-size:0.88rem">😐 Moyens</span><strong style="color:#d69e2e">${mediumPct}%</strong></div><div style="display:flex;justify-content:space-between;align-items:center"><span style="font-size:0.88rem">😟 Peu adaptés</span><strong style="color:var(--danger)">${badPct}%</strong></div></div><div style="font-size:0.75rem;color:var(--text-muted);margin-top:8px;text-align:center">${totalMeals} repas analysés cette semaine</div>`;document.getElementById('weekly-report-content').innerHTML=reportHtml;document.getElementById('modal-weekly-report').style.display='flex';localStorage.setItem(weekKey,'1');}
