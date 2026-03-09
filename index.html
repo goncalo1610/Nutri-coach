@@ -1871,15 +1871,44 @@ JSON: {"kcal":number,"prot":number,"carb":number,"fat":number,"healthScore":1|2|
     function showToast(msg){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2500);}
 
     if ('serviceWorker' in navigator) {
-        window.addEventListener('load', () => {
-            navigator.serviceWorker.register('/Nutri-coach/sw.js')
-                .then(reg => {
-                    console.log('✅ Service Worker enregistré');
-                    window._swReg = reg;
-                    // Demander permission + planifier notifs au démarrage
-                    initNotifications(reg);
-                })
-                .catch(err => console.log('❌ SW erreur:', err));
+        window.addEventListener('load', async () => {
+            try {
+                // ── Versioning auto : timestamp du build injecté dans le SW ──
+                const BUILD_TS = '{{BUILD_TS}}'; // remplacé ci-dessous dynamiquement
+
+                // On enregistre le SW avec un paramètre de version pour forcer la mise à jour
+                const swUrl = `/Nutri-coach/sw.js?v=${Date.now()}`;
+                const reg = await navigator.serviceWorker.register(swUrl);
+                console.log('✅ Service Worker enregistré');
+                window._swReg = reg;
+
+                // ── Détection mise à jour disponible ──
+                reg.addEventListener('updatefound', () => {
+                    const newWorker = reg.installing;
+                    newWorker.addEventListener('statechange', () => {
+                        if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
+                            // Nouvelle version disponible → on l'active immédiatement
+                            newWorker.postMessage({ type: 'SKIP_WAITING' });
+                        }
+                    });
+                });
+
+                // ── Quand le SW change → recharger la page automatiquement ──
+                let refreshing = false;
+                navigator.serviceWorker.addEventListener('controllerchange', () => {
+                    if (!refreshing) {
+                        refreshing = true;
+                        console.log('[App] Nouveau SW actif — rechargement...');
+                        window.location.reload();
+                    }
+                });
+
+                // Notifications
+                initNotifications(reg);
+
+            } catch(err) {
+                console.log('❌ SW erreur:', err);
+            }
         });
     }
 
