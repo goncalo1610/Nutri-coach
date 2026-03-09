@@ -1887,21 +1887,14 @@ JSON: {"kcal":number,"prot":number,"carb":number,"fat":number,"healthScore":1|2|
                     const newWorker = reg.installing;
                     newWorker.addEventListener('statechange', () => {
                         if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
-                            // Nouvelle version disponible → on l'active immédiatement
+                            // Nouvelle version dispo → activer + notifier sans forcer le rechargement
                             newWorker.postMessage({ type: 'SKIP_WAITING' });
+                            setTimeout(() => showToast('🔄 App mise à jour ! Ferme et rouvre pour appliquer.'), 1500);
                         }
                     });
                 });
 
-                // ── Quand le SW change → recharger la page automatiquement ──
-                let refreshing = false;
-                navigator.serviceWorker.addEventListener('controllerchange', () => {
-                    if (!refreshing) {
-                        refreshing = true;
-                        console.log('[App] Nouveau SW actif — rechargement...');
-                        window.location.reload();
-                    }
-                });
+                // Pas de reload automatique — évite les boucles
 
                 // Notifications
                 initNotifications(reg);
