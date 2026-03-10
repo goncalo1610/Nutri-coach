@@ -370,11 +370,11 @@
 
 <div id="app-container">
     <header>
-        <div style="display:flex;align-items:center;gap:6px;min-width:40px">
-            <button class="header-btn" id="btn-back" style="visibility:hidden" onclick="goBack()">
+        <div style="position:relative;min-width:40px;height:40px;display:flex;align-items:center">
+            <button class="header-btn" id="btn-back" style="visibility:hidden;position:absolute" onclick="goBack()">
                 <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M15 18l-6-6 6-6"/></svg>
             </button>
-            <div id="update-badge" style="display:none;align-items:center;gap:4px;font-size:0.62rem;font-weight:800;color:var(--primary);background:var(--primary-light);padding:4px 8px;border-radius:20px;white-space:nowrap">
+            <div id="update-badge" style="display:none;align-items:center;gap:4px;font-size:0.62rem;font-weight:800;color:var(--primary);background:var(--primary-light);padding:4px 8px;border-radius:20px;white-space:nowrap;position:absolute;left:0">
                 <svg id="update-icon" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/><path d="M3.51 9a9 9 0 0114.13-3.36L23 10M1 14l5.36 4.36A9 9 0 0020.49 15"/></svg>
                 App à jour
             </div>
@@ -1048,8 +1048,6 @@
                         if (p && typeof showSection === 'function') showSection('view-home');
                         else if (!p && typeof showSection === 'function') showSection('view-profile');
                     }
-
-                    if (typeof showToast === 'function') showToast("☁️ Données synchronisées");
                 }
             }
             setCloudStatus('synced');
@@ -1951,6 +1949,11 @@ JSON: {"kcal":number,"prot":number,"carb":number,"fat":number,"healthScore":1|2|
         document.querySelectorAll('.view-section').forEach(v=>v.classList.remove('active'));
         document.getElementById(id).classList.add('active');
         document.getElementById('btn-back').style.visibility=id==='view-home'?'hidden':'visible';
+        // Badge mise à jour visible seulement sur l'accueil
+        const badge = document.getElementById('update-badge');
+        if (badge && badge.style.display !== 'none') {
+            badge.style.visibility = id === 'view-home' ? 'visible' : 'hidden';
+        }
         document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
         const navId = NAV_MAP[id];
         if(navId) document.getElementById(navId).classList.add('active');
