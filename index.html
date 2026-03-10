@@ -49,6 +49,8 @@
         body.dark-mode header { background:rgba(22,27,34,0.92); border-bottom:1px solid rgba(255,255,255,0.08); }
         .header-title { position:absolute; left:50%; transform:translateX(-50%); font-size:1.15rem; font-weight:900; display:flex; flex-direction:column; align-items:center; line-height:1.1; letter-spacing:-0.5px; pointer-events:none; }
         .header-subtitle { font-size:0.62rem; font-weight:700; color:var(--primary); text-transform:uppercase; letter-spacing:1.5px; }
+        @keyframes spinOnce { from { transform:rotate(0deg); } to { transform:rotate(360deg); } }
+        .spin-once { animation: spinOnce 0.7s ease-in-out forwards; }
         .header-btn { background:transparent; border:none; color:var(--text-color); width:40px; height:40px; display:flex; align-items:center; justify-content:center; cursor:pointer; border-radius:50%; transition:background 0.2s; }
         .header-btn:hover { background:var(--primary-light); }
         .view-section { display:none; padding:20px 16px; animation:fadeIn 0.28s ease-out; }
@@ -368,9 +370,15 @@
 
 <div id="app-container">
     <header>
-        <button class="header-btn" id="btn-back" style="visibility:hidden" onclick="goBack()">
-            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M15 18l-6-6 6-6"/></svg>
-        </button>
+        <div style="display:flex;align-items:center;gap:6px;min-width:40px">
+            <button class="header-btn" id="btn-back" style="visibility:hidden" onclick="goBack()">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M15 18l-6-6 6-6"/></svg>
+            </button>
+            <div id="update-badge" style="display:none;align-items:center;gap:4px;font-size:0.62rem;font-weight:800;color:var(--primary);background:var(--primary-light);padding:4px 8px;border-radius:20px;white-space:nowrap">
+                <svg id="update-icon" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/><path d="M3.51 9a9 9 0 0114.13-3.36L23 10M1 14l5.36 4.36A9 9 0 0020.49 15"/></svg>
+                App à jour
+            </div>
+        </div>
         <div class="header-title">
             <span>NUTRI+</span>
             <span class="header-subtitle">Coach IA</span>
@@ -1988,7 +1996,15 @@ JSON: {"kcal":number,"prot":number,"carb":number,"fat":number,"healthScore":1|2|
                             const lastNotified = localStorage.getItem('sw-update-notified');
                             if (lastNotified !== swUrl) {
                                 localStorage.setItem('sw-update-notified', swUrl);
-                                setTimeout(() => showToast('🔄 App mise à jour !'), 1500);
+                                // Afficher le badge dans le header
+                                const badge = document.getElementById('update-badge');
+                                const icon = document.getElementById('update-icon');
+                                if (badge) {
+                                    badge.style.display = 'flex';
+                                    if (icon) icon.classList.add('spin-once');
+                                    // Disparaît après 5 secondes
+                                    setTimeout(() => { badge.style.display = 'none'; }, 5000);
+                                }
                             }
                         }
                     });
