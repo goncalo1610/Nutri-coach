@@ -2269,7 +2269,7 @@ JSON: {"kcal":number,"prot":number,"carb":number,"fat":number,"healthScore":1|2|
         }
 
         // Liste dépliable
-        list.innerHTML = supps.map(s => `
+        list.innerHTML = '<div style="display:flex;flex-direction:column;gap:6px">' + supps.map(s => `
             <div class="suppl-item ${taken[s.id] ? 'taken' : ''}" onclick="toggleSuppl('${s.id}')" style="padding:8px 10px">
                 <div class="suppl-check" style="width:22px;height:22px;border-radius:6px;font-size:0.85rem">${taken[s.id] ? '✓' : ''}</div>
                 <div class="suppl-emoji" style="font-size:1.1rem">${s.emoji}</div>
@@ -2279,7 +2279,7 @@ JSON: {"kcal":number,"prot":number,"carb":number,"fat":number,"healthScore":1|2|
                 </div>
                 <div class="suppl-moment-badge">${MOMENT_LABELS[s.moment] || s.moment}</div>
             </div>
-        `).join('');
+        `).join('') + '</div>';
     }
 
     // ── Écouter les messages du Service Worker (clic notif → naviguer) ──
