@@ -1982,9 +1982,14 @@ JSON: {"kcal":number,"prot":number,"carb":number,"fat":number,"healthScore":1|2|
                     const newWorker = reg.installing;
                     newWorker.addEventListener('statechange', () => {
                         if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
-                            // Nouvelle version dispo → activer + notifier sans forcer le rechargement
                             newWorker.postMessage({ type: 'SKIP_WAITING' });
-                            setTimeout(() => showToast('🔄 App mise à jour ! Ferme et rouvre pour appliquer.'), 1500);
+                            // Notifier UNE seule fois par version de SW
+                            const swUrl = reg.active?.scriptURL || '';
+                            const lastNotified = localStorage.getItem('sw-update-notified');
+                            if (lastNotified !== swUrl) {
+                                localStorage.setItem('sw-update-notified', swUrl);
+                                setTimeout(() => showToast('🔄 App mise à jour !'), 1500);
+                            }
                         }
                     });
                 });
