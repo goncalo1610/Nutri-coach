@@ -1688,7 +1688,7 @@ Totaux: ${JSON.stringify({ calories_consommées: totalCal, objectif_ajusté: adj
 ${contextBlock}
 Type de repas: ${activeCategory}. Objectif santé: ${goalStr}. ${dietInfo} ${allergiesInfo}
 IMPORTANT: Estime les calories et macros basées UNIQUEMENT sur les aliments décrits/photographiés, sans tenir compte d'aucun objectif calorique.
-healthScore: 1=peu adapté à l'objectif ${goalStr}, 2=moyen, 3=bien adapté. Si ≤2, healthTips avec 2-3 conseils concrets séparés par \\n. Si 3, healthTips="".
+healthScore: 1=peu adapté à l'objectif ${goalStr}, 2=moyen, 3=bien adapté. Fournis toujours 2-3 conseils concrets dans healthTips séparés par \\n pour améliorer ce repas.
 JSON: {"kcal":number,"prot":number,"carb":number,"fat":number,"healthScore":1|2|3,"healthLabel":string,"healthTips":string}`;
 
         const res=await callGemini(prompt,true,currentImgs);
@@ -1709,12 +1709,14 @@ JSON: {"kcal":number,"prot":number,"carb":number,"fat":number,"healthScore":1|2|
             document.getElementById('m-carb-val').value = carb;
             document.getElementById('m-fat-val').value  = fat;
 
-            const emojis={1:'😟',2:'😐',3:'😊'};
-            document.getElementById('meal-health-emoji').textContent=emojis[res.healthScore]||'😐';
-            document.getElementById('meal-health-label').textContent=res.healthLabel||'';
+            const idealKcal = getIdealKcalForMeal(activeCategory);
+            const isOver = idealKcal > 0 && kcal > idealKcal;
+            const emoji = isOver ? '😞' : '😊';
+            document.getElementById('meal-health-emoji').textContent = emoji;
+            document.getElementById('meal-health-label').textContent = res.healthLabel || '';
             const tipsEl=document.getElementById('meal-health-tips');
             if(tipsEl){
-                if(res.healthTips&&res.healthScore<3){
+                if(res.healthTips){
                     tipsEl.style.display='block';
                     tipsEl.innerHTML='<div style="font-weight:800;font-size:0.82rem;margin-bottom:4px">💡 Comment améliorer ce repas :</div>'+res.healthTips.split('\n').filter(Boolean).map(t=>`<div style="font-size:0.8rem;margin-top:3px">• ${t.replace(/^[-•]\s*/, '')}</div>`).join('');
                 } else { tipsEl.style.display='none'; }
@@ -1770,8 +1772,9 @@ JSON: {"kcal":number,"prot":number,"carb":number,"fat":number,"healthScore":1|2|
         document.getElementById('m-prot-val').value=m.prot;
         document.getElementById('m-carb-val').value=m.carb;
         document.getElementById('m-fat-val').value=m.fat;
-        const emojis={1:'😟',2:'😐',3:'😊'};
-        document.getElementById('meal-health-emoji').textContent=emojis[m.healthScore]||'😐';
+        const idealKcalEdit = getIdealKcalForMeal(m.type);
+        const isOverEdit = idealKcalEdit > 0 && m.kcal > idealKcalEdit;
+        document.getElementById('meal-health-emoji').textContent = isOverEdit ? '😞' : '😊';
         document.getElementById('meal-health-label').textContent=m.healthLabel||'';
         document.getElementById('m-preview').style.display='block';
         document.getElementById('btn-analyze-meal').style.display='none';
@@ -1866,7 +1869,10 @@ JSON: {"kcal":number,"prot":number,"carb":number,"fat":number,"healthScore":1|2|
         else{bText.style.display='none';}
 
         const mealIcons={'Petit Déjeuner':'☕','Déjeuner':'☀️','Dîner':'🌙','Collation':'🍎'};
-        const healthEmojis={1:'😟',2:'😐',3:'😊'};
+        const healthEmojis = (meal) => {
+            const ideal = getIdealKcalForMeal(meal.type);
+            return ideal > 0 && meal.kcal > ideal ? '😞' : '😊';
+        };
         const list=document.getElementById('home-meals-list');
         list.innerHTML='';
         if(!day.meals.length){
@@ -1876,7 +1882,7 @@ JSON: {"kcal":number,"prot":number,"carb":number,"fat":number,"healthScore":1|2|
                 const el=document.createElement('div');
                 el.className='meal-item';
                 const descHtml=m.desc?`<div class="meal-item-desc">📝 ${m.desc}</div>`:'<div class="meal-item-desc" style="opacity:0.6">Aucune description</div>';
-                const tipsHtml=(m.healthTips&&m.healthScore<3)?`<div class="meal-item-tips">💡 ${m.healthTips.split('\n').filter(Boolean).map(t=>t.replace(/^[-•]\s*/,'')).join('<br>• ')}</div>`:'';
+                const tipsHtml=m.healthTips?`<div class="meal-item-tips">💡 ${m.healthTips.split('\n').filter(Boolean).map(t=>t.replace(/^[-•]\s*/,'')).join('<br>• ')}</div>`:'';
                 const macrosDetail=`<div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:4px">
                     <span style="font-size:0.75rem;font-weight:700;color:var(--prot-color)">🥩 P: ${m.prot}g</span>
                     <span style="font-size:0.75rem;font-weight:700;color:var(--carb-color)">🍞 G: ${m.carb}g</span>
@@ -1892,7 +1898,7 @@ JSON: {"kcal":number,"prot":number,"carb":number,"fat":number,"healthScore":1|2|
                             </div>
                         </div>
                         <div style="display:flex;align-items:center;gap:4px;flex-shrink:0">
-                            ${m.healthScore?`<span style="font-size:1.2rem">${healthEmojis[m.healthScore]||''}</span>`:''}
+                            <span style="font-size:1.2rem">${healthEmojis(m)}</span>
                             <button class="meal-edit-btn" onclick="event.stopPropagation();editMeal(${i})">✏️</button>
                             <button class="meal-delete-btn" onclick="event.stopPropagation();askDeleteMeal(${i})">🗑️</button>
                         </div>
