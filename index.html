@@ -493,6 +493,98 @@
         }
         .coach-header-btn:active { transform: scale(0.92); }
 
+        /* ===== POPUP MENU OUTILS ===== */
+        #tools-popup {
+            position: fixed;
+            bottom: calc(var(--nav-height) + env(safe-area-inset-bottom) + 8px);
+            /* 4ème icône sur 5 = centré à 75% de la largeur de la nav */
+            left: calc(min(100vw, 600px) * 0.75);
+            transform: translateX(-50%);
+            width: 210px;
+            z-index: 200;
+            display: none;
+            pointer-events: none;
+        }
+        #tools-popup.open { display: block; pointer-events: all; }
+        .tools-popup-inner {
+            background: var(--card-bg);
+            border-radius: 14px;
+            box-shadow: 0 -4px 30px rgba(0,0,0,0.15);
+            border: 1px solid rgba(0,0,0,0.06);
+            overflow: hidden;
+            animation: popupUp 0.22s cubic-bezier(0.34,1.56,0.64,1);
+        }
+        body.dark-mode .tools-popup-inner { border-color: rgba(255,255,255,0.08); box-shadow: 0 -4px 30px rgba(0,0,0,0.4); }
+        @keyframes popupUp {
+            from { transform: translateY(16px); opacity: 0; }
+            to   { transform: translateY(0);    opacity: 1; }
+        }
+        .tools-popup-item {
+            display: flex; align-items: center; gap: 10px;
+            padding: 9px 14px; cursor: pointer;
+            transition: background 0.15s;
+            border-bottom: 1px solid rgba(0,0,0,0.05);
+        }
+        body.dark-mode .tools-popup-item { border-bottom-color: rgba(255,255,255,0.05); }
+        .tools-popup-item:last-child { border-bottom: none; }
+        .tools-popup-item:active { background: var(--primary-light); }
+        .tools-popup-icon { font-size: 1rem; width: 28px; height: 28px; border-radius: 8px; background: var(--bg-body); display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+        .tools-popup-label { font-weight: 800; font-size: 0.8rem; }
+        .tools-popup-desc { font-size: 0.62rem; color: var(--text-muted); font-weight: 600; }
+        /* Overlay de fermeture */
+        #tools-popup-backdrop {
+            position: fixed; inset: 0; z-index: 199;
+            display: none;
+        }
+        #tools-popup-backdrop.open { display: block; }
+
+        /* ===== GRILLE SÉLECTION OUTILS ===== */
+        .tool-select-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 14px;
+        }
+        .tool-select-card {
+            background: var(--card-bg);
+            border-radius: 20px;
+            padding: 22px 14px 18px;
+            box-shadow: var(--shadow);
+            border: 2px solid rgba(0,0,0,0.03);
+            cursor: pointer;
+            transition: all 0.2s;
+            text-align: center;
+            display: flex; flex-direction: column; align-items: center; gap: 6px;
+        }
+        body.dark-mode .tool-select-card { border-color: rgba(255,255,255,0.06); }
+        .tool-select-card:active { transform: scale(0.97); border-color: var(--primary); background: var(--primary-light); }
+        .tool-select-emoji { font-size: 2.2rem; line-height: 1; }
+        .tool-select-name { font-weight: 900; font-size: 0.88rem; letter-spacing: -0.3px; }
+        .tool-select-desc { font-size: 0.68rem; font-weight: 600; color: var(--text-muted); }
+
+        /* ===== CHIPS NAVIGATION OUTILS ===== */
+        .tools-nav {
+            display: flex; overflow-x: auto; gap: 8px;
+            padding: 0 0 14px 0; scrollbar-width: none;
+            margin-bottom: 4px;
+        }
+        .tools-nav::-webkit-scrollbar { display: none; }
+        .tools-nav-chip {
+            flex: 0 0 auto; padding: 8px 14px;
+            border-radius: 20px; border: 1.5px solid rgba(0,0,0,0.08);
+            background: var(--bg-body); color: var(--text-muted);
+            font-size: 0.78rem; font-weight: 800; cursor: pointer;
+            display: flex; align-items: center; gap: 5px;
+            transition: all 0.2s; font-family: 'Nunito', sans-serif;
+            white-space: nowrap;
+        }
+        body.dark-mode .tools-nav-chip { border-color: rgba(255,255,255,0.1); }
+        .tools-nav-chip:active { transform: scale(0.95); }
+        .tools-nav-chip.active {
+            background: var(--primary); border-color: var(--primary);
+            color: white; box-shadow: 0 3px 10px rgba(56,178,172,0.3);
+        }
+        .tools-section-anchor { scroll-margin-top: 80px; }
+
         /* ===== HISTOGRAMME SPORT ===== */
         .sport-chart-card {
             background: var(--cal-card-gradient);
@@ -1125,20 +1217,67 @@
         </div>
     </div>
 
-    <!-- 4. OUTILS -->
+    <!-- 4. OUTILS — GRILLE DE SÉLECTION -->
     <div id="view-menu" class="view-section">
         <h2>🛠️ Outils Coach</h2>
+        <p style="font-size:0.85rem;color:var(--text-muted);margin:-8px 0 16px 0">Sélectionne un outil</p>
+        <div class="tool-select-grid">
+            <div class="tool-select-card" onclick="openTool('poids')">
+                <div class="tool-select-emoji">⚖️</div>
+                <div class="tool-select-name">Évolution du poids</div>
+                <div class="tool-select-desc">Suivi de ta courbe</div>
+            </div>
+            <div class="tool-select-card" onclick="openTool('complements')">
+                <div class="tool-select-emoji">💊</div>
+                <div class="tool-select-name">Compléments</div>
+                <div class="tool-select-desc">Gérer tes suppléments</div>
+            </div>
+            <div class="tool-select-card" onclick="openTool('scan')">
+                <div class="tool-select-emoji">🍽️</div>
+                <div class="tool-select-name">Scan Menu</div>
+                <div class="tool-select-desc">Photo d'un menu resto</div>
+            </div>
+            <div class="tool-select-card" onclick="openTool('recette')">
+                <div class="tool-select-emoji">👨‍🍳</div>
+                <div class="tool-select-name">Idée Recette</div>
+                <div class="tool-select-desc">Avec tes ingrédients</div>
+            </div>
+            <div class="tool-select-card" onclick="openTool('historique')">
+                <div class="tool-select-emoji">📅</div>
+                <div class="tool-select-name">Historique</div>
+                <div class="tool-select-desc">Tes journées passées</div>
+            </div>
+        </div>
+    </div>
 
-        <!-- GESTION COMPLÉMENTS -->
+    <!-- 4b. OUTIL : POIDS -->
+    <div id="view-tool-poids" class="view-section">
+        <h2>⚖️ Évolution du poids</h2>
+        <div class="card">
+            <div id="weight-chart-container">
+                <div id="weight-empty" style="text-align:center;color:var(--text-muted);font-size:0.85rem;padding:10px">Aucune donnée pour l'instant.</div>
+                <canvas id="weight-chart" class="weight-chart" style="display:none"></canvas>
+                <div id="weight-list" style="margin-top:10px"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 4c. OUTIL : COMPLÉMENTS -->
+    <div id="view-tool-complements" class="view-section">
+        <h2>💊 Mes Compléments</h2>
         <div class="card">
             <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
-                <h3 style="margin:0">💊 Mes Compléments</h3>
+                <h3 style="margin:0">Liste des compléments</h3>
                 <button class="secondary" style="padding:6px 12px;font-size:0.78rem" onclick="openSupplModal()">+ Ajouter</button>
             </div>
             <div id="suppl-manage-list"><div class="suppl-empty" style="padding:8px 0">Aucun complément configuré.</div></div>
         </div>
+    </div>
+
+    <!-- 4d. OUTIL : SCAN MENU -->
+    <div id="view-tool-scan" class="view-section">
+        <h2>🍽️ Scan Menu Restaurant</h2>
         <div class="card">
-            <h3>🍽️ Scan Menu Restaurant</h3>
             <p style="font-size:0.85rem;color:var(--text-muted);margin:0 0 12px 0">Prends en photo un menu, l'IA te conseille les plats les plus sains.</p>
             <div class="grid-2">
                 <button class="secondary" onclick="triggerImport('camera','scan')">📸 Photo</button>
@@ -1147,8 +1286,12 @@
             <div id="loader-scan" class="loader">🔍 Analyse du menu...</div>
             <div id="scan-res" class="coach-message" style="display:none"></div>
         </div>
+    </div>
+
+    <!-- 4e. OUTIL : RECETTE -->
+    <div id="view-tool-recette" class="view-section">
+        <h2>👨‍🍳 Idée Recette</h2>
         <div class="card">
-            <h3>👨‍🍳 Idée Recette</h3>
             <p style="font-size:0.85rem;color:var(--text-muted);margin:0 0 10px 0">Dis-moi ce que tu as dans ton frigo !</p>
             <label>Ingrédients disponibles</label>
             <input type="text" id="fridge-in" placeholder="Ex: poulet, courgettes, riz...">
@@ -1156,20 +1299,13 @@
             <div id="loader-recipe" class="loader">🧠 Création de la recette...</div>
             <div id="recipe-res" class="coach-message" style="display:none"></div>
         </div>
+    </div>
+
+    <!-- 4f. OUTIL : HISTORIQUE -->
+    <div id="view-tool-historique" class="view-section">
+        <h2>📅 Historique</h2>
         <div class="card">
-            <h3>⚖️ Évolution du poids</h3>
-            <div id="weight-chart-container">
-                <div id="weight-empty" style="text-align:center;color:var(--text-muted);font-size:0.85rem;padding:10px">Aucune donnée pour l'instant.</div>
-                <canvas id="weight-chart" class="weight-chart" style="display:none"></canvas>
-                <div id="weight-list" style="margin-top:10px"></div>
-            </div>
-        </div>
-        <div class="card" style="cursor:pointer" onclick="toggleHistory()">
-            <div style="display:flex;justify-content:space-between;align-items:center">
-                <h3 style="margin:0">📅 Historique</h3>
-                <svg id="history-chevron" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" style="transition:transform 0.2s"><path d="M6 9l6 6 6-6"/></svg>
-            </div>
-            <div id="history-list" style="display:none;margin-top:12px"></div>
+            <div id="history-list-full" style="margin-top:0"></div>
         </div>
     </div>
 
@@ -1279,6 +1415,35 @@
         </div>
     </div>
 
+    <!-- BACKDROP popup outils -->
+    <div id="tools-popup-backdrop" onclick="closeToolsPopup()"></div>
+
+    <!-- POPUP MENU OUTILS -->
+    <div id="tools-popup">
+        <div class="tools-popup-inner">
+            <div class="tools-popup-item" onclick="selectTool('poids')">
+                <div class="tools-popup-icon">⚖️</div>
+                <div><div class="tools-popup-label">Évolution du poids</div><div class="tools-popup-desc">Suivi de ta courbe</div></div>
+            </div>
+            <div class="tools-popup-item" onclick="selectTool('complements')">
+                <div class="tools-popup-icon">💊</div>
+                <div><div class="tools-popup-label">Compléments</div><div class="tools-popup-desc">Gérer tes suppléments</div></div>
+            </div>
+            <div class="tools-popup-item" onclick="selectTool('scan')">
+                <div class="tools-popup-icon">🍽️</div>
+                <div><div class="tools-popup-label">Scan Menu</div><div class="tools-popup-desc">Photo d'un menu resto</div></div>
+            </div>
+            <div class="tools-popup-item" onclick="selectTool('recette')">
+                <div class="tools-popup-icon">👨‍🍳</div>
+                <div><div class="tools-popup-label">Idée Recette</div><div class="tools-popup-desc">Avec tes ingrédients</div></div>
+            </div>
+            <div class="tools-popup-item" onclick="selectTool('historique')">
+                <div class="tools-popup-icon">📅</div>
+                <div><div class="tools-popup-label">Historique</div><div class="tools-popup-desc">Tes journées passées</div></div>
+            </div>
+        </div>
+    </div>
+
     <!-- ===== BOTTOM NAV ===== -->
     <nav class="bottom-nav">
         <div class="nav-item" id="nav-home" onclick="showSection('view-home')">
@@ -1298,7 +1463,7 @@
         <div class="nav-fab-wrapper">
             <div class="nav-fab" onclick="showSection('view-day')">➕</div>
         </div>
-        <div class="nav-item" id="nav-menu" onclick="showSection('view-menu')">
+        <div class="nav-item" id="nav-menu" onclick="toggleToolsPopup()">
             <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="9" y1="13" x2="15" y2="13"/><line x1="9" y1="17" x2="12" y2="17"/></svg>
             <span>Outils</span>
         </div>
@@ -2458,6 +2623,11 @@ JSON: {"kcal":number,"prot":number,"carb":number,"fat":number,"healthScore":1|2|
         'view-home': 'nav-home',
         'view-training': 'nav-training',
         'view-menu': 'nav-menu',
+        'view-tool-poids': 'nav-menu',
+        'view-tool-complements': 'nav-menu',
+        'view-tool-scan': 'nav-menu',
+        'view-tool-recette': 'nav-menu',
+        'view-tool-historique': 'nav-menu',
         'view-settings': 'nav-settings',
     };
 
@@ -2474,7 +2644,9 @@ JSON: {"kcal":number,"prot":number,"carb":number,"fat":number,"healthScore":1|2|
         document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
         const navId = NAV_MAP[id];
         if(navId) document.getElementById(navId).classList.add('active');
-        if(id==='view-menu') { renderWeightChart(); renderSupplManage(); }
+        if(id==='view-menu') { renderWeightChart(); renderSupplManage(); initToolsScrollObserver(); }
+        if(id==='view-tool-poids') renderWeightChart();
+        if(id==='view-tool-complements') renderSupplManage();
         if(id==='view-home') renderSupplHome();
         if(id==='view-day') renderMealCategories();
         if(id==='view-training') renderSportHistory();
@@ -2777,6 +2949,114 @@ JSON: {"kcal":number,"prot":number,"carb":number,"fat":number,"healthScore":1|2|
         `).join('') + '</div>';
     }
 
+
+    // ===== POPUP MENU OUTILS =====
+    function toggleToolsPopup() {
+        const popup = document.getElementById('tools-popup');
+        const backdrop = document.getElementById('tools-popup-backdrop');
+        const isOpen = popup.classList.contains('open');
+        if (isOpen) {
+            closeToolsPopup();
+        } else {
+            // Positionner le popup au-dessus de l'icône Outils
+            const navItem = document.getElementById('nav-menu');
+            if (navItem) {
+                const rect = navItem.getBoundingClientRect();
+                const popupW = 210;
+                let left = rect.left + rect.width / 2 - popupW / 2;
+                // Empêcher de déborder à droite/gauche
+                left = Math.max(8, Math.min(left, window.innerWidth - popupW - 8));
+                popup.style.left = left + 'px';
+                popup.style.transform = 'none';
+            }
+            popup.classList.add('open');
+            backdrop.classList.add('open');
+            document.getElementById('nav-menu').classList.add('active');
+        }
+    }
+
+    function closeToolsPopup() {
+        document.getElementById('tools-popup').classList.remove('open');
+        document.getElementById('tools-popup-backdrop').classList.remove('open');
+        // Retirer active sauf si on est sur une vue outil
+        const active = document.querySelector('.view-section.active');
+        if (!active || !active.id.startsWith('view-tool-')) {
+            document.getElementById('nav-menu').classList.remove('active');
+        }
+    }
+
+    function selectTool(tool) {
+        closeToolsPopup();
+        openTool(tool);
+    }
+
+    // ===== NAVIGATION OUTILS =====
+    function openTool(tool) {
+        const viewId = 'view-tool-' + tool;
+        showSection(viewId);
+        if (tool === 'poids') renderWeightChart();
+        if (tool === 'complements') renderSupplManage();
+        if (tool === 'historique') renderHistoriqueFull();
+    }
+
+    function renderHistoriqueFull() {
+        const list = document.getElementById('history-list-full');
+        if (!list) return;
+        list.innerHTML = '';
+        const keys = Object.keys(appData.days).sort().reverse();
+        if (!keys.length) {
+            list.innerHTML = '<div style="color:var(--text-muted);font-size:0.85rem;text-align:center;padding:20px">Aucun historique pour l\'instant.</div>';
+            return;
+        }
+        keys.forEach(d => {
+            const day = appData.days[d];
+            const total = day.meals.reduce((s, m) => s + m.kcal, 0);
+            const el = document.createElement('div');
+            el.className = 'card';
+            el.style.cssText = 'padding:12px;cursor:pointer;margin-bottom:8px;display:flex;justify-content:space-between;align-items:center';
+            el.innerHTML = `<div><div style="font-weight:800">${formatDate(d)}</div><div style="font-size:0.8rem;color:var(--text-muted)">${day.meals.length} repas · ${day.closed ? '✅ Clôturé' : '⏳ En cours'}</div></div><div style="font-weight:900;color:var(--primary)">${total} kcal</div>`;
+            el.onclick = () => { selectedDate = d; renderWeek(); renderHomeData(); showSection('view-home'); };
+            list.appendChild(el);
+        });
+    }
+
+    // ===== NAVIGATION CHIPS OUTILS =====
+    function scrollToTool(id, chipEl) {
+        const target = document.getElementById(id);
+        if (!target) return;
+        // Activer la chip cliquée
+        document.querySelectorAll('.tools-nav-chip').forEach(c => c.classList.remove('active'));
+        chipEl.classList.add('active');
+        // Scroller vers la section
+        target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+
+    // Observer pour mettre à jour la chip active au scroll
+    function initToolsScrollObserver() {
+        const sections = ['tool-poids', 'tool-complements', 'tool-scan', 'tool-recette', 'tool-historique'];
+        const chips = document.querySelectorAll('.tools-nav-chip');
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    const idx = sections.indexOf(entry.target.id);
+                    if (idx !== -1) {
+                        chips.forEach(c => c.classList.remove('active'));
+                        if (chips[idx]) {
+                            chips[idx].classList.add('active');
+                            // Scroller la chip dans la vue
+                            chips[idx].scrollIntoView({ inline: 'nearest', behavior: 'smooth' });
+                        }
+                    }
+                }
+            });
+        }, { threshold: 0.3, rootMargin: '-60px 0px -60% 0px' });
+
+        sections.forEach(id => {
+            const el = document.getElementById(id);
+            if (el) observer.observe(el);
+        });
+    }
 
     // ===== CHAT COACH =====
     let coachChatHistory = []; // historique de la conversation pour le contexte multi-tour
