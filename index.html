@@ -334,6 +334,165 @@
         .meal-cat-macros .mc { color: var(--carb-color); }
         .meal-cat-macros .mf { color: var(--fat-color); }
 
+        /* ===== CHAT COACH ===== */
+        #coach-chat-overlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            z-index: 500; display: none; flex-direction: column;
+            background: var(--bg-app);
+            animation: slideUpChat 0.3s cubic-bezier(0.34,1.56,0.64,1);
+            max-width: 600px; margin: 0 auto; right: 0;
+        }
+        @keyframes slideUpChat {
+            from { transform: translateY(100%); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+        #coach-chat-overlay.closing {
+            animation: slideDownChat 0.25s ease-in forwards;
+        }
+        @keyframes slideDownChat {
+            from { transform: translateY(0); opacity: 1; }
+            to { transform: translateY(100%); opacity: 0; }
+        }
+        .coach-chat-header {
+            height: var(--header-height);
+            padding: 0 16px;
+            display: flex; align-items: center; justify-content: space-between;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            flex-shrink: 0;
+            padding-top: env(safe-area-inset-top);
+        }
+        .coach-chat-header-info { display: flex; align-items: center; gap: 10px; }
+        .coach-avatar {
+            width: 38px; height: 38px; border-radius: 50%;
+            background: rgba(255,255,255,0.25);
+            display: flex; align-items: center; justify-content: center;
+            font-size: 1.3rem; flex-shrink: 0;
+            border: 2px solid rgba(255,255,255,0.4);
+        }
+        .coach-chat-name { font-weight: 900; font-size: 0.95rem; color: white; line-height: 1.1; }
+        .coach-chat-status { font-size: 0.65rem; font-weight: 700; color: rgba(255,255,255,0.8); display: flex; align-items: center; gap: 4px; }
+        .coach-status-dot { width: 6px; height: 6px; border-radius: 50%; background: #68d391; animation: pulse 2s infinite; }
+        .coach-close-btn {
+            width: 36px; height: 36px; border-radius: 50%;
+            background: rgba(255,255,255,0.2); border: none;
+            color: white; font-size: 1.1rem; cursor: pointer;
+            display: flex; align-items: center; justify-content: center;
+            transition: background 0.2s; padding: 0; flex-shrink: 0;
+        }
+        .coach-close-btn:active { background: rgba(255,255,255,0.35); transform: scale(0.93); }
+        .coach-chat-messages {
+            flex: 1; overflow-y: auto; padding: 16px;
+            display: flex; flex-direction: column; gap: 12px;
+            scroll-behavior: smooth;
+        }
+        .coach-chat-messages::-webkit-scrollbar { display: none; }
+        .chat-msg { display: flex; gap: 8px; align-items: flex-end; max-width: 85%; }
+        .chat-msg.user { align-self: flex-end; flex-direction: row-reverse; }
+        .chat-msg.coach { align-self: flex-start; }
+        .chat-msg-avatar {
+            width: 28px; height: 28px; border-radius: 50%; flex-shrink: 0;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 0.9rem; background: linear-gradient(135deg, var(--primary), var(--secondary));
+            margin-bottom: 2px;
+        }
+        .chat-msg-bubble {
+            padding: 10px 14px; border-radius: 18px;
+            font-size: 0.88rem; font-weight: 600; line-height: 1.55;
+            max-width: 100%; word-break: break-word;
+        }
+        .chat-msg.coach .chat-msg-bubble {
+            background: var(--bg-body);
+            color: var(--text-color);
+            border-bottom-left-radius: 4px;
+        }
+        body.dark-mode .chat-msg.coach .chat-msg-bubble {
+            background: var(--card-bg);
+        }
+        .chat-msg.user .chat-msg-bubble {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: white;
+            border-bottom-right-radius: 4px;
+        }
+        .chat-msg-time {
+            font-size: 0.6rem; color: var(--text-muted); font-weight: 600;
+            margin-top: 3px; text-align: center; width: 100%;
+        }
+        .chat-msg-wrapper { display: flex; flex-direction: column; max-width: 85%; }
+        .chat-msg-wrapper.user { align-self: flex-end; align-items: flex-end; }
+        .chat-msg-wrapper.coach { align-self: flex-start; align-items: flex-start; }
+        .chat-msg-with-avatar { display: flex; gap: 8px; align-items: flex-end; }
+        .chat-msg-with-avatar.user { flex-direction: row-reverse; }
+        .coach-typing {
+            display: flex; gap: 4px; align-items: center;
+            padding: 10px 14px; background: var(--bg-body);
+            border-radius: 18px; border-bottom-left-radius: 4px;
+            width: fit-content;
+        }
+        body.dark-mode .coach-typing { background: var(--card-bg); }
+        .typing-dot {
+            width: 7px; height: 7px; border-radius: 50%;
+            background: var(--text-muted); animation: typingBounce 1.2s infinite;
+        }
+        .typing-dot:nth-child(2) { animation-delay: 0.2s; }
+        .typing-dot:nth-child(3) { animation-delay: 0.4s; }
+        @keyframes typingBounce {
+            0%,60%,100% { transform: translateY(0); opacity: 0.4; }
+            30% { transform: translateY(-6px); opacity: 1; }
+        }
+        .coach-suggestions {
+            display: flex; overflow-x: auto; gap: 8px;
+            padding: 0 16px 10px 16px; scrollbar-width: none; flex-shrink: 0;
+        }
+        .coach-suggestions::-webkit-scrollbar { display: none; }
+        .coach-suggestion-chip {
+            flex: 0 0 auto; padding: 7px 12px; border-radius: 20px;
+            border: 1.5px solid var(--primary); background: var(--primary-light);
+            color: var(--primary); font-size: 0.75rem; font-weight: 800;
+            cursor: pointer; white-space: nowrap; transition: all 0.15s;
+            font-family: 'Nunito', sans-serif;
+        }
+        .coach-suggestion-chip:active { transform: scale(0.95); background: var(--primary); color: white; }
+        .coach-chat-input-bar {
+            display: flex; align-items: center; gap: 10px;
+            padding: 10px 16px;
+            padding-bottom: calc(10px + env(safe-area-inset-bottom));
+            background: var(--bg-app);
+            border-top: 1px solid rgba(0,0,0,0.06);
+            flex-shrink: 0;
+        }
+        body.dark-mode .coach-chat-input-bar { border-top-color: rgba(255,255,255,0.08); }
+        #coach-chat-input {
+            flex: 1; padding: 11px 16px; border-radius: 24px;
+            border: 1.5px solid rgba(0,0,0,0.08);
+            background: var(--bg-body); color: var(--text-color);
+            font-size: 0.9rem; font-family: 'Nunito', sans-serif; font-weight: 600;
+            outline: none; resize: none; max-height: 100px;
+            transition: border-color 0.2s; margin: 0;
+            line-height: 1.4;
+        }
+        #coach-chat-input:focus { border-color: var(--primary); }
+        body.dark-mode #coach-chat-input { border-color: rgba(255,255,255,0.1); background: var(--card-bg); }
+        #coach-send-btn {
+            width: 42px; height: 42px; border-radius: 50%; border: none; padding: 0;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: white; font-size: 1rem; cursor: pointer; flex-shrink: 0;
+            display: flex; align-items: center; justify-content: center;
+            box-shadow: 0 3px 10px rgba(56,178,172,0.4);
+            transition: transform 0.15s, opacity 0.2s;
+        }
+        #coach-send-btn:active { transform: scale(0.92); }
+        #coach-send-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+        /* Bouton header coach */
+        .coach-header-btn {
+            width: 34px; height: 34px; border-radius: 50%;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            border: none; cursor: pointer; display: flex; align-items: center;
+            justify-content: center; font-size: 1rem;
+            box-shadow: 0 2px 8px rgba(56,178,172,0.35);
+            transition: transform 0.15s; flex-shrink: 0;
+        }
+        .coach-header-btn:active { transform: scale(0.92); }
+
         /* ===== HISTOGRAMME SPORT ===== */
         .sport-chart-card {
             background: var(--cal-card-gradient);
@@ -510,11 +669,12 @@
 
 <div id="app-container">
     <header>
-        <div style="position:relative;min-width:40px;height:40px;display:flex;align-items:center">
+        <div style="position:relative;min-width:40px;height:40px;display:flex;align-items:center;gap:6px">
             <button class="header-btn" id="btn-back" style="visibility:hidden;position:absolute" onclick="goBack()">
                 <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M15 18l-6-6 6-6"/></svg>
             </button>
-            <div id="update-badge" style="display:none;align-items:center;gap:4px;font-size:0.62rem;font-weight:800;color:var(--primary);background:var(--primary-light);padding:4px 8px;border-radius:20px;white-space:nowrap;position:absolute;left:0">
+            <button class="coach-header-btn" id="btn-coach-open" onclick="openCoachChat()" title="Coach IA">🤖</button>
+            <div id="update-badge" style="display:none;align-items:center;gap:4px;font-size:0.62rem;font-weight:800;color:var(--primary);background:var(--primary-light);padding:4px 8px;border-radius:20px;white-space:nowrap;">
                 <svg id="update-icon" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/><path d="M3.51 9a9 9 0 0114.13-3.36L23 10M1 14l5.36 4.36A9 9 0 0020.49 15"/></svg>
                 App à jour
             </div>
@@ -1041,7 +1201,7 @@
             <button class="danger" style="margin-top:20px" onclick="resetApp()">⚠️ Tout effacer et recommencer</button>
         </div>
         <div class="card" style="text-align:center;padding:20px">
-            <div style="font-size:0.75rem;color:var(--text-muted)">NUTRI+ Coach v4.2 ☁️ Firebase</div>
+            <div style="font-size:0.75rem;color:var(--text-muted)">NUTRI+ Coach v4.1 ☁️ Firebase</div>
         </div>
     </div>
 
@@ -1081,6 +1241,41 @@
                 <button class="outline" style="flex:1" onclick="closeSupplModal()">Annuler</button>
                 <button style="flex:1" onclick="saveSuppl()">Ajouter ✅</button>
             </div>
+        </div>
+    </div>
+
+    <!-- ===== CHAT COACH OVERLAY ===== -->
+    <div id="coach-chat-overlay">
+        <!-- Header coach -->
+        <div class="coach-chat-header">
+            <div class="coach-chat-header-info">
+                <div class="coach-avatar">🤖</div>
+                <div>
+                    <div class="coach-chat-name">Alex</div>
+                    <div class="coach-chat-status">
+                        <div class="coach-status-dot"></div>
+                        Disponible · Sport & Nutrition
+                    </div>
+                </div>
+            </div>
+            <button class="coach-close-btn" onclick="closeCoachChat()">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M18 6L6 18M6 6l12 12"/></svg>
+            </button>
+        </div>
+
+        <!-- Messages -->
+        <div class="coach-chat-messages" id="coach-messages"></div>
+
+        <!-- Suggestions rapides -->
+        <div class="coach-suggestions" id="coach-suggestions"></div>
+
+        <!-- Input bar -->
+        <div class="coach-chat-input-bar">
+            <textarea id="coach-chat-input" placeholder="Pose ta question au coach..." rows="1"
+                onkeydown="handleCoachKey(event)" oninput="autoResizeInput(this)"></textarea>
+            <button id="coach-send-btn" onclick="sendCoachMessage()">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+            </button>
         </div>
     </div>
 
@@ -2580,6 +2775,304 @@ JSON: {"kcal":number,"prot":number,"carb":number,"fat":number,"healthScore":1|2|
                 <div class="suppl-moment-badge">${MOMENT_LABELS[s.moment] || s.moment}</div>
             </div>
         `).join('') + '</div>';
+    }
+
+
+    // ===== CHAT COACH =====
+    let coachChatHistory = []; // historique de la conversation pour le contexte multi-tour
+    let coachIsTyping = false;
+
+    const COACH_SUGGESTIONS_DEFAULT = [
+        "💪 Comment progresser en muscu ?",
+        "🥗 Que manger avant le sport ?",
+        "😴 Le sommeil affecte les résultats ?",
+        "🔥 Comment brûler plus de graisses ?",
+        "💧 Combien d'eau boire par jour ?",
+        "📈 Je stagne, pourquoi ?"
+    ];
+
+    function buildCoachContext() {
+        const p = appData.profile;
+        if (!p) return "L'utilisateur n'a pas encore configuré son profil.";
+
+        const today = getTodayStr();
+        const day = appData.days[today] || { meals: [], sport: 0, sportEntries: [] };
+
+        // Repas du jour
+        const mealsToday = day.meals.map(m =>
+            `${m.type}: ${m.kcal}kcal (P:${m.prot}g G:${m.carb}g L:${m.fat}g)`
+        ).join(', ') || 'aucun repas enregistré';
+
+        // Sport du jour
+        const sportToday = day.sportEntries?.map(e => `${e.act} ${e.dur ? e.dur+'min' : ''} (${e.kcal}kcal)`).join(', ') || 'aucune séance';
+
+        // Historique 7 jours
+        const weekSummary = [];
+        for (let i = 1; i <= 7; i++) {
+            const d = new Date(); d.setDate(d.getDate() - i);
+            const ds = d.toISOString().split('T')[0];
+            const wd = appData.days[ds];
+            if (wd && (wd.meals?.length > 0 || wd.sport > 0)) {
+                const kcal = wd.meals?.reduce((s, m) => s + m.kcal, 0) || 0;
+                weekSummary.push(`J-${i}: ${kcal}kcal mangées, ${wd.sport || 0}kcal sport`);
+            }
+        }
+
+        const goalLabels = { loss: 'perte de poids', maintain: 'maintien', gain: 'prise de masse' };
+        const morphLabels = { ecto: 'ectomorphe', meso: 'mésomorphe', endo: 'endomorphe' };
+
+        return `Voici le profil complet de l'utilisateur :
+- Prénom: ${p.name || 'inconnu'}
+- Poids: ${p.weight}kg, Taille: ${p.height}cm, Âge: ${p.age} ans, Sexe: ${p.sex === 'male' ? 'homme' : 'femme'}
+- Morphotype: ${morphLabels[p.morph] || p.morph}
+- Objectif: ${goalLabels[p.goalDir] || p.goalDir}${p.weightTarget ? `, cible ${p.weightTarget}kg en ${p.goalWeeks} semaines` : ''}
+- Cibles: ${p.targets?.cal} kcal/j, P:${p.targets?.prot}g G:${p.targets?.carb}g L:${p.targets?.fat}g
+- Activité: ${p.activity >= 1.725 ? 'très actif' : p.activity >= 1.55 ? 'modérément actif' : p.activity >= 1.375 ? 'légèrement actif' : 'sédentaire'}
+- Stress: ${p.stress || 'modéré'}, Régime: ${p.diet !== 'none' ? p.diet : 'aucun'}
+${p.allergies ? `- Allergies: ${p.allergies}` : ''}
+${p.lifestyle ? `- Quotidien: ${p.lifestyle}` : ''}
+
+Aujourd'hui (${today}):
+- Repas: ${mealsToday}
+- Sport: ${sportToday}
+- Eau: ${((day.water || 0) * 0.2).toFixed(1)}L bues
+- Sommeil cette nuit: ${day.sleep ? day.sleep + 'h' : 'non renseigné'}
+
+Historique récent:
+${weekSummary.length > 0 ? weekSummary.join('\n') : 'Pas encore de données cette semaine'}`;
+    }
+
+    function openCoachChat() {
+        const overlay = document.getElementById('coach-chat-overlay');
+        overlay.style.display = 'flex';
+        overlay.classList.remove('closing');
+
+        // Message de bienvenue si première ouverture
+        if (coachChatHistory.length === 0) {
+            const p = appData.profile;
+            const firstName = p?.name ? p.name.split(' ')[0] : '';
+            const greeting = getGreeting();
+            appendCoachMessage(
+                `${greeting} ${firstName ? firstName + ' ! ' : '! '}Je suis Alex, ton coach perso 💪\n\nPose-moi n'importe quelle question sur le sport, la nutrition ou ton plan — je connais déjà ton profil et tes données du jour ! 😎`,
+                'coach'
+            );
+        }
+
+        renderCoachSuggestions();
+        setTimeout(() => {
+            document.getElementById('coach-chat-input').focus();
+            scrollCoachToBottom();
+        }, 300);
+    }
+
+    function closeCoachChat() {
+        const overlay = document.getElementById('coach-chat-overlay');
+        overlay.classList.add('closing');
+        setTimeout(() => { overlay.style.display = 'none'; }, 240);
+    }
+
+    function getGreeting() {
+        const h = new Date().getHours();
+        if (h < 12) return '☀️ Bonjour';
+        if (h < 18) return '👋 Salut';
+        return '🌙 Bonsoir';
+    }
+
+    function renderCoachSuggestions(suggestions = COACH_SUGGESTIONS_DEFAULT) {
+        const el = document.getElementById('coach-suggestions');
+        el.innerHTML = suggestions.map(s =>
+            `<button class="coach-suggestion-chip" onclick="useSuggestion(this)">${s}</button>`
+        ).join('');
+    }
+
+    function useSuggestion(btn) {
+        const text = btn.textContent;
+        document.getElementById('coach-chat-input').value = text;
+        // Vider les suggestions pendant qu'on répond
+        document.getElementById('coach-suggestions').innerHTML = '';
+        sendCoachMessage();
+    }
+
+    function handleCoachKey(e) {
+        if (e.key === 'Enter' && !e.shiftKey) {
+            e.preventDefault();
+            sendCoachMessage();
+        }
+    }
+
+    function autoResizeInput(el) {
+        el.style.height = 'auto';
+        el.style.height = Math.min(el.scrollHeight, 100) + 'px';
+    }
+
+    async function sendCoachMessage() {
+        const input = document.getElementById('coach-chat-input');
+        const text = input.value.trim();
+        if (!text || coachIsTyping) return;
+        if (!appData.apiKey) {
+            showToast("⚠️ Clé API Gemini requise dans les Réglages");
+            closeCoachChat();
+            showSection('view-settings');
+            return;
+        }
+
+        // Afficher le message utilisateur
+        appendCoachMessage(text, 'user');
+        input.value = '';
+        input.style.height = 'auto';
+        document.getElementById('coach-suggestions').innerHTML = '';
+
+        // Indicateur de frappe
+        coachIsTyping = true;
+        document.getElementById('coach-send-btn').disabled = true;
+        const typingId = showTypingIndicator();
+
+        // Ajouter au contexte multi-tour
+        coachChatHistory.push({ role: 'user', content: text });
+
+        // Construire le prompt avec tout le contexte
+        const systemContext = buildCoachContext();
+        const historyText = coachChatHistory.slice(-10) // garder les 10 derniers échanges
+            .map(m => `${m.role === 'user' ? 'Utilisateur' : 'Coach'}: ${m.content}`)
+            .join('\n');
+
+        const fullPrompt = `Tu es Alex, un coach sportif et nutritionnel personnel intégré dans l'app NUTRI+. Tu es décontracté, fun, bienveillant et motivant 😎. Tu tutoies l'utilisateur, tu utilises des emojis avec parcimonie (1-2 max par réponse), et tu donnes des conseils pratiques et personnalisés BASÉS SUR SES VRAIES DONNÉES.
+
+DONNÉES UTILISATEUR:
+${systemContext}
+
+RÈGLES IMPORTANTES:
+- Réponds en français, de façon concise (3-5 phrases max sauf si question complexe)
+- Tu es décontracté mais pro — pas de blabla inutile
+- Base tes conseils sur les vraies données ci-dessus (repas du jour, sport, objectif...)
+- Si tu remarques quelque chose d'important dans ses données (manque de protéines, pas assez d'eau...), mentionne-le naturellement
+- Ne réponds PAS aux questions hors sport/nutrition/santé — redirige gentiment
+
+HISTORIQUE DE LA CONVERSATION:
+${historyText}
+
+Réponds maintenant à la dernière question de l'utilisateur.`;
+
+        try {
+            const url = `https://generativelanguage.googleapis.com/v1beta/models/${MODEL}:generateContent?key=${appData.apiKey}`;
+            const resp = await fetch(url, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ contents: [{ parts: [{ text: fullPrompt }] }] })
+            });
+            const data = await resp.json();
+            removeTypingIndicator(typingId);
+
+            if (!resp.ok || !data.candidates?.length) throw new Error("Pas de réponse");
+
+            const reply = data.candidates[0].content.parts[0].text.trim();
+            coachChatHistory.push({ role: 'coach', content: reply });
+            appendCoachMessage(reply, 'coach');
+
+            // Suggestions contextuelles après la réponse
+            setTimeout(() => renderContextualSuggestions(text, reply), 400);
+
+        } catch(e) {
+            removeTypingIndicator(typingId);
+            appendCoachMessage("Oups, j'ai eu un souci pour te répondre 😅 Réessaie dans un instant !", 'coach');
+        }
+
+        coachIsTyping = false;
+        document.getElementById('coach-send-btn').disabled = false;
+    }
+
+    function appendCoachMessage(text, role) {
+        const container = document.getElementById('coach-messages');
+        const now = new Date().toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' });
+
+        const wrapper = document.createElement('div');
+        wrapper.className = `chat-msg-wrapper ${role}`;
+
+        const msgRow = document.createElement('div');
+        msgRow.className = `chat-msg-with-avatar ${role}`;
+
+        if (role === 'coach') {
+            const avatar = document.createElement('div');
+            avatar.className = 'chat-msg-avatar';
+            avatar.textContent = '🤖';
+            msgRow.appendChild(avatar);
+        }
+
+        const bubble = document.createElement('div');
+        bubble.className = 'chat-msg-bubble';
+        // Convertir les sauts de ligne en <br>
+        bubble.innerHTML = text.replace(/\n/g, '<br>');
+        msgRow.appendChild(bubble);
+
+        wrapper.appendChild(msgRow);
+
+        const timeEl = document.createElement('div');
+        timeEl.className = 'chat-msg-time';
+        timeEl.textContent = now;
+        wrapper.appendChild(timeEl);
+
+        container.appendChild(wrapper);
+        scrollCoachToBottom();
+    }
+
+    function showTypingIndicator() {
+        const container = document.getElementById('coach-messages');
+        const id = 'typing-' + Date.now();
+        const wrapper = document.createElement('div');
+        wrapper.className = 'chat-msg-wrapper coach';
+        wrapper.id = id;
+
+        const row = document.createElement('div');
+        row.className = 'chat-msg-with-avatar coach';
+
+        const avatar = document.createElement('div');
+        avatar.className = 'chat-msg-avatar';
+        avatar.textContent = '🤖';
+
+        const typing = document.createElement('div');
+        typing.className = 'coach-typing';
+        typing.innerHTML = '<div class="typing-dot"></div><div class="typing-dot"></div><div class="typing-dot"></div>';
+
+        row.appendChild(avatar);
+        row.appendChild(typing);
+        wrapper.appendChild(row);
+        container.appendChild(wrapper);
+        scrollCoachToBottom();
+        return id;
+    }
+
+    function removeTypingIndicator(id) {
+        const el = document.getElementById(id);
+        if (el) el.remove();
+    }
+
+    function renderContextualSuggestions(userMsg, coachReply) {
+        // Suggestions basées sur le sujet abordé
+        const msg = (userMsg + coachReply).toLowerCase();
+        let suggestions = [];
+
+        if (msg.includes('muscu') || msg.includes('musculation') || msg.includes('force')) {
+            suggestions = ['🏋️ Combien de séances/sem ?', '🥩 Protéines après l\'entraînement ?', '😴 Repos entre séances ?'];
+        } else if (msg.includes('poid') || msg.includes('gras') || msg.includes('mincir') || msg.includes('perte')) {
+            suggestions = ['🔥 Déficit calorique idéal ?', '🏃 Cardio ou muscu pour maigrir ?', '🥗 Que manger le soir ?'];
+        } else if (msg.includes('repas') || msg.includes('manger') || msg.includes('nutrition') || msg.includes('calorie')) {
+            suggestions = ['🍳 Idée petit déjeuner sportif ?', '⏰ Meilleur moment pour manger ?', '🥦 Légumes les plus nutritifs ?'];
+        } else if (msg.includes('sommeil') || msg.includes('récup') || msg.includes('fatigue')) {
+            suggestions = ['😴 Combien d\'heures idéal ?', '🌙 Que manger avant de dormir ?', '💊 Suppléments pour récupérer ?'];
+        } else if (msg.includes('eau') || msg.includes('hydrat')) {
+            suggestions = ['💧 Boire pendant le sport ?', '🥤 Boissons sportives utiles ?'];
+        } else {
+            // Suggestions par défaut rotatives
+            const pool = COACH_SUGGESTIONS_DEFAULT;
+            suggestions = pool.sort(() => Math.random() - 0.5).slice(0, 3);
+        }
+
+        renderCoachSuggestions(suggestions);
+    }
+
+    function scrollCoachToBottom() {
+        const el = document.getElementById('coach-messages');
+        if (el) setTimeout(() => { el.scrollTop = el.scrollHeight; }, 50);
     }
 
     navigator.serviceWorker && navigator.serviceWorker.addEventListener('message', event => {
