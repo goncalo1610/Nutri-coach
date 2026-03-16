@@ -82,7 +82,7 @@
         .gauge-fill { fill:none; stroke-width:3.5; stroke-dasharray:100,100; stroke-dashoffset:100; transition:stroke-dashoffset 0.9s cubic-bezier(0.34,1.56,0.64,1); stroke-linecap:round; }
         .gauge-icon { position:absolute; top:50%; left:50%; transform:translate(-50%,-50%); }
 
-        /* ===== BOTTOM NAV - 5 items avec FAB central ===== */
+        /* ===== BOTTOM NAV ===== */
         .bottom-nav {
             position:fixed; bottom:0; left:0; right:0; max-width:600px; margin:0 auto;
             background:rgba(255,255,255,0.94); backdrop-filter:blur(14px);
@@ -190,7 +190,7 @@
         .suppl-empty { text-align:center; padding:14px; color:var(--text-muted); font-size:0.82rem; font-weight:600; }
         .suppl-empty button { margin-top:8px; font-size:0.8rem; padding:8px 16px; }
 
-        /* Gestion compléments (dans Outils) */
+        /* Gestion compléments */
         .suppl-manage-item { display:flex; align-items:center; gap:10px; padding:10px 0; border-bottom:1px solid rgba(0,0,0,0.06); }
         body.dark-mode .suppl-manage-item { border-bottom-color:rgba(255,255,255,0.06); }
         .suppl-manage-item:last-child { border-bottom:none; }
@@ -333,6 +333,146 @@
         .meal-cat-macros .mp { color: var(--prot-color); }
         .meal-cat-macros .mc { color: var(--carb-color); }
         .meal-cat-macros .mf { color: var(--fat-color); }
+
+        /* ===== HISTOGRAMME SPORT ===== */
+        .sport-chart-card {
+            background: var(--cal-card-gradient);
+            border-radius: var(--radius);
+            padding: 16px;
+            margin-bottom: 14px;
+            box-shadow: var(--shadow);
+            border: 1px solid rgba(0,0,0,0.03);
+        }
+        body.dark-mode .sport-chart-card {
+            border: 1px solid rgba(255,255,255,0.06);
+        }
+        .sport-chart-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 14px;
+        }
+        .sport-chart-title {
+            font-weight: 900;
+            font-size: 0.95rem;
+        }
+        .sport-chart-legend {
+            display: flex;
+            gap: 12px;
+            font-size: 0.68rem;
+            font-weight: 700;
+            color: var(--text-muted);
+        }
+        .sport-chart-legend-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            display: inline-block;
+            margin-right: 4px;
+        }
+        .sport-chart-toggle {
+            display: flex;
+            gap: 6px;
+            margin-bottom: 12px;
+        }
+        .sport-chart-toggle-btn {
+            flex: 1;
+            padding: 7px 0;
+            border: 1.5px solid rgba(56,178,172,0.3);
+            border-radius: 10px;
+            background: transparent;
+            color: var(--text-muted);
+            font-size: 0.75rem;
+            font-weight: 800;
+            font-family: 'Nunito', sans-serif;
+            cursor: pointer;
+            transition: all 0.2s;
+            width: auto;
+        }
+        .sport-chart-toggle-btn.active {
+            background: var(--primary);
+            border-color: var(--primary);
+            color: white;
+            box-shadow: 0 2px 8px rgba(56,178,172,0.3);
+        }
+        .sport-chart-toggle-btn:active {
+            transform: scale(0.97);
+        }
+        .sport-chart-bars-wrapper {
+            position: relative;
+            width: 100%;
+        }
+        .sport-chart-canvas-container {
+            position: relative;
+            width: 100%;
+            height: 160px;
+        }
+        #sport-histogram-canvas {
+            width: 100%;
+            height: 100%;
+            display: block;
+        }
+        .sport-chart-empty {
+            height: 160px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            color: var(--text-muted);
+            font-size: 0.82rem;
+            font-weight: 600;
+            gap: 6px;
+        }
+        .sport-chart-days {
+            display: flex;
+            justify-content: space-around;
+            margin-top: 6px;
+            padding: 0 2px;
+        }
+        .sport-chart-day-label {
+            font-size: 0.65rem;
+            font-weight: 800;
+            color: var(--text-muted);
+            text-align: center;
+            text-transform: uppercase;
+            flex: 1;
+        }
+        .sport-chart-day-label.today {
+            color: var(--primary);
+        }
+        .sport-chart-summary {
+            display: flex;
+            gap: 8px;
+            margin-top: 12px;
+        }
+        .sport-chart-stat {
+            flex: 1;
+            background: rgba(255,255,255,0.6);
+            border-radius: 10px;
+            padding: 8px 10px;
+            text-align: center;
+        }
+        body.dark-mode .sport-chart-stat {
+            background: rgba(255,255,255,0.05);
+        }
+        .sport-chart-stat-val {
+            font-size: 1.1rem;
+            font-weight: 900;
+            color: var(--primary);
+            line-height: 1;
+        }
+        .sport-chart-stat-label {
+            font-size: 0.62rem;
+            font-weight: 700;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-top: 3px;
+        }
+        @keyframes barGrow {
+            from { transform: scaleY(0); }
+            to { transform: scaleY(1); }
+        }
     </style>
 </head>
 <body>
@@ -580,7 +720,6 @@
                 </div>
             </div>
         </div>
-        <!-- INFO SPORT BONUS -->
         <div id="sport-cal-info" class="cal-info-box" style="display:none">
             🏋️ Bonus sport : <span id="sport-bonus-val" class="sport-bonus">+0 kcal</span> — Objectif ajusté à <span id="adjusted-target-val" style="color:var(--primary);font-weight:900">0</span> kcal
         </div>
@@ -679,6 +818,50 @@
     <!-- 2. SPORT — HISTORIQUE -->
     <div id="view-training" class="view-section">
         <h2>🏋️ Historique Sport</h2>
+
+        <!-- ===== HISTOGRAMME SEMAINE ===== -->
+        <div class="sport-chart-card">
+            <div class="sport-chart-header">
+                <div class="sport-chart-title">📊 Activité de la semaine</div>
+                <div class="sport-chart-legend">
+                    <span><span class="sport-chart-legend-dot" style="background:var(--primary)"></span>Séances</span>
+                    <span><span class="sport-chart-legend-dot" style="background:var(--secondary)"></span>Durée</span>
+                </div>
+            </div>
+            <!-- Toggle séances / durée -->
+            <div class="sport-chart-toggle">
+                <button class="sport-chart-toggle-btn active" id="chart-btn-sessions" onclick="switchChartMode('sessions')">🏋️ Séances</button>
+                <button class="sport-chart-toggle-btn" id="chart-btn-duration" onclick="switchChartMode('duration')">⏱️ Durée (min)</button>
+            </div>
+            <!-- Canvas histogramme -->
+            <div class="sport-chart-bars-wrapper">
+                <div class="sport-chart-canvas-container">
+                    <canvas id="sport-histogram-canvas"></canvas>
+                </div>
+                <div id="sport-chart-empty" class="sport-chart-empty" style="display:none">
+                    <span style="font-size:2rem">🏃</span>
+                    <span>Aucune séance cette semaine</span>
+                </div>
+            </div>
+            <!-- Labels jours -->
+            <div class="sport-chart-days" id="sport-chart-days"></div>
+            <!-- Stats résumé -->
+            <div class="sport-chart-summary">
+                <div class="sport-chart-stat">
+                    <div class="sport-chart-stat-val" id="chart-stat-sessions">0</div>
+                    <div class="sport-chart-stat-label">Séances</div>
+                </div>
+                <div class="sport-chart-stat">
+                    <div class="sport-chart-stat-val" id="chart-stat-duration">0 min</div>
+                    <div class="sport-chart-stat-label">Durée totale</div>
+                </div>
+                <div class="sport-chart-stat">
+                    <div class="sport-chart-stat-val" id="chart-stat-days">0</div>
+                    <div class="sport-chart-stat-label">Jours actifs</div>
+                </div>
+            </div>
+        </div>
+        <!-- ===== FIN HISTOGRAMME ===== -->
 
         <div class="card" style="background:var(--cal-card-gradient);margin-bottom:14px">
             <div style="font-size:0.7rem;font-weight:800;text-transform:uppercase;color:var(--text-muted);letter-spacing:1px;margin-bottom:6px">Cette semaine</div>
@@ -858,7 +1041,7 @@
             <button class="danger" style="margin-top:20px" onclick="resetApp()">⚠️ Tout effacer et recommencer</button>
         </div>
         <div class="card" style="text-align:center;padding:20px">
-            <div style="font-size:0.75rem;color:var(--text-muted)">NUTRI+ Coach v4.1 ☁️ Firebase</div>
+            <div style="font-size:0.75rem;color:var(--text-muted)">NUTRI+ Coach v4.2 ☁️ Firebase</div>
         </div>
     </div>
 
@@ -1118,6 +1301,179 @@
     let mealDeleteIndex = null;
     let historyOpen = false;
 
+    // ===== HISTOGRAMME SPORT =====
+    let chartMode = 'sessions'; // 'sessions' ou 'duration'
+
+    function switchChartMode(mode) {
+        chartMode = mode;
+        document.getElementById('chart-btn-sessions').classList.toggle('active', mode === 'sessions');
+        document.getElementById('chart-btn-duration').classList.toggle('active', mode === 'duration');
+        drawSportHistogram();
+    }
+
+    function getSportWeekData() {
+        const today = new Date();
+        const data = [];
+        const DAY_LABELS = ['Dim', 'Lun', 'Mar', 'Mer', 'Jeu', 'Ven', 'Sam'];
+        const todayStr = getTodayStr();
+
+        for (let i = 6; i >= 0; i--) {
+            const d = new Date(today);
+            d.setDate(today.getDate() - i);
+            const ds = d.toISOString().split('T')[0];
+            const day = appData.days[ds] || {};
+            const entries = day.sportEntries || [];
+
+            // Calcul durée totale : on essaie de récupérer depuis les données
+            // Si les séances n'ont pas de durée stockée, on estime à 0
+            let totalDuration = 0;
+            entries.forEach(e => {
+                // La durée est stockée si on l'a ajoutée (voir saveSport ci-dessous)
+                totalDuration += (e.dur || 0);
+            });
+
+            data.push({
+                date: ds,
+                dayLabel: DAY_LABELS[d.getDay()],
+                dayNum: d.getDate(),
+                sessions: entries.length,
+                duration: totalDuration,
+                kcal: day.sport || 0,
+                isToday: ds === todayStr
+            });
+        }
+        return data;
+    }
+
+    function drawSportHistogram() {
+        const canvas = document.getElementById('sport-histogram-canvas');
+        const emptyEl = document.getElementById('sport-chart-empty');
+        const daysEl = document.getElementById('sport-chart-days');
+        if (!canvas) return;
+
+        const weekData = getSportWeekData();
+        const values = weekData.map(d => chartMode === 'sessions' ? d.sessions : d.duration);
+        const maxVal = Math.max(...values, 1);
+        const hasData = values.some(v => v > 0);
+
+        // Labels jours
+        daysEl.innerHTML = weekData.map(d =>
+            `<div class="sport-chart-day-label${d.isToday ? ' today' : ''}">${d.dayLabel}<br><span style="font-size:0.6rem;opacity:0.7">${d.dayNum}</span></div>`
+        ).join('');
+
+        // Stats résumé
+        const totalSessions = weekData.reduce((s, d) => s + d.sessions, 0);
+        const totalDuration = weekData.reduce((s, d) => s + d.duration, 0);
+        const activeDays = weekData.filter(d => d.sessions > 0).length;
+        document.getElementById('chart-stat-sessions').textContent = totalSessions;
+        document.getElementById('chart-stat-duration').textContent = totalDuration > 0 ? totalDuration + ' min' : '—';
+        document.getElementById('chart-stat-days').textContent = activeDays;
+
+        if (!hasData) {
+            canvas.style.display = 'none';
+            emptyEl.style.display = 'flex';
+            return;
+        }
+
+        canvas.style.display = 'block';
+        emptyEl.style.display = 'none';
+
+        // Redimensionner le canvas
+        const container = canvas.parentElement;
+        const W = container.offsetWidth || 300;
+        const H = 160;
+        canvas.width = W * (window.devicePixelRatio || 1);
+        canvas.height = H * (window.devicePixelRatio || 1);
+        canvas.style.width = W + 'px';
+        canvas.style.height = H + 'px';
+
+        const ctx = canvas.getContext('2d');
+        ctx.scale(window.devicePixelRatio || 1, window.devicePixelRatio || 1);
+        ctx.clearRect(0, 0, W, H);
+
+        const isDark = document.body.classList.contains('dark-mode');
+        const barColor = chartMode === 'sessions'
+            ? (isDark ? '#4fd1c5' : '#38b2ac')
+            : (isDark ? '#b794f4' : '#805ad5');
+        const barColorToday = chartMode === 'sessions'
+            ? (isDark ? '#81e6d9' : '#2c7a7b')
+            : (isDark ? '#d6bcfa' : '#553c9a');
+        const gridColor = isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.05)';
+        const textColor = isDark ? '#a0aec0' : '#718096';
+
+        const padL = 28;
+        const padR = 8;
+        const padT = 14;
+        const padB = 4;
+        const chartW = W - padL - padR;
+        const chartH = H - padT - padB;
+        const barCount = weekData.length;
+        const gap = chartW * 0.12 / barCount;
+        const barW = (chartW - gap * (barCount - 1)) / barCount;
+
+        // Grille horizontale (3 lignes)
+        ctx.strokeStyle = gridColor;
+        ctx.lineWidth = 1;
+        for (let i = 1; i <= 3; i++) {
+            const y = padT + chartH - (chartH / 3) * i;
+            ctx.beginPath();
+            ctx.moveTo(padL, y);
+            ctx.lineTo(W - padR, y);
+            ctx.stroke();
+        }
+
+        // Axe Y labels
+        ctx.fillStyle = textColor;
+        ctx.font = `bold ${Math.round(9 * (window.devicePixelRatio || 1) / (window.devicePixelRatio || 1))}px Nunito, sans-serif`;
+        ctx.textAlign = 'right';
+        ctx.textBaseline = 'middle';
+        const yMax = Math.ceil(maxVal);
+        ctx.fillText(yMax, padL - 4, padT);
+        ctx.fillText(Math.round(yMax / 2), padL - 4, padT + chartH / 2);
+        ctx.fillText('0', padL - 4, padT + chartH);
+
+        // Barres
+        weekData.forEach((d, i) => {
+            const val = chartMode === 'sessions' ? d.sessions : d.duration;
+            const barH = val > 0 ? Math.max(4, (val / maxVal) * chartH) : 0;
+            const x = padL + i * (barW + gap);
+            const y = padT + chartH - barH;
+
+            if (val === 0) return;
+
+            // Gradient sur chaque barre
+            const grad = ctx.createLinearGradient(x, y, x, padT + chartH);
+            const baseColor = d.isToday ? barColorToday : barColor;
+            grad.addColorStop(0, baseColor);
+            grad.addColorStop(1, baseColor + (isDark ? '55' : '33'));
+
+            ctx.fillStyle = grad;
+
+            // Barre arrondie en haut
+            const radius = Math.min(6, barW / 2, barH / 2);
+            ctx.beginPath();
+            ctx.moveTo(x + radius, y);
+            ctx.lineTo(x + barW - radius, y);
+            ctx.quadraticCurveTo(x + barW, y, x + barW, y + radius);
+            ctx.lineTo(x + barW, padT + chartH);
+            ctx.lineTo(x, padT + chartH);
+            ctx.lineTo(x, y + radius);
+            ctx.quadraticCurveTo(x, y, x + radius, y);
+            ctx.closePath();
+            ctx.fill();
+
+            // Valeur au-dessus de la barre
+            if (val > 0) {
+                ctx.fillStyle = d.isToday ? barColorToday : barColor;
+                ctx.font = `900 9px Nunito, sans-serif`;
+                ctx.textAlign = 'center';
+                ctx.textBaseline = 'bottom';
+                const label = chartMode === 'sessions' ? val.toString() : (val >= 60 ? Math.round(val/60)+'h' : val+'m');
+                ctx.fillText(label, x + barW / 2, y - 2);
+            }
+        });
+    }
+
     function getTodayStr() { return new Date().toISOString().split('T')[0]; }
 
     document.addEventListener('DOMContentLoaded', () => {
@@ -1244,7 +1600,6 @@ Totaux: ${JSON.stringify({ calories_consommées: totalCal, objectif_ajusté: adj
         box.innerHTML = `<div>${isLoss?'📉':'📈'} Écart : <span class="gcb-val">${diff>0?'+':''}${diff.toFixed(1)} kg</span> en ${weeks} semaines</div><div>Ajustement : <span class="gcb-val">${isLoss?'':'+'}${dailyDelta} kcal/jour</span></div>${warn}`;
     }
 
-    // ===== CALCUL PROFIL — CORRIGÉ =====
     function saveProfile() {
         const name = document.getElementById('p-name').value.trim();
         const weight = parseFloat(document.getElementById('p-weight').value);
@@ -1268,20 +1623,16 @@ Totaux: ${JSON.stringify({ calories_consommées: totalCal, objectif_ajusté: adj
         if (isNaN(height)||height<100||height>250) return showAlert("Taille invalide","Entre une taille entre 100 et 250 cm.");
         if (isNaN(age)||age<10||age>100) return showAlert("Âge invalide","Entre un âge entre 10 et 100 ans.");
 
-        // Calcul BMR (Mifflin-St Jeor)
         let bmr = sex==='male'
             ? (10*weight) + (6.25*height) - (5*age) + 5
             : (10*weight) + (6.25*height) - (5*age) - 161;
 
-        // Ajustement morphotype
         const morphMult = {ecto:1.03, meso:1.00, endo:0.97};
         let tdee = Math.round(bmr * activity * (morphMult[morph]||1));
 
-        // Ajustement stress
         const stressMult = {low:1.0, medium:1.0, high:0.97, very_high:0.95};
         tdee = Math.round(tdee * (stressMult[stress]||1));
 
-        // Calcul delta objectif
         let goalDelta = 0;
         if (goalDir==='loss') {
             goalDelta = (weightTarget && goalWeeks)
@@ -1294,7 +1645,6 @@ Totaux: ${JSON.stringify({ calories_consommées: totalCal, objectif_ajusté: adj
         }
         const calTarget = tdee + goalDelta;
 
-        // ===== MACROS CORRIGÉES =====
         const protMultMap = {ecto:1.8, meso:2.0, endo:2.2};
         const protMult = protMultMap[morph] || 2.0;
         const protTarget = Math.round(weight * protMult);
@@ -1308,33 +1658,11 @@ Totaux: ${JSON.stringify({ calories_consommées: totalCal, objectif_ajusté: adj
         const calRemaining = calTarget - calFromProt - calFromFat;
         const carbTarget = Math.max(80, Math.round(calRemaining / 4));
 
-        // ===== SPLITS REPAS — CORRIGÉS ET COMPLETS =====
-        // IMPORTANT : chaque fréquence a les 4 catégories définies explicitement
         const mealSplitsMap = {
-            2: {
-                'Petit Déjeuner': 0.40,
-                'Déjeuner':       0.60,
-                'Dîner':          0.00,
-                'Collation':      0.00
-            },
-            3: {
-                'Petit Déjeuner': 0.25,
-                'Déjeuner':       0.40,
-                'Dîner':          0.35,
-                'Collation':      0.00
-            },
-            4: {
-                'Petit Déjeuner': 0.25,
-                'Déjeuner':       0.35,
-                'Dîner':          0.30,
-                'Collation':      0.10
-            },
-            5: {
-                'Petit Déjeuner': 0.20,
-                'Déjeuner':       0.30,
-                'Dîner':          0.25,
-                'Collation':      0.125  // x2 collations = 25% total
-            }
+            2: { 'Petit Déjeuner': 0.40, 'Déjeuner': 0.60, 'Dîner': 0.00, 'Collation': 0.00 },
+            3: { 'Petit Déjeuner': 0.25, 'Déjeuner': 0.40, 'Dîner': 0.35, 'Collation': 0.00 },
+            4: { 'Petit Déjeuner': 0.25, 'Déjeuner': 0.35, 'Dîner': 0.30, 'Collation': 0.10 },
+            5: { 'Petit Déjeuner': 0.20, 'Déjeuner': 0.30, 'Dîner': 0.25, 'Collation': 0.125 }
         };
         const safeMealFreq = [2,3,4,5].includes(mealFreq) ? mealFreq : 4;
         const mealSplit = mealSplitsMap[safeMealFreq];
@@ -1344,12 +1672,7 @@ Totaux: ${JSON.stringify({ calories_consommées: totalCal, objectif_ajusté: adj
             goalDir, weightTarget, goalWeeks, goalDelta,
             mealFreq: safeMealFreq,
             sleep: null, stress, diet, allergies, cooking,
-            targets: {
-                cal: calTarget,
-                prot: protTarget,
-                fat: fatTarget,
-                carb: carbTarget
-            },
+            targets: { cal: calTarget, prot: protTarget, fat: fatTarget, carb: carbTarget },
             mealSplit: mealSplit,
             bmr: Math.round(bmr),
             tdeeBase: tdee
@@ -1454,7 +1777,7 @@ Totaux: ${JSON.stringify({ calories_consommées: totalCal, objectif_ajusté: adj
                         <div style="width:38px;height:38px;border-radius:10px;background:rgba(56,178,172,0.12);display:flex;align-items:center;justify-content:center;font-size:1.2rem;flex-shrink:0">🏋️</div>
                         <div>
                             <div style="font-weight:700;font-size:0.92rem">${e.act}</div>
-                            <div style="font-size:0.75rem;color:var(--text-muted);font-weight:600">${e.kcal} kcal brûlées</div>
+                            <div style="font-size:0.75rem;color:var(--text-muted);font-weight:600">${e.kcal} kcal brûlées${e.dur ? ' · ' + e.dur + ' min' : ''}</div>
                         </div>
                     </div>
                     <button onclick="deleteSportEntry('${selectedDate}',${i})" style="background:none;border:none;width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;cursor:pointer;color:var(--danger);font-size:1.1rem;padding:0;flex-shrink:0">🗑️</button>
@@ -1484,7 +1807,7 @@ Totaux: ${JSON.stringify({ calories_consommées: totalCal, objectif_ajusté: adj
                                 <span style="font-size:1.1rem">🏃</span>
                                 <div>
                                     <div style="font-weight:700;font-size:0.88rem">${e.act}</div>
-                                    <div style="font-size:0.72rem;color:var(--text-muted)">${e.kcal} kcal</div>
+                                    <div style="font-size:0.72rem;color:var(--text-muted)">${e.kcal} kcal${e.dur ? ' · ' + e.dur + ' min' : ''}</div>
                                 </div>
                             </div>
                         </div>`).join('')}
@@ -1492,6 +1815,9 @@ Totaux: ${JSON.stringify({ calories_consommées: totalCal, objectif_ajusté: adj
         }
         weekListEl.innerHTML = weekHtml || '';
         document.getElementById('sport-empty-state').style.display = (!hasAny && entries.length === 0) ? 'block' : 'none';
+
+        // Dessiner l'histogramme
+        drawSportHistogram();
     }
 
     function deleteSportEntry(date, index) {
@@ -1519,11 +1845,14 @@ Totaux: ${JSON.stringify({ calories_consommées: totalCal, objectif_ajusté: adj
         const manual=document.getElementById('t-kcal-manual').value!==''?parseInt(document.getElementById('t-kcal-manual').value):NaN;
         const kcal=!isNaN(manual)&&manual>0?manual:appData.lastIAKcal;
         const act=document.getElementById('t-act').value.trim();
+        const dur=parseInt(document.getElementById('t-dur').value) || 0;
         if(!kcal||kcal<=0)return showAlert("Calories manquantes","Saisis les calories ou utilise l'IA.");
         if(!act)return showAlert("Activité manquante","Entre le nom de l'activité.");
         if(!appData.days[selectedDate])appData.days[selectedDate]={meals:[],sport:0,sportEntries:[],closed:false};
         if(!appData.days[selectedDate].sportEntries)appData.days[selectedDate].sportEntries=[];
-        appData.days[selectedDate].sport+=kcal;appData.days[selectedDate].sportEntries.push({act,kcal});
+        appData.days[selectedDate].sport+=kcal;
+        // On stocke aussi la durée pour l'histogramme
+        appData.days[selectedDate].sportEntries.push({act, kcal, dur});
         appData.lastIAKcal=0;saveData();renderHomeData();
         hideSportForm();
         renderSportHistory();
@@ -1544,15 +1873,13 @@ Totaux: ${JSON.stringify({ calories_consommées: totalCal, objectif_ajusté: adj
         {key:'Collation',      emoji:'🍎', label:'Collation'}
     ];
 
-    // ===== CORRECTION PRINCIPALE : getMealPct lit directement le profil sauvegardé =====
     function getMealPct(key) {
         const p = appData.profile;
-        if (!p || !p.mealSplit) return 0.25; // fallback si pas de profil
+        if (!p || !p.mealSplit) return 0.25;
         const pct = p.mealSplit[key];
         return (pct !== undefined && pct !== null) ? pct : 0;
     }
 
-    // ===== CALCUL IDÉAL PAR REPAS — CORRIGÉ =====
     function getIdealKcalForMeal(key) {
         const p = appData.profile;
         if (!p || !p.targets) return 0;
@@ -1561,7 +1888,6 @@ Totaux: ${JSON.stringify({ calories_consommées: totalCal, objectif_ajusté: adj
         return pct > 0 ? Math.round(calTarget * pct) : 0;
     }
 
-    // ===== CALCUL MACROS IDÉALES PAR REPAS =====
     function getIdealMacrosForMeal(key) {
         const p = appData.profile;
         if (!p || !p.targets) return { prot: 0, carb: 0, fat: 0 };
@@ -1579,15 +1905,12 @@ Totaux: ${JSON.stringify({ calories_consommées: totalCal, objectif_ajusté: adj
 
         const p = appData.profile;
         const day = appData.days[selectedDate] || { meals: [] };
-        const mealFreq = p ? p.mealFreq : 4;
 
-        // Catégories planifiées (pct > 0) + Collation toujours visible (optionnelle si pct = 0)
         const catsToRender = MEAL_CATS.filter(cat => {
             const pct = getMealPct(cat.key);
-            return pct > 0 || cat.key === 'Collation'; // Collation toujours présente
+            return pct > 0 || cat.key === 'Collation';
         });
 
-        // Si profil pas encore configuré → tout montrer
         const finalCats = (catsToRender.length > 1 ? catsToRender : MEAL_CATS);
 
         grid.innerHTML = '<div class="meal-cat-grid"></div>';
@@ -1595,7 +1918,7 @@ Totaux: ${JSON.stringify({ calories_consommées: totalCal, objectif_ajusté: adj
 
         finalCats.forEach(cat => {
             const pct = getMealPct(cat.key);
-            const isOptional = cat.key === 'Collation' && pct === 0; // collation hors plan
+            const isOptional = cat.key === 'Collation' && pct === 0;
             const idealKcal = getIdealKcalForMeal(cat.key);
             const idealMacros = getIdealMacrosForMeal(cat.key);
             const meals = day.meals.filter(m => m.type === cat.key);
@@ -1606,7 +1929,6 @@ Totaux: ${JSON.stringify({ calories_consommées: totalCal, objectif_ajusté: adj
             const card = document.createElement('div');
             card.className = 'meal-cat-card' + (hasMeal ? ' has-meal' : '') + (isOptional ? ' optional-cat' : '');
 
-            // Macros idéales (seulement si dans le plan)
             const macrosHtml = idealKcal > 0 ? `
                 <div class="meal-cat-macros">
                     <span class="mp">P:${idealMacros.prot}g</span>
@@ -1614,14 +1936,12 @@ Totaux: ${JSON.stringify({ calories_consommées: totalCal, objectif_ajusté: adj
                     <span class="mf">L:${idealMacros.fat}g</span>
                 </div>` : '';
 
-            // Label selon contexte
             const kcalIdealHtml = idealKcal > 0
                 ? `<div class="meal-cat-kcal">Idéal : <span>~${idealKcal} kcal</span></div>${macrosHtml}`
                 : isOptional
                     ? `<div class="meal-cat-kcal" style="color:var(--text-muted);font-style:italic;font-size:0.72rem">Optionnelle · hors plan</div>`
                     : `<div class="meal-cat-kcal" style="color:var(--text-muted);font-style:italic">Configure ton profil</div>`;
 
-            // Statut kcal enregistrés
             const recordedHtml = hasMeal
                 ? `<div class="meal-cat-recorded">${totalKcal} kcal enregistrés` +
                   (totalKcal > idealKcal * 1.15 && idealKcal > 0 ? ' ⚠️' : totalKcal > 0 ? ' ✅' : '') +
@@ -1672,7 +1992,6 @@ Totaux: ${JSON.stringify({ calories_consommées: totalCal, objectif_ajusté: adj
 
         const profile=appData.profile;
         const goalStr=profile?.goalDir==='loss'?'perte de poids':profile?.goalDir==='gain'?'prise de masse':'maintien';
-        const idealKcal = getIdealKcalForMeal(activeCategory);
         const dietInfo=profile?.diet&&profile.diet!=='none'?`Régime: ${profile.diet}.`:'';
         const allergiesInfo=profile?.allergies?`Allergies: ${profile.allergies}.`:'';
         const hasPhoto=currentImgs.length>0;
@@ -1682,8 +2001,6 @@ Totaux: ${JSON.stringify({ calories_consommées: totalCal, objectif_ajusté: adj
         else if(hasPhoto)contextBlock=`${currentImgs.length} photo(s). Analyse visuellement.`;
         else contextBlock=`Description: "${desc}".`;
 
-        // NE PAS transmettre l'objectif calorique idéal à l'IA — cela biaisait l'estimation
-        // L'IA doit estimer les calories réelles du repas, indépendamment des objectifs
         const prompt=`Tu es un nutritionniste expert. Analyse ce repas et estime ses valeurs nutritionnelles RÉELLES avec précision.
 ${contextBlock}
 Type de repas: ${activeCategory}. Objectif santé: ${goalStr}. ${dietInfo} ${allergiesInfo}
@@ -1916,7 +2233,7 @@ JSON: {"kcal":number,"prot":number,"carb":number,"fat":number,"healthScore":1|2|
     async function analyzeMenu(b64){const resDiv=document.getElementById('scan-res');const loader=document.getElementById('loader-scan');resDiv.style.display='none';loader.style.display='block';const res=await callGemini("Analyse ce menu de restaurant. Conseille les 2 plats les plus sains en expliquant brièvement pourquoi. Sois concis et bienveillant.",false,[b64]);loader.style.display='none';if(res){resDiv.textContent=res;resDiv.style.display='block';}}
     async function generateRecipe(){const ing=document.getElementById('fridge-in').value.trim();if(!ing)return showAlert("Ingrédients manquants","Liste ce que tu as dans ton frigo !");const resDiv=document.getElementById('recipe-res');const loader=document.getElementById('loader-recipe');resDiv.style.display='none';loader.style.display='block';const res=await callGemini(`Propose une recette saine, simple et rapide avec ces ingrédients: ${ing}. Inclus les étapes et une estimation des calories.`);loader.style.display='none';if(res){resDiv.textContent=res;resDiv.style.display='block';}}
 
-    const WATER_STEP_L = 0.2; // 1 unité = 0.2L
+    const WATER_STEP_L = 0.2;
     function getWaterTarget(){const p=appData.profile;if(!p)return 10;let ml=p.weight*35;if(parseFloat(p.activity)>=1.55)ml+=500;if(p.stress==='high'||p.stress==='very_high')ml+=250;if(p.goalDir==='loss')ml+=250;return Math.max(7,Math.min(15,Math.round(ml/(WATER_STEP_L*1000))));}
     function renderWaterGlasses(){const day=appData.days[selectedDate]||{};const filled=day.water||0;const target=getWaterTarget();const liters=(filled*WATER_STEP_L).toFixed(1).replace(/\.?0+$/,'')||'0';const pct=Math.round(Math.min((filled/target)*100,100));const elCur=document.getElementById('w-current');const elLit=document.getElementById('w-liters');const elPct=document.getElementById('w-pct');const elTgt=document.getElementById('w-target');const elTgtL=document.getElementById('w-target-l');const pfill=document.getElementById('water-progress-fill');const msgEl=document.getElementById('water-msg');if(elCur)elCur.textContent=filled;if(elLit)elLit.textContent=liters;if(elPct)elPct.textContent=pct;if(elTgt)elTgt.textContent=target;if(elTgtL)elTgtL.textContent=(target*WATER_STEP_L).toFixed(1).replace(/\.?0+$/,'');if(pfill)pfill.style.width=pct+'%';if(msgEl){if(filled===0)msgEl.textContent="Pense à t'hydrater ! 💧";else if(filled<target*0.4)msgEl.textContent="Continue, tu es bien parti ! 🌊";else if(filled<target*0.7)msgEl.textContent="Bonne progression ! 👍";else if(filled<target)msgEl.textContent="Plus que "+(target-filled)+" verre(s) !";else msgEl.textContent="Objectif atteint ! 🎉";}}
     function changeWater(delta){if(!appData.days[selectedDate])appData.days[selectedDate]={meals:[],sport:0,sportEntries:[],closed:false};const day=appData.days[selectedDate];day.water=Math.max(0,Math.min(20,(day.water||0)+delta));saveData();renderWaterGlasses();}
@@ -1955,7 +2272,6 @@ JSON: {"kcal":number,"prot":number,"carb":number,"fat":number,"healthScore":1|2|
         document.querySelectorAll('.view-section').forEach(v=>v.classList.remove('active'));
         document.getElementById(id).classList.add('active');
         document.getElementById('btn-back').style.visibility=id==='view-home'?'hidden':'visible';
-        // Badge mise à jour visible seulement sur l'accueil
         const badge = document.getElementById('update-badge');
         if (badge && badge.style.display !== 'none') {
             badge.style.visibility = id === 'view-home' ? 'visible' : 'hidden';
@@ -1985,33 +2301,25 @@ JSON: {"kcal":number,"prot":number,"carb":number,"fat":number,"healthScore":1|2|
     if ('serviceWorker' in navigator) {
         window.addEventListener('load', async () => {
             try {
-                // ── Versioning auto : timestamp du build injecté dans le SW ──
-                const BUILD_TS = '{{BUILD_TS}}'; // remplacé ci-dessous dynamiquement
-
-                // On enregistre le SW avec un paramètre de version pour forcer la mise à jour
                 const swUrl = `/Nutri-coach/sw.js?v=${Date.now()}`;
                 const reg = await navigator.serviceWorker.register(swUrl);
                 console.log('✅ Service Worker enregistré');
                 window._swReg = reg;
 
-                // ── Détection mise à jour disponible ──
                 reg.addEventListener('updatefound', () => {
                     const newWorker = reg.installing;
                     newWorker.addEventListener('statechange', () => {
                         if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
                             newWorker.postMessage({ type: 'SKIP_WAITING' });
-                            // Notifier UNE seule fois par version de SW
                             const swUrl = reg.active?.scriptURL || '';
                             const lastNotified = localStorage.getItem('sw-update-notified');
                             if (lastNotified !== swUrl) {
                                 localStorage.setItem('sw-update-notified', swUrl);
-                                // Afficher le badge dans le header
                                 const badge = document.getElementById('update-badge');
                                 const icon = document.getElementById('update-icon');
                                 if (badge) {
                                     badge.style.display = 'flex';
                                     if (icon) icon.classList.add('spin-once');
-                                    // Disparaît après 5 secondes
                                     setTimeout(() => { badge.style.display = 'none'; }, 3000);
                                 }
                             }
@@ -2019,9 +2327,6 @@ JSON: {"kcal":number,"prot":number,"carb":number,"fat":number,"healthScore":1|2|
                     });
                 });
 
-                // Pas de reload automatique — évite les boucles
-
-                // Notifications
                 initNotifications(reg);
 
             } catch(err) {
@@ -2030,14 +2335,9 @@ JSON: {"kcal":number,"prot":number,"carb":number,"fat":number,"healthScore":1|2|
         });
     }
 
-    // ===== SYSTÈME DE NOTIFICATIONS =====
-
     async function initNotifications(reg) {
         if (!('Notification' in window)) return;
-
-        // Si permission pas encore demandée, on attend que l'utilisateur interagisse
         if (Notification.permission === 'default') {
-            // On demande la permission de façon non intrusive après 3s
             setTimeout(() => requestNotifPermission(reg), 3000);
         } else if (Notification.permission === 'granted') {
             scheduleNotifications(reg);
@@ -2055,51 +2355,35 @@ JSON: {"kcal":number,"prot":number,"carb":number,"fat":number,"healthScore":1|2|
 
     function scheduleNotifications(reg) {
         if (!reg || Notification.permission !== 'granted') return;
-
-        // Annuler les anciens timers si existants
         if (window._notifTimers) window._notifTimers.forEach(t => clearTimeout(t));
         window._notifTimers = [];
-
         const now = new Date();
-
-        // ── NOTIF 1 : Clôture journée à 22h si pas clôturée ──
         const tonight22h = new Date(now);
         tonight22h.setHours(22, 0, 0, 0);
-        // Si 22h est déjà passée aujourd'hui, programmer pour demain
         if (now >= tonight22h) tonight22h.setDate(tonight22h.getDate() + 1);
         const msTo22h = tonight22h - now;
-
         const timer1 = setTimeout(() => {
             checkAndNotifyBilan(reg);
-            // Reprogrammer pour le lendemain (toutes les 24h)
             const daily = setInterval(() => checkAndNotifyBilan(reg), 24 * 60 * 60 * 1000);
             window._notifTimers.push(daily);
         }, msTo22h);
         window._notifTimers.push(timer1);
-
-        // ── NOTIF 2 : Bilan hebdo le dimanche à 9h ──
         const nextSunday9h = getNextSunday9h(now);
         const msToSunday = nextSunday9h - now;
-
         const timer2 = setTimeout(() => {
             sendWeeklyReportNotif(reg);
-            // Reprogrammer toutes les semaines (7 jours)
             const weekly = setInterval(() => sendWeeklyReportNotif(reg), 7 * 24 * 60 * 60 * 1000);
             window._notifTimers.push(weekly);
         }, msToSunday);
         window._notifTimers.push(timer2);
-
-        console.log(`🔔 Notif bilan: dans ${Math.round(msTo22h/60000)} min`);
-        console.log(`🔔 Notif hebdo: dans ${Math.round(msToSunday/3600000)}h`);
     }
 
     function getNextSunday9h(now) {
         const d = new Date(now);
-        const day = d.getDay(); // 0=dim, 1=lun...
+        const day = d.getDay();
         const daysUntilSunday = day === 0 ? 0 : 7 - day;
         d.setDate(d.getDate() + daysUntilSunday);
         d.setHours(9, 0, 0, 0);
-        // Si on est dimanche mais 9h déjà passée → dimanche prochain
         if (now >= d) d.setDate(d.getDate() + 7);
         return d;
     }
@@ -2109,8 +2393,6 @@ JSON: {"kcal":number,"prot":number,"carb":number,"fat":number,"healthScore":1|2|
         const day = appData.days[today];
         const alreadyClosed = day && day.closed;
         const hasMeals = day && day.meals && day.meals.length > 0;
-
-        // Notifier seulement si au moins 1 repas saisi ET pas encore clôturé
         if (hasMeals && !alreadyClosed) {
             sendNotification(reg, {
                 title: '🌙 NUTRI+ — Bilan du jour',
@@ -2124,7 +2406,6 @@ JSON: {"kcal":number,"prot":number,"carb":number,"fat":number,"healthScore":1|2|
     }
 
     function sendWeeklyReportNotif(reg) {
-        // Calculer un résumé rapide de la semaine
         const today = new Date();
         let totalMeals = 0, closedDays = 0, totalKcal = 0;
         for (let i = 0; i < 7; i++) {
@@ -2137,14 +2418,11 @@ JSON: {"kcal":number,"prot":number,"carb":number,"fat":number,"healthScore":1|2|
                 totalKcal += day.meals.reduce((s, m) => s + m.kcal, 0);
             }
         }
-
-        if (totalMeals === 0) return; // Pas de données cette semaine, pas de notif
-
+        if (totalMeals === 0) return;
         const avgKcal = closedDays > 0 ? Math.round(totalKcal / 7) : 0;
         const bodyText = totalMeals > 0
             ? `${totalMeals} repas cette semaine · ${closedDays}/7 jours clôturés${avgKcal > 0 ? ` · ~${avgKcal} kcal/j en moyenne` : ''}. Ouvre l'app pour voir ton bilan complet ! 📊`
             : 'Ouvre l\'app pour voir ton bilan de la semaine ! 📊';
-
         sendNotification(reg, {
             title: '📊 NUTRI+ — Bilan hebdomadaire',
             body: bodyText,
@@ -2169,7 +2447,6 @@ JSON: {"kcal":number,"prot":number,"carb":number,"fat":number,"healthScore":1|2|
                     vibrate: [200, 100, 200]
                 });
             } else {
-                // Fallback : notification directe si SW pas encore actif
                 new Notification(options.title, { body: options.body, icon: options.icon });
             }
         } catch(e) {
@@ -2178,7 +2455,6 @@ JSON: {"kcal":number,"prot":number,"carb":number,"fat":number,"healthScore":1|2|
     }
 
     // ===== COMPLÉMENTS ALIMENTAIRES =====
-
     let selectedSupplEmoji = '💊';
 
     function selectSupplEmoji(el) {
@@ -2222,7 +2498,6 @@ JSON: {"kcal":number,"prot":number,"carb":number,"fat":number,"healthScore":1|2|
 
     function deleteSuppl(id) {
         appData.supplements = (appData.supplements || []).filter(s => s.id !== id);
-        // Nettoyer les coches du jour
         const today = getTodayStr();
         if (appData.days[today]?.supplTaken) {
             delete appData.days[today].supplTaken[id];
@@ -2272,7 +2547,6 @@ JSON: {"kcal":number,"prot":number,"carb":number,"fat":number,"healthScore":1|2|
         supplWidgetOpen = !supplWidgetOpen;
         const list = document.getElementById('suppl-home-list');
         const chevron = document.getElementById('suppl-chevron');
-        const border = list.parentElement.querySelector('[style*="border-top"]') || list;
         list.style.display = supplWidgetOpen ? 'block' : 'none';
         chevron.style.transform = supplWidgetOpen ? 'rotate(180deg)' : 'rotate(0deg)';
     }
@@ -2289,16 +2563,12 @@ JSON: {"kcal":number,"prot":number,"carb":number,"fat":number,"healthScore":1|2|
         const takenCount = supps.filter(s => taken[s.id]).length;
         document.getElementById('suppl-taken-count').textContent = takenCount;
         document.getElementById('suppl-total-count').textContent = supps.length;
-
-        // Dots de statut (vert = pris, gris = pas encore)
         const dotsEl = document.getElementById('suppl-dots');
         if (dotsEl) {
             dotsEl.innerHTML = supps.map(s =>
                 `<div style="width:8px;height:8px;border-radius:50%;background:${taken[s.id] ? 'var(--primary)' : 'rgba(113,128,150,0.3)'}"></div>`
             ).join('');
         }
-
-        // Liste dépliable
         list.innerHTML = '<div style="display:flex;flex-direction:column;gap:6px">' + supps.map(s => `
             <div class="suppl-item ${taken[s.id] ? 'taken' : ''}" onclick="toggleSuppl('${s.id}')" style="padding:8px 10px">
                 <div class="suppl-check" style="width:22px;height:22px;border-radius:6px;font-size:0.85rem">${taken[s.id] ? '✓' : ''}</div>
@@ -2312,18 +2582,17 @@ JSON: {"kcal":number,"prot":number,"carb":number,"fat":number,"healthScore":1|2|
         `).join('') + '</div>';
     }
 
-    // ── Écouter les messages du Service Worker (clic notif → naviguer) ──
     navigator.serviceWorker && navigator.serviceWorker.addEventListener('message', event => {
         if (event.data?.type === 'NAVIGATE' && event.data?.section) {
             showSection(event.data.section);
         }
     });
 
-    // ── Gérer l'ouverture via URL de notification ──
     const urlParams = new URLSearchParams(window.location.search);
     const notifSection = urlParams.get('notif');
     if (notifSection) {
-        setTimeout(() => showSection(notifSection), 1500); // après initApp
-    }</script>
+        setTimeout(() => showSection(notifSection), 1500);
+    }
+</script>
 </body>
 </html>
