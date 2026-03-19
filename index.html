@@ -720,9 +720,9 @@
             letter-spacing: 0.5px;
             margin-top: 3px;
         }
-        @keyframes barGrow {
-            from { transform: scaleY(0); }
-            to { transform: scaleY(1); }
+        @keyframes voicePulse {
+            0%,100% { transform:scale(1); opacity:1; }
+            50% { transform:scale(1.5); opacity:0.5; }
         }
     </style>
 </head>
@@ -1189,7 +1189,19 @@
             </div>
             <div class="images-grid" id="images-grid"></div>
             <label>Description du repas</label>
-            <textarea id="m-desc" placeholder="Ex: 150g de poulet grillé, riz basmati, salade verte..." rows="3" style="resize:none"></textarea>
+            <div style="position:relative">
+                <textarea id="m-desc" placeholder="Ex: 150g de poulet grillé, riz basmati, salade verte..." rows="3" style="resize:none;padding-right:48px"></textarea>
+                <button id="voice-btn" onclick="toggleVoiceInput()" title="Dicter le repas"
+                    style="position:absolute;right:10px;bottom:22px;width:32px;height:32px;border-radius:50%;border:none;background:var(--primary-light);color:var(--primary);font-size:1rem;cursor:pointer;display:flex;align-items:center;justify-content:center;padding:0;transition:all 0.2s;flex-shrink:0">
+                    🎙️
+                </button>
+            </div>
+            <!-- Barre d'état vocal -->
+            <div id="voice-status-bar" style="display:none;align-items:center;gap:10px;padding:10px 14px;background:rgba(229,62,62,0.08);border:1.5px solid rgba(229,62,62,0.3);border-radius:12px;margin-top:-10px;margin-bottom:14px">
+                <div id="voice-pulse" style="width:10px;height:10px;border-radius:50%;background:#e53e3e;flex-shrink:0;animation:voicePulse 1s infinite"></div>
+                <div style="flex:1;font-size:0.8rem;font-weight:700;color:var(--text-color)" id="voice-live-text">En écoute...</div>
+                <button onclick="stopVoiceInput()" style="width:auto;padding:6px 14px;border-radius:20px;background:#e53e3e;color:white;font-size:0.78rem;font-weight:800;border:none;cursor:pointer">⏹ Stop</button>
+            </div>
             <div id="loader-m" class="loader">🔍 L'IA analyse ton repas...</div>
             <div id="m-preview" style="display:none" class="card">
                 <div style="display:flex;align-items:center;gap:12px;margin-bottom:10px">
@@ -2198,11 +2210,11 @@ Totaux: ${JSON.stringify({ calories_consommées: totalCal, objectif_ajusté: adj
         document.getElementById('loader-sport').style.display='block';
         const res=await callGemini(`Estimation calories brûlées pour "${act}" pendant ${dur} minutes. ${pInfo}. JSON: {"kcal":number}`,true);
         document.getElementById('loader-sport').style.display='none';
-        if(res?.kcal){appData.lastIAKcal=res.kcal;document.getElementById('t-kcal-ia').textContent=res.kcal;document.getElementById('t-preview').style.display='block';}
+        if(res?.kcal){appData.lastIAKcal=Math.round(res.kcal);document.getElementById('t-kcal-ia').textContent=Math.round(res.kcal);document.getElementById('t-preview').style.display='block';}
     }
 
     function saveSport(){
-        const manual=document.getElementById('t-kcal-manual').value!==''?parseInt(document.getElementById('t-kcal-manual').value):NaN;
+        const manual=document.getElementById('t-kcal-manual').value!==''?Math.round(parseFloat(document.getElementById('t-kcal-manual').value)):NaN;
         const kcal=!isNaN(manual)&&manual>0?manual:appData.lastIAKcal;
         const act=document.getElementById('t-act').value.trim();
         const dur=parseInt(document.getElementById('t-dur').value) || 0;
@@ -2637,6 +2649,7 @@ JSON: {"kcal":number,"prot":number,"carb":number,"fat":number,"healthScore":1|2|
         document.querySelectorAll('.view-section').forEach(v=>v.classList.remove('active'));
         document.getElementById(id).classList.add('active');
         document.getElementById('btn-back').style.visibility=id==='view-home'?'hidden':'visible';
+        document.getElementById('btn-coach-open').style.display=id==='view-home'?'flex':'none';
         const badge = document.getElementById('update-badge');
         if (badge && badge.style.display !== 'none') {
             badge.style.visibility = id === 'view-home' ? 'visible' : 'hidden';
@@ -2949,6 +2962,109 @@ JSON: {"kcal":number,"prot":number,"carb":number,"fat":number,"healthScore":1|2|
         `).join('') + '</div>';
     }
 
+
+    // ===== SAISIE VOCALE REPAS =====
+    let voiceRecognition = null;
+    let voiceIsListening = false;
+    let voiceAccumulated = ''; // texte accumulé entre les segments
+
+    function toggleVoiceInput() {
+        if (voiceIsListening) {
+            stopVoiceInput();
+        } else {
+            startVoiceInput();
+        }
+    }
+
+    function startVoiceInput() {
+        const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+        if (!SpeechRecognition) {
+            showToast("⚠️ Ton navigateur ne supporte pas la reconnaissance vocale");
+            return;
+        }
+
+        voiceAccumulated = document.getElementById('m-desc').value.trim();
+        voiceRecognition = new SpeechRecognition();
+        voiceRecognition.lang = 'fr-FR';
+        voiceRecognition.continuous = true;       // ne s'arrête pas tout seul
+        voiceRecognition.interimResults = true;   // résultats en temps réel
+        voiceRecognition.maxAlternatives = 1;
+
+        voiceRecognition.onstart = () => {
+            voiceIsListening = true;
+            // UI : bouton rouge + barre d'état
+            const btn = document.getElementById('voice-btn');
+            btn.style.background = 'rgba(229,62,62,0.15)';
+            btn.style.color = '#e53e3e';
+            btn.textContent = '🔴';
+            document.getElementById('voice-status-bar').style.display = 'flex';
+            document.getElementById('voice-live-text').textContent = 'En écoute... parle !';
+        };
+
+        voiceRecognition.onresult = (event) => {
+            let interim = '';
+            let final = '';
+            for (let i = event.resultIndex; i < event.results.length; i++) {
+                const transcript = event.results[i][0].transcript;
+                if (event.results[i].isFinal) {
+                    final += transcript + ' ';
+                } else {
+                    interim += transcript;
+                }
+            }
+            if (final) voiceAccumulated += (voiceAccumulated ? ' ' : '') + final.trim();
+            // Affichage live dans la barre + dans le textarea
+            const liveText = voiceAccumulated + (interim ? ' ' + interim : '');
+            document.getElementById('voice-live-text').textContent = liveText || 'En écoute... parle !';
+            document.getElementById('m-desc').value = liveText;
+        };
+
+        voiceRecognition.onerror = (e) => {
+            if (e.error !== 'no-speech') {
+                showToast("Erreur micro : " + e.error);
+                stopVoiceInput();
+            }
+        };
+
+        // Si le navigateur coupe automatiquement, on relance tant que l'utilisateur n'a pas arrêté
+        voiceRecognition.onend = () => {
+            if (voiceIsListening) {
+                // Relance automatique pour éviter la coupure Android
+                try { voiceRecognition.start(); } catch(e) {}
+            }
+        };
+
+        try {
+            voiceRecognition.start();
+        } catch(e) {
+            showToast("Impossible d'activer le micro");
+        }
+    }
+
+    function stopVoiceInput() {
+        voiceIsListening = false;
+        if (voiceRecognition) {
+            voiceRecognition.onend = null; // empêcher la relance
+            voiceRecognition.stop();
+            voiceRecognition = null;
+        }
+        // Mettre le texte final dans le textarea
+        if (voiceAccumulated) {
+            document.getElementById('m-desc').value = voiceAccumulated.trim();
+        }
+        // Réinitialiser UI
+        const btn = document.getElementById('voice-btn');
+        btn.style.background = 'var(--primary-light)';
+        btn.style.color = 'var(--primary)';
+        btn.textContent = '🎙️';
+        document.getElementById('voice-status-bar').style.display = 'none';
+        document.getElementById('voice-live-text').textContent = 'En écoute...';
+        voiceAccumulated = '';
+
+        if (document.getElementById('m-desc').value.trim()) {
+            showToast("✅ Dictée terminée — vérifie et analyse !");
+        }
+    }
 
     // ===== POPUP MENU OUTILS =====
     function toggleToolsPopup() {
