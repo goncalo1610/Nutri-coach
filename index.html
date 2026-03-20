@@ -1193,7 +1193,7 @@
                 <textarea id="m-desc" placeholder="Ex: 150g de poulet grillé, riz basmati, salade verte..." rows="3" style="resize:none;padding-right:48px"></textarea>
                 <button id="voice-btn" onclick="toggleVoiceInput()" title="Dicter le repas"
                     style="position:absolute;right:10px;bottom:22px;width:32px;height:32px;border-radius:50%;border:none;background:var(--primary-light);color:var(--primary);font-size:1rem;cursor:pointer;display:flex;align-items:center;justify-content:center;padding:0;transition:all 0.2s;flex-shrink:0">
-                    🎙️
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="2" width="6" height="12" rx="3"/><path d="M5 10a7 7 0 0014 0"/><line x1="12" y1="21" x2="12" y2="17"/><line x1="8" y1="21" x2="16" y2="21"/></svg>
                 </button>
             </div>
             <!-- Barre d'état vocal -->
@@ -2984,61 +2984,67 @@ JSON: {"kcal":number,"prot":number,"carb":number,"fat":number,"healthScore":1|2|
         }
 
         voiceAccumulated = document.getElementById('m-desc').value.trim();
-        voiceRecognition = new SpeechRecognition();
-        voiceRecognition.lang = 'fr-FR';
-        voiceRecognition.continuous = true;       // ne s'arrête pas tout seul
-        voiceRecognition.interimResults = true;   // résultats en temps réel
-        voiceRecognition.maxAlternatives = 1;
 
-        voiceRecognition.onstart = () => {
-            voiceIsListening = true;
-            // UI : bouton rouge + barre d'état
-            const btn = document.getElementById('voice-btn');
-            btn.style.background = 'rgba(229,62,62,0.15)';
-            btn.style.color = '#e53e3e';
-            btn.textContent = '🔴';
-            document.getElementById('voice-status-bar').style.display = 'flex';
-            document.getElementById('voice-live-text').textContent = 'En écoute... parle !';
-        };
+        function createAndStart() {
+            const recognition = new SpeechRecognition();
+            recognition.lang = 'fr-FR';
+            recognition.continuous = true;
+            recognition.interimResults = true;
+            recognition.maxAlternatives = 1;
 
-        voiceRecognition.onresult = (event) => {
-            let interim = '';
-            let final = '';
-            for (let i = event.resultIndex; i < event.results.length; i++) {
-                const transcript = event.results[i][0].transcript;
-                if (event.results[i].isFinal) {
-                    final += transcript + ' ';
-                } else {
-                    interim += transcript;
+            recognition.onstart = () => {
+                voiceIsListening = true;
+                const btn = document.getElementById('voice-btn');
+                btn.style.background = 'rgba(229,62,62,0.15)';
+                btn.style.color = '#e53e3e';
+                btn.innerHTML = '<svg width="14" height="14" viewBox="0 0 24 24" fill="#e53e3e" stroke="#e53e3e" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="2" width="6" height="12" rx="3"/><path d="M5 10a7 7 0 0014 0"/><line x1="12" y1="21" x2="12" y2="17"/><line x1="8" y1="21" x2="16" y2="21"/></svg>';
+                document.getElementById('voice-status-bar').style.display = 'flex';
+                document.getElementById('voice-live-text').textContent = 'En écoute... parle !';
+            };
+
+            // Texte provisoire de la session en cours (pas encore finalisé)
+            let sessionInterim = '';
+
+            recognition.onresult = (event) => {
+                sessionInterim = '';
+                for (let i = event.resultIndex; i < event.results.length; i++) {
+                    const transcript = event.results[i][0].transcript;
+                    if (event.results[i].isFinal) {
+                        // Ajouter uniquement les nouveaux mots finalisés
+                        voiceAccumulated = (voiceAccumulated ? voiceAccumulated + ' ' : '') + transcript.trim();
+                    } else {
+                        sessionInterim += transcript;
+                    }
                 }
-            }
-            if (final) voiceAccumulated += (voiceAccumulated ? ' ' : '') + final.trim();
-            // Affichage live dans la barre + dans le textarea
-            const liveText = voiceAccumulated + (interim ? ' ' + interim : '');
-            document.getElementById('voice-live-text').textContent = liveText || 'En écoute... parle !';
-            document.getElementById('m-desc').value = liveText;
-        };
+                // Affichage : texte accumulé + texte provisoire en cours
+                const displayed = voiceAccumulated + (sessionInterim ? ' ' + sessionInterim : '');
+                document.getElementById('voice-live-text').textContent = displayed || 'En écoute... parle !';
+                document.getElementById('m-desc').value = displayed;
+            };
 
-        voiceRecognition.onerror = (e) => {
-            if (e.error !== 'no-speech') {
-                showToast("Erreur micro : " + e.error);
-                stopVoiceInput();
-            }
-        };
+            recognition.onerror = (e) => {
+                if (e.error !== 'no-speech') {
+                    showToast("Erreur micro : " + e.error);
+                    stopVoiceInput();
+                }
+            };
 
-        // Si le navigateur coupe automatiquement, on relance tant que l'utilisateur n'a pas arrêté
-        voiceRecognition.onend = () => {
-            if (voiceIsListening) {
-                // Relance automatique pour éviter la coupure Android
-                try { voiceRecognition.start(); } catch(e) {}
-            }
-        };
+            // Relance automatique si Android coupe, SANS dupliquer le texte déjà accumulé
+            recognition.onend = () => {
+                if (voiceIsListening) {
+                    setTimeout(() => {
+                        if (voiceIsListening) {
+                            try { createAndStart(); } catch(e) {}
+                        }
+                    }, 100);
+                }
+            };
 
-        try {
-            voiceRecognition.start();
-        } catch(e) {
-            showToast("Impossible d'activer le micro");
+            voiceRecognition = recognition;
+            try { recognition.start(); } catch(e) { showToast("Impossible d'activer le micro"); }
         }
+
+        createAndStart();
     }
 
     function stopVoiceInput() {
@@ -3052,11 +3058,10 @@ JSON: {"kcal":number,"prot":number,"carb":number,"fat":number,"healthScore":1|2|
         if (voiceAccumulated) {
             document.getElementById('m-desc').value = voiceAccumulated.trim();
         }
-        // Réinitialiser UI
         const btn = document.getElementById('voice-btn');
         btn.style.background = 'var(--primary-light)';
         btn.style.color = 'var(--primary)';
-        btn.textContent = '🎙️';
+        btn.innerHTML = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="2" width="6" height="12" rx="3"/><path d="M5 10a7 7 0 0014 0"/><line x1="12" y1="21" x2="12" y2="17"/><line x1="8" y1="21" x2="16" y2="21"/></svg>';
         document.getElementById('voice-status-bar').style.display = 'none';
         document.getElementById('voice-live-text').textContent = 'En écoute...';
         voiceAccumulated = '';
