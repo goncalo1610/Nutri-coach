@@ -2966,109 +2966,90 @@ JSON: {"kcal":number,"prot":number,"carb":number,"fat":number,"healthScore":1|2|
     // ===== SAISIE VOCALE REPAS =====
     let voiceRecognition = null;
     let voiceIsListening = false;
-    let voiceAccumulated = ''; // texte accumulé entre les segments
+    let voiceAccumulated = '';
 
     function toggleVoiceInput() {
-        if (voiceIsListening) {
-            stopVoiceInput();
-        } else {
-            startVoiceInput();
-        }
+        voiceIsListening ? stopVoiceInput() : startVoiceInput();
     }
 
     function startVoiceInput() {
         const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-        if (!SpeechRecognition) {
-            showToast("⚠️ Ton navigateur ne supporte pas la reconnaissance vocale");
-            return;
-        }
+        if (!SpeechRecognition) { showToast("⚠️ Ton navigateur ne supporte pas la reconnaissance vocale"); return; }
 
         voiceAccumulated = document.getElementById('m-desc').value.trim();
+        voiceIsListening = true;
 
-        function createAndStart() {
-            const recognition = new SpeechRecognition();
-            recognition.lang = 'fr-FR';
-            recognition.continuous = true;
-            recognition.interimResults = true;
-            recognition.maxAlternatives = 1;
+        // Créer UNE SEULE instance et la réutiliser — évite la répétition au restart
+        const recognition = new SpeechRecognition();
+        recognition.lang = 'fr-FR';
+        recognition.continuous = false;   // false = Android gère mieux, on relance manuellement
+        recognition.interimResults = true;
+        recognition.maxAlternatives = 1;
+        voiceRecognition = recognition;
 
-            recognition.onstart = () => {
-                voiceIsListening = true;
-                const btn = document.getElementById('voice-btn');
-                btn.style.background = 'rgba(229,62,62,0.15)';
-                btn.style.color = '#e53e3e';
-                btn.innerHTML = '<svg width="14" height="14" viewBox="0 0 24 24" fill="#e53e3e" stroke="#e53e3e" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="2" width="6" height="12" rx="3"/><path d="M5 10a7 7 0 0014 0"/><line x1="12" y1="21" x2="12" y2="17"/><line x1="8" y1="21" x2="16" y2="21"/></svg>';
-                document.getElementById('voice-status-bar').style.display = 'flex';
-                document.getElementById('voice-live-text').textContent = 'En écoute... parle !';
-            };
+        // Activer l'UI
+        const btn = document.getElementById('voice-btn');
+        btn.style.background = 'rgba(229,62,62,0.15)';
+        btn.style.color = '#e53e3e';
+        btn.innerHTML = '<svg width="14" height="14" viewBox="0 0 24 24" fill="#e53e3e" stroke="#e53e3e" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="2" width="6" height="12" rx="3"/><path d="M5 10a7 7 0 0014 0"/><line x1="12" y1="21" x2="12" y2="17"/><line x1="8" y1="21" x2="16" y2="21"/></svg>';
+        document.getElementById('voice-status-bar').style.display = 'flex';
+        document.getElementById('voice-live-text').textContent = 'En écoute... parle !';
 
-            // Texte provisoire de la session en cours (pas encore finalisé)
-            let sessionInterim = '';
+        recognition.onresult = (event) => {
+            let interim = '';
+            // On lit UNIQUEMENT les résultats de cet appel (event.resultIndex → length)
+            for (let i = event.resultIndex; i < event.results.length; i++) {
+                const t = event.results[i][0].transcript;
+                if (event.results[i].isFinal) {
+                    voiceAccumulated = voiceAccumulated ? voiceAccumulated + ' ' + t.trim() : t.trim();
+                } else {
+                    interim += t;
+                }
+            }
+            const displayed = voiceAccumulated + (interim ? ' ' + interim : '');
+            document.getElementById('voice-live-text').textContent = displayed || 'En écoute... parle !';
+            document.getElementById('m-desc').value = displayed;
+        };
 
-            recognition.onresult = (event) => {
-                sessionInterim = '';
-                for (let i = event.resultIndex; i < event.results.length; i++) {
-                    const transcript = event.results[i][0].transcript;
-                    if (event.results[i].isFinal) {
-                        // Ajouter uniquement les nouveaux mots finalisés
-                        voiceAccumulated = (voiceAccumulated ? voiceAccumulated + ' ' : '') + transcript.trim();
-                    } else {
-                        sessionInterim += transcript;
+        recognition.onerror = (e) => {
+            if (e.error === 'not-allowed') { showToast("⚠️ Accès au micro refusé"); stopVoiceInput(); }
+            // 'no-speech', 'network' etc. → on ignore, onend relancera
+        };
+
+        // Quand une session se termine (Android coupe après ~5s) → relancer si toujours actif
+        recognition.onend = () => {
+            if (voiceIsListening) {
+                // Mettre à jour le textarea avec le texte propre avant relance
+                document.getElementById('m-desc').value = voiceAccumulated;
+                setTimeout(() => {
+                    if (voiceIsListening) {
+                        try { recognition.start(); } catch(e) {}
                     }
-                }
-                // Affichage : texte accumulé + texte provisoire en cours
-                const displayed = voiceAccumulated + (sessionInterim ? ' ' + sessionInterim : '');
-                document.getElementById('voice-live-text').textContent = displayed || 'En écoute... parle !';
-                document.getElementById('m-desc').value = displayed;
-            };
+                }, 200);
+            }
+        };
 
-            recognition.onerror = (e) => {
-                if (e.error !== 'no-speech') {
-                    showToast("Erreur micro : " + e.error);
-                    stopVoiceInput();
-                }
-            };
-
-            // Relance automatique si Android coupe, SANS dupliquer le texte déjà accumulé
-            recognition.onend = () => {
-                if (voiceIsListening) {
-                    setTimeout(() => {
-                        if (voiceIsListening) {
-                            try { createAndStart(); } catch(e) {}
-                        }
-                    }, 100);
-                }
-            };
-
-            voiceRecognition = recognition;
-            try { recognition.start(); } catch(e) { showToast("Impossible d'activer le micro"); }
-        }
-
-        createAndStart();
+        try { recognition.start(); } catch(e) { showToast("Impossible d'activer le micro"); voiceIsListening = false; }
     }
 
     function stopVoiceInput() {
         voiceIsListening = false;
         if (voiceRecognition) {
-            voiceRecognition.onend = null; // empêcher la relance
-            voiceRecognition.stop();
+            voiceRecognition.onend = null; // bloquer la relance
+            try { voiceRecognition.stop(); } catch(e) {}
             voiceRecognition = null;
         }
-        // Mettre le texte final dans le textarea
-        if (voiceAccumulated) {
-            document.getElementById('m-desc').value = voiceAccumulated.trim();
-        }
+        // Texte final propre dans le textarea
+        document.getElementById('m-desc').value = voiceAccumulated.trim();
+        // Réinitialiser UI
         const btn = document.getElementById('voice-btn');
         btn.style.background = 'var(--primary-light)';
         btn.style.color = 'var(--primary)';
         btn.innerHTML = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="2" width="6" height="12" rx="3"/><path d="M5 10a7 7 0 0014 0"/><line x1="12" y1="21" x2="12" y2="17"/><line x1="8" y1="21" x2="16" y2="21"/></svg>';
         document.getElementById('voice-status-bar').style.display = 'none';
         document.getElementById('voice-live-text').textContent = 'En écoute...';
+        if (voiceAccumulated.trim()) showToast("✅ Dictée terminée — vérifie et analyse !");
         voiceAccumulated = '';
-
-        if (document.getElementById('m-desc').value.trim()) {
-            showToast("✅ Dictée terminée — vérifie et analyse !");
-        }
     }
 
     // ===== POPUP MENU OUTILS =====
