@@ -1191,16 +1191,28 @@
             <label>Description du repas</label>
             <div style="position:relative">
                 <textarea id="m-desc" placeholder="Ex: 150g de poulet grillé, riz basmati, salade verte..." rows="3" style="resize:none;padding-right:48px"></textarea>
-                <button id="voice-btn" onclick="toggleVoiceInput()" title="Dicter le repas"
-                    style="position:absolute;right:10px;bottom:22px;width:32px;height:32px;border-radius:50%;border:none;background:var(--primary-light);color:var(--primary);font-size:1rem;cursor:pointer;display:flex;align-items:center;justify-content:center;padding:0;transition:all 0.2s;flex-shrink:0">
+                <button id="voice-btn" onclick="startVoiceRecording()" title="Dicter le repas"
+                    style="position:absolute;right:10px;bottom:22px;width:32px;height:32px;border-radius:50%;border:none;background:var(--primary-light);color:var(--primary);cursor:pointer;display:flex;align-items:center;justify-content:center;padding:0;transition:all 0.2s;flex-shrink:0">
                     <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="2" width="6" height="12" rx="3"/><path d="M5 10a7 7 0 0014 0"/><line x1="12" y1="21" x2="12" y2="17"/><line x1="8" y1="21" x2="16" y2="21"/></svg>
                 </button>
             </div>
-            <!-- Barre d'état vocal -->
-            <div id="voice-status-bar" style="display:none;align-items:center;gap:10px;padding:10px 14px;background:rgba(229,62,62,0.08);border:1.5px solid rgba(229,62,62,0.3);border-radius:12px;margin-top:-10px;margin-bottom:14px">
-                <div id="voice-pulse" style="width:10px;height:10px;border-radius:50%;background:#e53e3e;flex-shrink:0;animation:voicePulse 1s infinite"></div>
-                <div style="flex:1;font-size:0.8rem;font-weight:700;color:var(--text-color)" id="voice-live-text">En écoute...</div>
-                <button onclick="stopVoiceInput()" style="width:auto;padding:6px 14px;border-radius:20px;background:#e53e3e;color:white;font-size:0.78rem;font-weight:800;border:none;cursor:pointer">⏹ Stop</button>
+
+            <!-- Barre enregistrement en cours -->
+            <div id="voice-recording-bar" style="display:none;align-items:center;gap:10px;padding:10px 14px;background:rgba(229,62,62,0.08);border:1.5px solid rgba(229,62,62,0.3);border-radius:12px;margin-top:-10px;margin-bottom:14px">
+                <div style="width:10px;height:10px;border-radius:50%;background:#e53e3e;flex-shrink:0;animation:voicePulse 1s infinite"></div>
+                <div style="flex:1;font-size:0.8rem;font-weight:700;color:var(--text-color)">
+                    Enregistrement… <span id="voice-timer">0s</span>
+                </div>
+                <!-- Flèche envoi direct -->
+                <button onclick="stopAndSendVoice()" title="Envoyer"
+                    style="width:36px;height:36px;border-radius:50%;background:var(--primary);color:white;border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;padding:0;flex-shrink:0;box-shadow:0 2px 8px rgba(56,178,172,0.4)">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="19" x2="12" y2="5"/><polyline points="5 12 12 5 19 12"/></svg>
+                </button>
+            </div>
+
+            <!-- Loader transcription -->
+            <div id="voice-transcribing" style="display:none;text-align:center;padding:10px;color:var(--secondary);font-style:italic;font-size:0.85rem;animation:pulse 1.4s infinite;margin-top:-10px;margin-bottom:14px">
+                🎙️ Transcription en cours...
             </div>
             <div id="loader-m" class="loader">🔍 L'IA analyse ton repas...</div>
             <div id="m-preview" style="display:none" class="card">
@@ -2963,93 +2975,97 @@ JSON: {"kcal":number,"prot":number,"carb":number,"fat":number,"healthScore":1|2|
     }
 
 
-    // ===== SAISIE VOCALE REPAS =====
-    let voiceRecognition = null;
-    let voiceIsListening = false;
-    let voiceAccumulated = '';
+    // ===== ENREGISTREMENT VOCAL → TRANSCRIPTION GEMINI =====
+    let mediaRecorder = null;
+    let audioChunks = [];
+    let voiceTimerInterval = null;
+    let voiceSeconds = 0;
+    let recordedBlob = null;
 
-    function toggleVoiceInput() {
-        voiceIsListening ? stopVoiceInput() : startVoiceInput();
+    async function startVoiceRecording() {
+        if (!appData.apiKey) { showToast("⚠️ Clé API Gemini requise dans les Réglages"); return; }
+        try {
+            const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+            audioChunks = [];
+            voiceSeconds = 0;
+
+            const mimeType = MediaRecorder.isTypeSupported('audio/webm;codecs=opus') ? 'audio/webm;codecs=opus'
+                : MediaRecorder.isTypeSupported('audio/webm') ? 'audio/webm' : 'audio/mp4';
+
+            mediaRecorder = new MediaRecorder(stream, { mimeType });
+            mediaRecorder.ondataavailable = (e) => { if (e.data.size > 0) audioChunks.push(e.data); };
+            mediaRecorder.onstop = () => {
+                stream.getTracks().forEach(t => t.stop());
+                recordedBlob = new Blob(audioChunks, { type: mimeType });
+                sendVoiceToGemini();
+            };
+            mediaRecorder.start(100);
+
+            // UI
+            document.getElementById('voice-recording-bar').style.display = 'flex';
+            document.getElementById('voice-btn').style.opacity = '0.4';
+            document.getElementById('voice-btn').style.pointerEvents = 'none';
+
+            // Timer 120s max
+            voiceTimerInterval = setInterval(() => {
+                voiceSeconds++;
+                document.getElementById('voice-timer').textContent = voiceSeconds + 's';
+                if (voiceSeconds >= 120) stopAndSendVoice();
+            }, 1000);
+
+        } catch(e) { showToast("⚠️ Accès au micro refusé ou non disponible"); }
     }
 
-    function startVoiceInput() {
-        const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-        if (!SpeechRecognition) { showToast("⚠️ Ton navigateur ne supporte pas la reconnaissance vocale"); return; }
-
-        voiceAccumulated = document.getElementById('m-desc').value.trim();
-        voiceIsListening = true;
-
-        // Créer UNE SEULE instance et la réutiliser — évite la répétition au restart
-        const recognition = new SpeechRecognition();
-        recognition.lang = 'fr-FR';
-        recognition.continuous = false;   // false = Android gère mieux, on relance manuellement
-        recognition.interimResults = true;
-        recognition.maxAlternatives = 1;
-        voiceRecognition = recognition;
-
-        // Activer l'UI
-        const btn = document.getElementById('voice-btn');
-        btn.style.background = 'rgba(229,62,62,0.15)';
-        btn.style.color = '#e53e3e';
-        btn.innerHTML = '<svg width="14" height="14" viewBox="0 0 24 24" fill="#e53e3e" stroke="#e53e3e" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="2" width="6" height="12" rx="3"/><path d="M5 10a7 7 0 0014 0"/><line x1="12" y1="21" x2="12" y2="17"/><line x1="8" y1="21" x2="16" y2="21"/></svg>';
-        document.getElementById('voice-status-bar').style.display = 'flex';
-        document.getElementById('voice-live-text').textContent = 'En écoute... parle !';
-
-        recognition.onresult = (event) => {
-            let interim = '';
-            // On lit UNIQUEMENT les résultats de cet appel (event.resultIndex → length)
-            for (let i = event.resultIndex; i < event.results.length; i++) {
-                const t = event.results[i][0].transcript;
-                if (event.results[i].isFinal) {
-                    voiceAccumulated = voiceAccumulated ? voiceAccumulated + ' ' + t.trim() : t.trim();
-                } else {
-                    interim += t;
-                }
-            }
-            const displayed = voiceAccumulated + (interim ? ' ' + interim : '');
-            document.getElementById('voice-live-text').textContent = displayed || 'En écoute... parle !';
-            document.getElementById('m-desc').value = displayed;
-        };
-
-        recognition.onerror = (e) => {
-            if (e.error === 'not-allowed') { showToast("⚠️ Accès au micro refusé"); stopVoiceInput(); }
-            // 'no-speech', 'network' etc. → on ignore, onend relancera
-        };
-
-        // Quand une session se termine (Android coupe après ~5s) → relancer si toujours actif
-        recognition.onend = () => {
-            if (voiceIsListening) {
-                // Mettre à jour le textarea avec le texte propre avant relance
-                document.getElementById('m-desc').value = voiceAccumulated;
-                setTimeout(() => {
-                    if (voiceIsListening) {
-                        try { recognition.start(); } catch(e) {}
-                    }
-                }, 200);
-            }
-        };
-
-        try { recognition.start(); } catch(e) { showToast("Impossible d'activer le micro"); voiceIsListening = false; }
-    }
-
-    function stopVoiceInput() {
-        voiceIsListening = false;
-        if (voiceRecognition) {
-            voiceRecognition.onend = null; // bloquer la relance
-            try { voiceRecognition.stop(); } catch(e) {}
-            voiceRecognition = null;
+    function stopAndSendVoice() {
+        clearInterval(voiceTimerInterval);
+        document.getElementById('voice-recording-bar').style.display = 'none';
+        document.getElementById('voice-btn').style.opacity = '1';
+        document.getElementById('voice-btn').style.pointerEvents = 'auto';
+        if (mediaRecorder && mediaRecorder.state !== 'inactive') {
+            mediaRecorder.stop(); // déclenche onstop → sendVoiceToGemini()
         }
-        // Texte final propre dans le textarea
-        document.getElementById('m-desc').value = voiceAccumulated.trim();
-        // Réinitialiser UI
-        const btn = document.getElementById('voice-btn');
-        btn.style.background = 'var(--primary-light)';
-        btn.style.color = 'var(--primary)';
-        btn.innerHTML = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="2" width="6" height="12" rx="3"/><path d="M5 10a7 7 0 0014 0"/><line x1="12" y1="21" x2="12" y2="17"/><line x1="8" y1="21" x2="16" y2="21"/></svg>';
-        document.getElementById('voice-status-bar').style.display = 'none';
-        document.getElementById('voice-live-text').textContent = 'En écoute...';
-        if (voiceAccumulated.trim()) showToast("✅ Dictée terminée — vérifie et analyse !");
-        voiceAccumulated = '';
+    }
+
+    async function sendVoiceToGemini() {
+        if (!recordedBlob) return;
+        document.getElementById('voice-transcribing').style.display = 'block';
+        try {
+            const base64Audio = await blobToBase64(recordedBlob);
+            const mimeType = recordedBlob.type || 'audio/webm';
+            const url = `https://generativelanguage.googleapis.com/v1beta/models/${MODEL}:generateContent?key=${appData.apiKey}`;
+            const resp = await fetch(url, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ contents: [{ parts: [
+                    { inline_data: { mime_type: mimeType, data: base64Audio } },
+                    { text: "Transcris exactement ce qui est dit dans cet audio en français. Retourne uniquement la transcription brute, sans ponctuation excessive, sans guillemets, sans commentaires." }
+                ]}]})
+            });
+            const data = await resp.json();
+            document.getElementById('voice-transcribing').style.display = 'none';
+            if (data.candidates?.[0]?.content?.parts?.[0]?.text) {
+                const transcription = data.candidates[0].content.parts[0].text.trim();
+                const existing = document.getElementById('m-desc').value.trim();
+                document.getElementById('m-desc').value = existing ? existing + ' ' + transcription : transcription;
+                showToast("✅ Transcription terminée !");
+            } else {
+                showToast("⚠️ Transcription impossible, réessaie");
+            }
+        } catch(e) {
+            document.getElementById('voice-transcribing').style.display = 'none';
+            showToast("⚠️ Erreur : " + e.message);
+        }
+        recordedBlob = null;
+        audioChunks = [];
+    }
+
+    function blobToBase64(blob) {
+        return new Promise((resolve, reject) => {
+            const reader = new FileReader();
+            reader.onloadend = () => resolve(reader.result.split(',')[1]);
+            reader.onerror = reject;
+            reader.readAsDataURL(blob);
+        });
     }
 
     // ===== POPUP MENU OUTILS =====
