@@ -2438,13 +2438,20 @@ Tutoie, sois direct, chaleureux. Cite les vrais chiffres. Jamais de phrases gén
             const tgt = profile?.targets?.cal || 0;
             return soFar > 0 ? `Calories déjà consommées aujourd'hui: ${soFar} kcal${tgt > 0 ? ' (objectif: ' + tgt + ' kcal)' : ''}.` : '';
         })();
-        const prompt=`Tu es Alex, un coach nutrition personnel. Analyse ce repas et estime ses valeurs nutritionnelles RÉELLES avec précision.
+        const prompt=`Tu es un nutritionniste expert en estimation calorique précise. Analyse ce repas.
 ${contextBlock}
 Type de repas: ${activeCategory}. Objectif santé: ${goalStr}. ${dietInfo} ${allergiesInfo} ${mealContextSport} ${mealContextTotal}
-IMPORTANT: Estime les calories et macros basées UNIQUEMENT sur les aliments décrits/photographiés, sans tenir compte d'aucun objectif calorique.
+
+RÈGLES D'ESTIMATION — respecte-les absolument :
+1. Estime UNIQUEMENT ce qui est visible sur la photo ou décrit explicitement. Ne suppose pas de portions généreuses.
+2. Si aucun grammage n'est précisé, utilise une PORTION STANDARD RÉELLE pour un repas ordinaire (ni XXL, ni restaurant gastronomique).
+3. Vérifie la cohérence via les macros : kcal doit être proche de (prot×4)+(carb×4)+(fat×9). Si l'écart dépasse 10%, recalcule.
+4. Reste CONSERVATEUR sur les quantités : une photo donne toujours une impression plus grande que la réalité.
+5. N'inclus PAS l'huile de cuisson sauf si clairement visible/décrite.
+
 healthScore: 1=peu adapté à l'objectif ${goalStr}, 2=moyen, 3=bien adapté.
-healthTips: 2-3 conseils courts et concrets pour améliorer ce repas, séparés par \\n.
-coachComment: UNE phrase courte (max 20 mots), directe et personnalisée comme si tu parlais à voix haute à ton client. Sois précis, humain, et utilise le contexte (sport, objectif, moment de la journée). Pas de généralités.
+healthTips: 2-3 conseils courts et concrets pour améliorer ce repas, séparés par \n.
+coachComment: UNE phrase courte (max 20 mots), directe et personnalisée. Utilise le contexte (sport, objectif, moment). Pas de généralités.
 JSON: {"kcal":number,"prot":number,"carb":number,"fat":number,"healthScore":1|2|3,"healthLabel":string,"healthTips":string,"coachComment":string}`;
 
         const res=await callGemini(prompt,true,currentImgs);
