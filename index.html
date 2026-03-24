@@ -824,10 +824,10 @@
     </div>
 
     <div id="modal-weekly-report" class="modal-overlay">
-        <div class="modal-box">
-            <div style="font-size:2rem;margin-bottom:6px">📊</div>
-            <h3>Bilan de la semaine</h3>
-            <div id="weekly-report-content" style="margin:12px 0;font-size:0.88rem;line-height:1.7"></div>
+        <div class="modal-box" style="max-width:400px;max-height:85vh;overflow-y:auto">
+            <div style="font-size:2rem;margin-bottom:4px">📊</div>
+            <h3 style="margin-bottom:12px">Bilan de la semaine</h3>
+            <div id="weekly-report-content" style="margin:0 0 14px 0;font-size:0.88rem;line-height:1.7;text-align:left"></div>
             <button class="gemini-btn" onclick="document.getElementById('modal-weekly-report').style.display='none'">Compris 💪</button>
         </div>
     </div>
@@ -1062,8 +1062,17 @@
                 <div id="chk-bilan-icon" style="width:26px;height:26px;border-radius:8px;border:2px solid var(--primary);display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:all 0.2s;font-size:1rem"></div>
                 <div><div style="font-weight:800">Clôturer la journée</div><div style="font-size:0.78rem;color:var(--text-muted)">Analyse IA + sauvegarde cloud ☁️</div></div>
             </div>
-            <div id="loader-bilan" class="loader">🧠 Le coach analyse ta journée...</div>
-            <div id="bilan-text" class="coach-message" style="display:none"></div>
+            <div id="loader-bilan" class="loader">🧠 Alex analyse ta journée...</div>
+            <div id="bilan-text" style="display:none;margin-top:12px">
+                <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px">
+                    <div style="width:34px;height:34px;border-radius:50%;background:linear-gradient(135deg,var(--primary),var(--secondary));display:flex;align-items:center;justify-content:center;font-size:1.1rem;flex-shrink:0">🏋🏼</div>
+                    <div>
+                        <div style="font-weight:900;font-size:0.82rem">Alex — Ton coach</div>
+                        <div style="font-size:0.7rem;color:var(--text-muted);font-weight:600">Bilan du jour</div>
+                    </div>
+                </div>
+                <div id="bilan-text-content" style="background:var(--primary-light);border-radius:0 14px 14px 14px;padding:14px 16px;font-size:0.93rem;font-weight:600;line-height:1.7;color:var(--text-color);white-space:pre-wrap;border:1.5px solid rgba(56,178,172,0.2)"></div>
+            </div>
         </div>
     </div>
 
@@ -1222,6 +1231,11 @@
                         <div style="font-weight:800;font-size:1rem">Résultats de l'analyse</div>
                         <div id="meal-health-label" style="font-size:0.82rem;color:var(--text-muted);font-weight:600"></div>
                     </div>
+                </div>
+                <!-- Bulle coach Alex -->
+                <div id="meal-coach-comment" style="display:none;align-items:flex-start;gap:10px;background:var(--primary-light);border-radius:14px;padding:11px 13px;margin-bottom:12px;border:1.5px solid rgba(56,178,172,0.25)">
+                    <div style="font-size:1.3rem;flex-shrink:0;line-height:1.2">🏋🏼</div>
+                    <div class="mcc-text" style="font-size:0.88rem;font-weight:700;color:var(--text-color);line-height:1.5"></div>
                 </div>
                 <div id="meal-health-tips" style="display:none;background:rgba(214,158,46,0.1);border-left:3px solid #d69e2e;border-radius:8px;padding:10px 12px;margin-bottom:12px;color:var(--text-color)"></div>
                 <div class="grid-2">
@@ -1933,21 +1947,47 @@
         day.closed = true;
         renderHomeData();
         document.getElementById('loader-bilan').style.display = 'block';
-        const p = appData.profile; const t = p.targets;
-        const lifestyleInfo = p.lifestyle ? `Quotidien: ${p.lifestyle}.` : '';
-        const dietInfo = p.diet && p.diet !== 'none' ? `Régime: ${p.diet}.` : '';
-        const stressInfo = p.stress ? `Stress: ${p.stress}.` : '';
-        const sleepToday = day.sleep; const sleepAvg = getAvgSleep7Days();
-        const sleepInfo = sleepToday ? `Sommeil cette nuit: ${sleepToday.toFixed(1)}h (moyenne 7j: ${sleepAvg.toFixed(1)}h).` : sleepAvg !== 7 ? `Moyenne sommeil 7j: ${sleepAvg.toFixed(1)}h.` : '';
-        const allergiesInfo = p.allergies ? `Allergies/intolérances: ${p.allergies}.` : '';
-        const goalInfo = p.goalDir === 'loss' && p.weightTarget ? `Objectif: atteindre ${p.weightTarget}kg en ${p.goalWeeks} semaines.` : '';
+
+        const p = appData.profile;
+        const t = p.targets;
         const totalCal = day.meals.reduce((s,m)=>s+m.kcal,0);
+        const totalProt = day.meals.reduce((s,m)=>s+m.prot,0);
         const adjCal = t.cal + (day.sport||0);
-        const prompt = `Tu es un coach nutritionnel bienveillant. Analyse cette journée et donne un conseil court, encourageant et personnalisé (3-4 phrases max).
-Profil: ${p.name}, ${p.weight}kg, morphotype ${p.morph || 'meso'}. ${goalInfo} ${lifestyleInfo} ${dietInfo} ${stressInfo} ${sleepInfo} ${allergiesInfo}
-Objectifs: ${t.cal} kcal de base (${adjCal} kcal ajusté avec sport), ${t.prot}g protéines, ${t.carb}g glucides, ${t.fat}g lipides.
-Repas: ${JSON.stringify(day.meals.map(m => ({type:m.type, kcal:m.kcal, score:m.healthScore})))}.
-Totaux: ${JSON.stringify({ calories_consommées: totalCal, objectif_ajusté: adjCal, proteines: day.meals.reduce((s,m)=>s+m.prot,0), sport_kcal: day.sport||0, pas: day.steps||0, eau_litres: ((day.water||0)*0.2).toFixed(1) })}.`;
+        const goodMeals = day.meals.filter(m => m.healthScore === 3).length;
+        const calRatio = adjCal > 0 ? totalCal / adjCal : 1;
+        const stepsToday = day.steps || 0;
+        const stepsKcal = estimateStepsKcal(stepsToday, p.weight);
+
+        // Contexte 7 jours complet
+        const fullContext = buildAlexContext7Days(selectedDate);
+
+        // Ton adaptatif
+        const toneHint = (calRatio < 0.7 || goodMeals === 0)
+            ? 'La journée a été difficile — sois particulièrement encourageant, bienveillant, sans jugement.'
+            : calRatio > 1.2
+                ? 'Il y a eu des excès aujourd\'hui — sois direct et constructif, pas moralisateur.'
+                : 'Bonne journée — sois positif et exigeant pour pousser à progresser.';
+
+        const prompt = `Tu es Alex, coach nutrition et sport personnel. Fais le bilan de cette journée de façon PERSONNALISÉE, HUMAINE, et ANCRÉE dans les vraies données.
+
+${fullContext}
+
+FOCUS JOURNÉE D'AUJOURD'HUI :
+- Calories: ${totalCal} kcal consommées / objectif ajusté ${adjCal} kcal
+- Protéines: ${totalProt}g / objectif ${t.prot}g
+- Sport: ${day.sport > 0 ? (day.sportEntries||[]).map(e=>e.act+' '+e.kcal+'kcal').join(', ') : 'aucune séance'}
+- Pas: ${stepsToday > 0 ? stepsToday.toLocaleString('fr-FR') + ' pas (~' + stepsKcal + ' kcal de marche)' : 'non renseigné'}
+- Eau: ${((day.water||0)*0.2).toFixed(1)}L | Sommeil: ${day.sleep ? day.sleep.toFixed(1)+'h' : 'non renseigné'}
+- Qualité repas: ${goodMeals}/${day.meals.length} bien notés
+
+${toneHint}
+
+Écris un message NATUREL en 4-5 phrases maximum. Structure obligatoire (sans titres, texte fluide) :
+1. Une accroche sur le point le plus marquant du jour (pas une généralité — cite un chiffre réel).
+2. Une observation basée sur les TENDANCES des 7 jours (corrèle nutrition + sport + pas + sommeil si pertinent).
+3. Un seul conseil actionnable et précis pour demain.
+Tutoie, sois direct, chaleureux. Cite les vrais chiffres. Jamais de phrases génériques.`;
+
         const txt = await callGemini(prompt, false);
         document.getElementById('loader-bilan').style.display = 'none';
         day.aiSummary = txt;
@@ -2264,10 +2304,12 @@ Totaux: ${JSON.stringify({ calories_consommées: totalCal, objectif_ajusté: adj
         return (pct !== undefined && pct !== null) ? pct : 0;
     }
 
-    function getIdealKcalForMeal(key) {
+    function getIdealKcalForMeal(key, forDate) {
         const p = appData.profile;
         if (!p || !p.targets) return 0;
-        const calTarget = p.targets.cal;
+        const ds = forDate || selectedDate;
+        const sportKcal = appData.days[ds]?.sport || 0;
+        const calTarget = p.targets.cal + sportKcal;
         const pct = getMealPct(key);
         return pct > 0 ? Math.round(calTarget * pct) : 0;
     }
@@ -2303,7 +2345,7 @@ Totaux: ${JSON.stringify({ calories_consommées: totalCal, objectif_ajusté: adj
         finalCats.forEach(cat => {
             const pct = getMealPct(cat.key);
             const isOptional = cat.key === 'Collation' && pct === 0;
-            const idealKcal = getIdealKcalForMeal(cat.key);
+            const idealKcal = getIdealKcalForMeal(cat.key, selectedDate);
             const idealMacros = getIdealMacrosForMeal(cat.key);
             const meals = day.meals.filter(m => m.type === cat.key);
             const totalKcal = meals.reduce((s, m) => s + m.kcal, 0);
@@ -2320,8 +2362,9 @@ Totaux: ${JSON.stringify({ calories_consommées: totalCal, objectif_ajusté: adj
                     <span class="mf">L:${idealMacros.fat}g</span>
                 </div>` : '';
 
+            const sportKcalToday = appData.days[selectedDate]?.sport || 0;
             const kcalIdealHtml = idealKcal > 0
-                ? `<div class="meal-cat-kcal">Idéal : <span>~${idealKcal} kcal</span></div>${macrosHtml}`
+                ? `<div class="meal-cat-kcal">Idéal : <span>~${idealKcal} kcal</span>${sportKcalToday > 0 ? ' 🔥' : ''}</div>${macrosHtml}`
                 : isOptional
                     ? `<div class="meal-cat-kcal" style="color:var(--text-muted);font-style:italic;font-size:0.72rem">Optionnelle · hors plan</div>`
                     : `<div class="meal-cat-kcal" style="color:var(--text-muted);font-style:italic">Configure ton profil</div>`;
@@ -2385,12 +2428,24 @@ Totaux: ${JSON.stringify({ calories_consommées: totalCal, objectif_ajusté: adj
         else if(hasPhoto)contextBlock=`${currentImgs.length} photo(s). Analyse visuellement.`;
         else contextBlock=`Description: "${desc}".`;
 
-        const prompt=`Tu es un nutritionniste expert. Analyse ce repas et estime ses valeurs nutritionnelles RÉELLES avec précision.
+        const mealContextSport = profile?.targets ? (() => {
+            const todayDay = appData.days[selectedDate] || {};
+            return todayDay.sport > 0 ? `Séance sport aujourd'hui: ${todayDay.sport} kcal brûlées.` : '';
+        })() : '';
+        const mealContextTotal = (() => {
+            const todayDay = appData.days[selectedDate] || { meals: [] };
+            const soFar = todayDay.meals.reduce((s,m) => s + m.kcal, 0);
+            const tgt = profile?.targets?.cal || 0;
+            return soFar > 0 ? `Calories déjà consommées aujourd'hui: ${soFar} kcal${tgt > 0 ? ' (objectif: ' + tgt + ' kcal)' : ''}.` : '';
+        })();
+        const prompt=`Tu es Alex, un coach nutrition personnel. Analyse ce repas et estime ses valeurs nutritionnelles RÉELLES avec précision.
 ${contextBlock}
-Type de repas: ${activeCategory}. Objectif santé: ${goalStr}. ${dietInfo} ${allergiesInfo}
+Type de repas: ${activeCategory}. Objectif santé: ${goalStr}. ${dietInfo} ${allergiesInfo} ${mealContextSport} ${mealContextTotal}
 IMPORTANT: Estime les calories et macros basées UNIQUEMENT sur les aliments décrits/photographiés, sans tenir compte d'aucun objectif calorique.
-healthScore: 1=peu adapté à l'objectif ${goalStr}, 2=moyen, 3=bien adapté. Fournis toujours 2-3 conseils concrets dans healthTips séparés par \\n pour améliorer ce repas.
-JSON: {"kcal":number,"prot":number,"carb":number,"fat":number,"healthScore":1|2|3,"healthLabel":string,"healthTips":string}`;
+healthScore: 1=peu adapté à l'objectif ${goalStr}, 2=moyen, 3=bien adapté.
+healthTips: 2-3 conseils courts et concrets pour améliorer ce repas, séparés par \\n.
+coachComment: UNE phrase courte (max 20 mots), directe et personnalisée comme si tu parlais à voix haute à ton client. Sois précis, humain, et utilise le contexte (sport, objectif, moment de la journée). Pas de généralités.
+JSON: {"kcal":number,"prot":number,"carb":number,"fat":number,"healthScore":1|2|3,"healthLabel":string,"healthTips":string,"coachComment":string}`;
 
         const res=await callGemini(prompt,true,currentImgs);
         document.getElementById('loader-m').style.display='none';
@@ -2410,11 +2465,21 @@ JSON: {"kcal":number,"prot":number,"carb":number,"fat":number,"healthScore":1|2|
             document.getElementById('m-carb-val').value = carb;
             document.getElementById('m-fat-val').value  = fat;
 
-            const idealKcal = getIdealKcalForMeal(activeCategory);
+            const idealKcal = getIdealKcalForMeal(activeCategory, selectedDate);
             const isOver = idealKcal > 0 && kcal > idealKcal;
             const emoji = isOver ? '😞' : '😊';
             document.getElementById('meal-health-emoji').textContent = emoji;
             document.getElementById('meal-health-label').textContent = res.healthLabel || '';
+            // Bulle coachComment style "Alex parle"
+            const coachCommentEl = document.getElementById('meal-coach-comment');
+            if (coachCommentEl) {
+                if (res.coachComment) {
+                    coachCommentEl.style.display = 'flex';
+                    coachCommentEl.querySelector('.mcc-text').textContent = res.coachComment;
+                } else {
+                    coachCommentEl.style.display = 'none';
+                }
+            }
             const tipsEl=document.getElementById('meal-health-tips');
             if(tipsEl){
                 if(res.healthTips){
@@ -2473,7 +2538,7 @@ JSON: {"kcal":number,"prot":number,"carb":number,"fat":number,"healthScore":1|2|
         document.getElementById('m-prot-val').value=m.prot;
         document.getElementById('m-carb-val').value=m.carb;
         document.getElementById('m-fat-val').value=m.fat;
-        const idealKcalEdit = getIdealKcalForMeal(m.type);
+        const idealKcalEdit = getIdealKcalForMeal(m.type, selectedDate);
         const isOverEdit = idealKcalEdit > 0 && m.kcal > idealKcalEdit;
         document.getElementById('meal-health-emoji').textContent = isOverEdit ? '😞' : '😊';
         document.getElementById('meal-health-label').textContent=m.healthLabel||'';
@@ -2566,12 +2631,15 @@ JSON: {"kcal":number,"prot":number,"carb":number,"fat":number,"healthScore":1|2|
         else{chkIcon.textContent='';chkIcon.style.background='transparent';}
 
         const bText=document.getElementById('bilan-text');
-        if(day.closed&&day.aiSummary){bText.textContent=day.aiSummary;bText.style.display='block';}
-        else{bText.style.display='none';}
+        const bContent=document.getElementById('bilan-text-content');
+        if(day.closed&&day.aiSummary){
+            if(bContent) bContent.textContent=day.aiSummary;
+            bText.style.display='block';
+        } else { bText.style.display='none'; }
 
         const mealIcons={'Petit Déjeuner':'☕','Déjeuner':'☀️','Dîner':'🌙','Collation':'🍎'};
         const healthEmojis = (meal) => {
-            const ideal = getIdealKcalForMeal(meal.type);
+            const ideal = getIdealKcalForMeal(meal.type, selectedDate);
             return ideal > 0 && meal.kcal > ideal ? '😞' : '😊';
         };
         const list=document.getElementById('home-meals-list');
@@ -2622,7 +2690,142 @@ JSON: {"kcal":number,"prot":number,"carb":number,"fat":number,"healthScore":1|2|
     function renderWaterGlasses(){const day=appData.days[selectedDate]||{};const filled=day.water||0;const target=getWaterTarget();const liters=(filled*WATER_STEP_L).toFixed(1).replace(/\.?0+$/,'')||'0';const pct=Math.round(Math.min((filled/target)*100,100));const elCur=document.getElementById('w-current');const elLit=document.getElementById('w-liters');const elPct=document.getElementById('w-pct');const elTgt=document.getElementById('w-target');const elTgtL=document.getElementById('w-target-l');const pfill=document.getElementById('water-progress-fill');const msgEl=document.getElementById('water-msg');if(elCur)elCur.textContent=filled;if(elLit)elLit.textContent=liters;if(elPct)elPct.textContent=pct;if(elTgt)elTgt.textContent=target;if(elTgtL)elTgtL.textContent=(target*WATER_STEP_L).toFixed(1).replace(/\.?0+$/,'');if(pfill)pfill.style.width=pct+'%';if(msgEl){if(filled===0)msgEl.textContent="Pense à t'hydrater ! 💧";else if(filled<target*0.4)msgEl.textContent="Continue, tu es bien parti ! 🌊";else if(filled<target*0.7)msgEl.textContent="Bonne progression ! 👍";else if(filled<target)msgEl.textContent="Plus que "+(target-filled)+" verre(s) !";else msgEl.textContent="Objectif atteint ! 🎉";}}
     function changeWater(delta){if(!appData.days[selectedDate])appData.days[selectedDate]={meals:[],sport:0,sportEntries:[],closed:false};const day=appData.days[selectedDate];day.water=Math.max(0,Math.min(20,(day.water||0)+delta));saveData();renderWaterGlasses();}
 
-    function checkWeeklyReport(){const today=new Date();if(today.getDay()!==0)return;const weekKey='weekly_report_'+getWeekKey();if(localStorage.getItem(weekKey))return;let totalMeals=0,unhealthyMeals=0,mediumMeals=0,goodMeals=0;for(let i=0;i<7;i++){const d=new Date(today);d.setDate(today.getDate()-i);const ds=d.toISOString().split('T')[0];const day=appData.days[ds];if(day)day.meals.forEach(m=>{totalMeals++;if(m.healthScore===1)unhealthyMeals++;else if(m.healthScore===2)mediumMeals++;else if(m.healthScore===3)goodMeals++;});}if(totalMeals<3)return;const goodPct=Math.round((goodMeals/totalMeals)*100);const mediumPct=Math.round((mediumMeals/totalMeals)*100);const badPct=Math.round((unhealthyMeals/totalMeals)*100);let globalEmoji,globalMsg;if(goodPct>=70){globalEmoji='🟢';globalMsg='Excellente semaine, continue comme ça !';}else if(goodPct>=50){globalEmoji='🟡';globalMsg='Bonne semaine, quelques ajustements possibles.';}else if(badPct>30){globalEmoji='🔴';globalMsg='Semaine difficile, concentre-toi sur la qualité des repas.';}else{globalEmoji='🟠';globalMsg='Semaine correcte, tu peux encore progresser !';}const reportHtml=`<div style="text-align:center;font-size:2.5rem;margin-bottom:8px">${globalEmoji}</div><div style="font-weight:800;text-align:center;margin-bottom:14px">${globalMsg}</div><div style="background:var(--bg-body);border-radius:12px;padding:12px 14px"><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px"><span style="font-size:0.88rem">😊 Adaptés</span><strong style="color:var(--success)">${goodPct}%</strong></div><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px"><span style="font-size:0.88rem">😐 Moyens</span><strong style="color:#d69e2e">${mediumPct}%</strong></div><div style="display:flex;justify-content:space-between;align-items:center"><span style="font-size:0.88rem">😟 Peu adaptés</span><strong style="color:var(--danger)">${badPct}%</strong></div></div><div style="font-size:0.75rem;color:var(--text-muted);margin-top:8px;text-align:center">${totalMeals} repas analysés cette semaine</div>`;document.getElementById('weekly-report-content').innerHTML=reportHtml;document.getElementById('modal-weekly-report').style.display='flex';localStorage.setItem(weekKey,'1');}
+    async function checkWeeklyReport() {
+        const today = new Date();
+        if (today.getDay() !== 0) return;
+        const weekKey = 'weekly_report_' + getWeekKey();
+        if (localStorage.getItem(weekKey)) return;
+
+        // Collecter données 7 jours
+        let totalMeals = 0, unhealthyMeals = 0, mediumMeals = 0, goodMeals = 0;
+        let totalSportDays = 0, totalSteps = 0, stepsCount = 0;
+        const dayGrid = []; // 7 cases pour la grille visuelle
+
+        for (let i = 6; i >= 0; i--) {
+            const d = new Date(today); d.setDate(today.getDate() - i);
+            const ds = d.toISOString().split('T')[0];
+            const wd = appData.days[ds] || {};
+            const meals = wd.meals || [];
+            const kcal = meals.reduce((s,m)=>s+m.kcal,0);
+            const goodDay = meals.filter(m=>m.healthScore===3).length;
+            const badDay  = meals.filter(m=>m.healthScore===1).length;
+            const hasSport = (wd.sport||0) > 0;
+            const steps = wd.steps || 0;
+            if (steps > 0) { totalSteps += steps; stepsCount++; }
+
+            meals.forEach(m => {
+                totalMeals++;
+                if (m.healthScore===1) unhealthyMeals++;
+                else if (m.healthScore===2) mediumMeals++;
+                else if (m.healthScore===3) goodMeals++;
+            });
+            if (hasSport) totalSportDays++;
+
+            // Couleur du jour pour la grille
+            // Même logique que les emojis 😊/😞 : majorité bons = vert, sinon rouge
+            let dayColor, dayBg, dayEmoji;
+            if (meals.length === 0) {
+                dayColor = 'var(--text-muted)'; dayBg = 'var(--bg-body)'; dayEmoji = '—';
+            } else if (goodDay >= Math.ceil(meals.length / 2)) {
+                dayColor = '#38a169'; dayBg = 'rgba(56,161,105,0.12)'; dayEmoji = '😊';
+            } else {
+                dayColor = '#e53e3e'; dayBg = 'rgba(229,62,62,0.1)'; dayEmoji = '😞';
+            }
+
+            const dayNames = ['Di','Lu','Ma','Me','Je','Ve','Sa'];
+            dayGrid.push({
+                name: dayNames[d.getDay()],
+                num: d.getDate(),
+                color: dayColor,
+                bg: dayBg,
+                dayEmoji,
+                hasSport,
+                hasMeals: meals.length > 0,
+                kcal
+            });
+        }
+
+        if (totalMeals < 3) return;
+
+        const goodPct = Math.round((goodMeals / totalMeals) * 100);
+        const mediumPct = Math.round((mediumMeals / totalMeals) * 100);
+        const badPct = Math.round((unhealthyMeals / totalMeals) * 100);
+        const avgSteps = stepsCount > 0 ? Math.round(totalSteps / stepsCount) : 0;
+
+        // ── Grille 7 jours ──
+        const gridHtml = `<div style="display:flex;gap:12px;flex-wrap:wrap;margin-bottom:8px;font-size:0.72rem;font-weight:700">
+            <span style="display:flex;align-items:center;gap:4px"><span style="width:10px;height:10px;border-radius:50%;background:#38a169;display:inline-block"></span>Majorité bons</span>
+            <span style="display:flex;align-items:center;gap:4px"><span style="width:10px;height:10px;border-radius:50%;background:#e53e3e;display:inline-block"></span>Majorité faibles</span>
+            <span style="color:var(--text-muted)">— Pas de données</span>
+        </div>
+        <div style="display:grid;grid-template-columns:repeat(7,1fr);gap:4px;margin-bottom:14px">
+            ${dayGrid.map(d => `
+            <div style="text-align:center;border-radius:10px;padding:6px 2px;background:${d.bg};border:1.5px solid ${d.color}20">
+                <div style="font-size:0.6rem;font-weight:800;color:var(--text-muted)">${d.name}</div>
+                <div style="font-size:0.85rem;font-weight:900;color:${d.color};margin:2px 0">${d.num}</div>
+                ${d.hasSport ? '<div style="font-size:0.65rem">🏋️</div>' : '<div style="height:14px"></div>'}
+                ${d.hasMeals ? `<div style="width:12px;height:12px;border-radius:50%;background:${d.color};margin:2px auto 0"></div>` : '<div style="font-size:0.65rem;color:var(--text-muted);margin-top:2px">—</div>'}
+            </div>`).join('')}
+        </div>`;
+
+        // ── Barre de qualité ──
+        const barHtml = `
+        <div style="margin-bottom:14px">
+            <div style="display:flex;border-radius:8px;overflow:hidden;height:10px;margin-bottom:8px">
+                ${goodPct > 0 ? `<div style="width:${goodPct}%;background:#38a169"></div>` : ''}
+                ${mediumPct > 0 ? `<div style="width:${mediumPct}%;background:#d69e2e"></div>` : ''}
+                ${badPct > 0 ? `<div style="width:${badPct}%;background:#e53e3e"></div>` : ''}
+            </div>
+            <div style="display:flex;justify-content:space-between;font-size:0.75rem;font-weight:700">
+                <span style="color:#38a169">🟢 Bons ${goodPct}%</span>
+                <span style="color:#d69e2e">🟡 Moyens ${mediumPct}%</span>
+                <span style="color:#e53e3e">🔴 Faibles ${badPct}%</span>
+            </div>
+            <div style="text-align:center;font-size:0.72rem;color:var(--text-muted);margin-top:4px">${totalMeals} repas · ${totalSportDays}/7 jours avec sport${avgSteps > 0 ? ' · ~' + avgSteps.toLocaleString('fr-FR') + ' pas/j' : ''}</div>
+        </div>`;
+
+        // ── Loader pour la synthèse IA ──
+        const loaderHtml = `<div id="weekly-ai-loader" style="text-align:center;padding:12px;color:var(--secondary);font-style:italic;font-size:0.88rem;animation:pulse 1.4s infinite">🧠 Alex analyse ta semaine...</div>`;
+        const aiBlock = `<div id="weekly-ai-content" style="display:none"></div>`;
+
+        document.getElementById('weekly-report-content').innerHTML = gridHtml + barHtml + loaderHtml + aiBlock;
+        document.getElementById('modal-weekly-report').style.display = 'flex';
+        localStorage.setItem(weekKey, '1');
+
+        // ── Synthèse narrative IA ──
+        if (appData.apiKey) {
+            const fullContext = buildAlexContext7Days(getTodayStr());
+            const prompt = `Tu es Alex, coach nutrition et sport personnel. Fais la synthèse de la semaine qui vient de s'écouler.
+
+${fullContext}
+
+STATS SEMAINE :
+- ${totalMeals} repas enregistrés : ${goodMeals} bons (${goodPct}%), ${mediumMeals} moyens (${mediumPct}%), ${unhealthyMeals} faibles (${badPct}%)
+- Sport: ${totalSportDays}/7 jours actifs
+${avgSteps > 0 ? `- Marche moyenne: ${avgSteps.toLocaleString('fr-FR')} pas/j (~${estimateStepsKcal(avgSteps * 7, appData.profile?.weight || 70)} kcal totales sur la semaine)` : ''}
+
+Écris une synthèse de 5-6 phrases MAXIMUM, naturelle et fluide, sans titres :
+1. Le point fort de la semaine (cite un chiffre concret).
+2. La corrélation la plus significative que tu détectes (sport vs nutrition, sommeil vs calories, pas vs objectif, etc.).
+3. Le point faible principal (1 seul, basé sur les vraies données).
+4. L'objectif prioritaire pour la semaine prochaine (précis, mesurable).
+Sois direct, chaleureux, comme un coach qui suit quelqu'un depuis des semaines. Jamais de généralités.`;
+
+            const txt = await callGemini(prompt, false);
+            const loaderEl = document.getElementById('weekly-ai-loader');
+            const contentEl = document.getElementById('weekly-ai-content');
+            if (loaderEl) loaderEl.style.display = 'none';
+            if (contentEl && txt) {
+                contentEl.style.display = 'block';
+                contentEl.innerHTML = `
+                <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px">
+                    <div style="width:30px;height:30px;border-radius:50%;background:linear-gradient(135deg,var(--primary),var(--secondary));display:flex;align-items:center;justify-content:center;font-size:1rem;flex-shrink:0">🏋🏼</div>
+                    <div style="font-weight:900;font-size:0.8rem">Alex — Synthèse de la semaine</div>
+                </div>
+                <div style="background:var(--primary-light);border-radius:0 14px 14px 14px;padding:13px 15px;font-size:0.88rem;font-weight:600;line-height:1.7;color:var(--text-color);white-space:pre-wrap;border:1.5px solid rgba(56,178,172,0.2)">${txt}</div>`;
+            }
+        }
+    }
     function getWeekKey(){const d=new Date();const jan1=new Date(d.getFullYear(),0,1);const week=Math.ceil(((d-jan1)/86400000+jan1.getDay()+1)/7);return d.getFullYear()+'_w'+week;}
 
     let sleepInputVal=7.0;
@@ -3189,55 +3392,120 @@ JSON: {"kcal":number,"prot":number,"carb":number,"fat":number,"healthScore":1|2|
         "📈 Je stagne, pourquoi ?"
     ];
 
-    function buildCoachContext() {
+    // ── Calcul calories marche (formule MET approximative) ──
+    function estimateStepsKcal(steps, weightKg) {
+        if (!steps || steps <= 0 || !weightKg) return 0;
+        // ~0.0005 kcal/kg/pas — formule simple et fiable
+        return Math.round(steps * weightKg * 0.0005);
+    }
+
+    // ── Contexte 7 jours complet — utilisé partout par Alex ──
+    function buildAlexContext7Days(anchorDate) {
         const p = appData.profile;
         if (!p) return "L'utilisateur n'a pas encore configuré son profil.";
 
-        const today = getTodayStr();
-        const day = appData.days[today] || { meals: [], sport: 0, sportEntries: [] };
-
-        // Repas du jour
-        const mealsToday = day.meals.map(m =>
-            `${m.type}: ${m.kcal}kcal (P:${m.prot}g G:${m.carb}g L:${m.fat}g)`
-        ).join(', ') || 'aucun repas enregistré';
-
-        // Sport du jour
-        const sportToday = day.sportEntries?.map(e => `${e.act} ${e.dur ? e.dur+'min' : ''} (${e.kcal}kcal)`).join(', ') || 'aucune séance';
-
-        // Historique 7 jours
-        const weekSummary = [];
-        for (let i = 1; i <= 7; i++) {
-            const d = new Date(); d.setDate(d.getDate() - i);
-            const ds = d.toISOString().split('T')[0];
-            const wd = appData.days[ds];
-            if (wd && (wd.meals?.length > 0 || wd.sport > 0)) {
-                const kcal = wd.meals?.reduce((s, m) => s + m.kcal, 0) || 0;
-                weekSummary.push(`J-${i}: ${kcal}kcal mangées, ${wd.sport || 0}kcal sport`);
-            }
-        }
-
+        const anchor = anchorDate || getTodayStr();
         const goalLabels = { loss: 'perte de poids', maintain: 'maintien', gain: 'prise de masse' };
         const morphLabels = { ecto: 'ectomorphe', meso: 'mésomorphe', endo: 'endomorphe' };
 
-        return `Voici le profil complet de l'utilisateur :
-- Prénom: ${p.name || 'inconnu'}
-- Poids: ${p.weight}kg, Taille: ${p.height}cm, Âge: ${p.age} ans, Sexe: ${p.sex === 'male' ? 'homme' : 'femme'}
-- Morphotype: ${morphLabels[p.morph] || p.morph}
-- Objectif: ${goalLabels[p.goalDir] || p.goalDir}${p.weightTarget ? `, cible ${p.weightTarget}kg en ${p.goalWeeks} semaines` : ''}
-- Cibles: ${p.targets?.cal} kcal/j, P:${p.targets?.prot}g G:${p.targets?.carb}g L:${p.targets?.fat}g
-- Activité: ${p.activity >= 1.725 ? 'très actif' : p.activity >= 1.55 ? 'modérément actif' : p.activity >= 1.375 ? 'légèrement actif' : 'sédentaire'}
-- Stress: ${p.stress || 'modéré'}, Régime: ${p.diet !== 'none' ? p.diet : 'aucun'}
-${p.allergies ? `- Allergies: ${p.allergies}` : ''}
-${p.lifestyle ? `- Quotidien: ${p.lifestyle}` : ''}
+        // ── Données jour par jour sur 7 jours ──
+        const days7 = [];
+        let totalSportSessions = 0, totalSportKcal = 0, sportDays = 0;
+        let totalStepsKcal = 0, totalProtAll = 0, totalCalAll = 0, daysWithData = 0;
+        let totalSleep = 0, sleepDays = 0;
+        let totalWater = 0, waterDays = 0;
+        let lowProtDays = 0, lowCalDays = 0, highCalDays = 0;
+        const sportActivities = [];
 
-Aujourd'hui (${today}):
-- Repas: ${mealsToday}
-- Sport: ${sportToday}
-- Eau: ${((day.water || 0) * 0.2).toFixed(1)}L bues
-- Sommeil cette nuit: ${day.sleep ? day.sleep + 'h' : 'non renseigné'}
+        for (let i = 0; i <= 7; i++) {
+            const d = new Date(anchor + 'T12:00:00');
+            d.setDate(d.getDate() - i);
+            const ds = d.toISOString().split('T')[0];
+            const wd = appData.days[ds] || {};
+            const meals = wd.meals || [];
+            const kcal = meals.reduce((s, m) => s + m.kcal, 0);
+            const prot = meals.reduce((s, m) => s + m.prot, 0);
+            const carb = meals.reduce((s, m) => s + m.carb, 0);
+            const fat  = meals.reduce((s, m) => s + m.fat, 0);
+            const sportKcal = wd.sport || 0;
+            const steps = wd.steps || 0;
+            const stepsKcal = estimateStepsKcal(steps, p.weight);
+            const adjTarget = (p.targets?.cal || 0) + sportKcal;
+            const goodMeals = meals.filter(m => m.healthScore === 3).length;
+            const sessions = (wd.sportEntries || []).map(e => e.act);
 
-Historique récent:
-${weekSummary.length > 0 ? weekSummary.join('\n') : 'Pas encore de données cette semaine'}`;
+            if (sportKcal > 0) { sportDays++; totalSportKcal += sportKcal; }
+            if (wd.sportEntries) { totalSportSessions += (wd.sportEntries.length || 0); sessions.forEach(a => { if (!sportActivities.includes(a)) sportActivities.push(a); }); }
+            if (steps > 0) totalStepsKcal += stepsKcal;
+            if (wd.sleep) { totalSleep += wd.sleep; sleepDays++; }
+            if (wd.water) { totalWater += wd.water; waterDays++; }
+
+            if (meals.length > 0) {
+                daysWithData++;
+                totalProtAll += prot;
+                totalCalAll += kcal;
+                if (p.targets?.prot && prot < p.targets.prot * 0.75) lowProtDays++;
+                if (adjTarget > 0 && kcal < adjTarget * 0.7) lowCalDays++;
+                if (adjTarget > 0 && kcal > adjTarget * 1.2) highCalDays++;
+            }
+
+            const label = i === 0 ? "Aujourd'hui" : i === 1 ? "Hier" : `J-${i}`;
+            if (meals.length > 0 || sportKcal > 0 || steps > 0) {
+                let line = `${label} (${ds}): `;
+                if (meals.length > 0) line += `${kcal} kcal mangées (P:${prot}g G:${carb}g L:${fat}g, obj:${adjTarget} kcal, ${goodMeals}/${meals.length} repas bons)`;
+                else line += 'pas de repas enregistré';
+                if (sportKcal > 0) line += ` | Sport: ${sessions.join(', ')} ${sportKcal} kcal brûlées`;
+                if (steps > 0) line += ` | Pas: ${steps.toLocaleString('fr-FR')} (~${stepsKcal} kcal de marche)`;
+                if (wd.sleep) line += ` | Sommeil: ${wd.sleep.toFixed(1)}h`;
+                if (wd.water) line += ` | Eau: ${(wd.water * 0.2).toFixed(1)}L`;
+                if (wd.closed) line += ` ✓`;
+                days7.push(line);
+            }
+        }
+
+        // ── Tendances pré-calculées ──
+        const trends = [];
+        const avgProt = daysWithData > 0 ? Math.round(totalProtAll / daysWithData) : 0;
+        const avgCal  = daysWithData > 0 ? Math.round(totalCalAll / daysWithData) : 0;
+        const avgSleep = sleepDays > 0 ? (totalSleep / sleepDays).toFixed(1) : null;
+        const avgWater = waterDays > 0 ? ((totalWater / waterDays) * 0.2).toFixed(1) : null;
+
+        if (lowProtDays >= 3) trends.push(`⚠️ Protéines insuffisantes (< 75% objectif) ${lowProtDays} jours sur 7 — moyenne: ${avgProt}g/j vs objectif ${p.targets?.prot}g`);
+        if (lowCalDays >= 3) trends.push(`⚠️ Sous-alimentation fréquente (< 70% objectif) ${lowCalDays} jours sur 7`);
+        if (highCalDays >= 3) trends.push(`⚠️ Dépassement calorique fréquent ${highCalDays} jours sur 7`);
+        if (sportDays === 0) trends.push(`⚠️ Aucune séance sport cette semaine`);
+        else if (sportDays >= 5) trends.push(`✅ Excellente régularité sport: ${sportDays}/7 jours`);
+        else trends.push(`Sport: ${sportDays}/7 jours (${totalSportSessions} séances, ${totalSportKcal} kcal)`);
+        if (totalStepsKcal > 0) trends.push(`Marche semaine: ~${totalStepsKcal} kcal brûlées au total (activité NEAT importante)`);
+        if (avgSleep && parseFloat(avgSleep) < 6.5) trends.push(`⚠️ Sommeil moyen insuffisant: ${avgSleep}h — impact négatif sur récupération et hormones de faim`);
+        if (sportActivities.length > 0) trends.push(`Activités pratiquées: ${sportActivities.join(', ')}`);
+
+        // Poids récent
+        const recentWeights = (appData.weightHistory || []).slice(-3);
+        const weightTrend = recentWeights.length >= 2
+            ? (() => { const diff = (recentWeights[recentWeights.length-1].weight - recentWeights[0].weight).toFixed(1); return `Poids récent: ${recentWeights[recentWeights.length-1].weight}kg (${diff > 0 ? '+' : ''}${diff}kg sur ${recentWeights.length} mesures)`; })()
+            : recentWeights.length === 1 ? `Poids actuel: ${recentWeights[0].weight}kg` : '';
+
+        return `PROFIL DE ${(p.name || 'l\'utilisateur').toUpperCase()} :
+- ${p.weight}kg | ${p.height}cm | ${p.age} ans | ${p.sex === 'male' ? 'Homme' : 'Femme'} | Morphotype: ${morphLabels[p.morph] || p.morph}
+- Objectif: ${goalLabels[p.goalDir] || p.goalDir}${p.weightTarget ? ` → cible ${p.weightTarget}kg en ${p.goalWeeks} sem.` : ''}
+- Cibles: ${p.targets?.cal} kcal/j | P:${p.targets?.prot}g | G:${p.targets?.carb}g | L:${p.targets?.fat}g
+- Activité déclarée: ${parseFloat(p.activity) >= 1.725 ? 'très actif' : parseFloat(p.activity) >= 1.55 ? 'modérément actif' : parseFloat(p.activity) >= 1.375 ? 'légèrement actif' : 'sédentaire'}
+- Stress: ${p.stress || 'modéré'} | Régime: ${p.diet && p.diet !== 'none' ? p.diet : 'aucun'}${p.allergies ? ` | Allergies: ${p.allergies}` : ''}${p.lifestyle ? `\n- Mode de vie: ${p.lifestyle}` : ''}
+${weightTrend ? `- ${weightTrend}` : ''}
+
+DONNÉES 7 DERNIERS JOURS :
+${days7.length > 0 ? days7.join('\n') : 'Pas encore de données'}
+
+TENDANCES DÉTECTÉES :
+${trends.length > 0 ? trends.join('\n') : 'Données insuffisantes pour détecter des tendances'}
+
+MOYENNES SEMAINE : ${avgCal > 0 ? `${avgCal} kcal/j mangées` : ''} | ${avgProt > 0 ? `${avgProt}g prot/j` : ''} | ${avgSleep ? `${avgSleep}h sommeil/j` : ''} | ${avgWater ? `${avgWater}L eau/j` : ''}`;
+    }
+
+    // Rétrocompatibilité — alias pour les appels existants
+    function buildCoachContext() {
+        return buildAlexContext7Days(getTodayStr());
     }
 
     function openCoachChat() {
@@ -3245,18 +3513,49 @@ ${weekSummary.length > 0 ? weekSummary.join('\n') : 'Pas encore de données cett
         overlay.style.display = 'flex';
         overlay.classList.remove('closing');
 
-        // Message de bienvenue si première ouverture
+        // Message de bienvenue proactif si première ouverture
         if (coachChatHistory.length === 0) {
             const p = appData.profile;
             const firstName = p?.name ? p.name.split(' ')[0] : '';
             const greeting = getGreeting();
-            appendCoachMessage(
-                `${greeting} ${firstName ? firstName + ' ! ' : '! '}Je suis Alex, ton coach perso 💪\n\nPose-moi n'importe quelle question sur le sport, la nutrition ou ton plan — je connais déjà ton profil et tes données du jour ! 😎`,
-                'coach'
-            );
+
+            // Message d'attente pendant l'analyse
+            const loadingMsg = `${greeting} ${firstName ? firstName + ' !' : '!'} Je regarde tes données de la semaine... 🔍`;
+            appendCoachMessage(loadingMsg, 'coach');
+
+            // Générer le vrai message proactif basé sur les 7 derniers jours
+            if (appData.apiKey) {
+                const fullContext = buildAlexContext7Days(getTodayStr());
+                const proactivePrompt = `Tu es Alex, coach nutrition et sport personnel intégré dans NUTRI+.
+L'utilisateur vient d'ouvrir le chat. Génère un message d'accueil PROACTIF en 2-3 phrases qui :
+1. Commence par "${greeting} ${firstName ? firstName + ' !' : '!'}" + une observation CONCRÈTE tirée des 7 derniers jours (cite un chiffre ou une tendance réelle).
+2. Pose UNE seule question pertinente pour engager la conversation — basée sur ce que tu vois dans les données.
+Sois direct, chaleureux, comme un vrai coach. Jamais de "je suis Alex" ni de présentation générique — tu te concentres sur ses données.
+
+${fullContext}`;
+
+                callGemini(proactivePrompt, false).then(txt => {
+                    // Remplacer le message de loading par le vrai message
+                    const msgs = document.querySelectorAll('.chat-msg-wrapper.coach');
+                    if (msgs.length > 0) {
+                        const lastCoach = msgs[msgs.length - 1];
+                        const bubble = lastCoach.querySelector('.chat-msg-bubble');
+                        if (bubble) bubble.innerHTML = (txt || loadingMsg).replace(/\n/g, '<br>');
+                    }
+                    coachChatHistory.push({ role: 'coach', content: txt || loadingMsg });
+                    renderCoachSuggestions();
+                }).catch(() => {
+                    coachChatHistory.push({ role: 'coach', content: loadingMsg });
+                    renderCoachSuggestions();
+                });
+            } else {
+                coachChatHistory.push({ role: 'coach', content: loadingMsg });
+                renderCoachSuggestions();
+            }
+        } else {
+            renderCoachSuggestions();
         }
 
-        renderCoachSuggestions();
         setTimeout(() => {
             document.getElementById('coach-chat-input').focus();
             scrollCoachToBottom();
