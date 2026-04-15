@@ -1382,7 +1382,7 @@
     <input type="file" id="camera-input" accept="image/*" capture="environment" style="display:none">
     <input type="file" id="gallery-input" accept="image/*" style="display:none">
     <input type="file" id="multi-camera-input" accept="image/*" capture="environment" style="display:none">
-    <input type="file" id="multi-gallery-input" accept="image/*" style="display:none">
+    <input type="file" id="multi-gallery-input" accept="image/*" multiple style="display:none">
 
     <!-- MODALE COMPLÉMENT -->
     <div id="modal-suppl" class="modal-overlay" style="display:none">
@@ -2285,7 +2285,7 @@ Tutoie, sois direct, chaleureux. Cite les vrais chiffres. Jamais de phrases gén
     }
 
     function triggerImportMulti(mode){if(currentImgs.length>=4)return showAlert("Maximum atteint","Tu peux ajouter jusqu'à 4 photos maximum.");if(mode==='camera')document.getElementById('multi-camera-input').click();else document.getElementById('multi-gallery-input').click();}
-    function processMultiFile(input){if(!input.files||!input.files[0])return;const file=input.files[0];input.value="";const reader=new FileReader();reader.onload=(e)=>{const dataURL=e.target.result;if(!dataURL||!dataURL.startsWith("data:"))return showAlert("Erreur","Impossible de lire ce fichier.");const b64=dataURL.split(",")[1];currentImgs.push(b64);renderImagesGrid();};reader.onerror=()=>showAlert("Erreur","Impossible de lire ce fichier.");reader.readAsDataURL(file);}
+    function processMultiFile(input){if(!input.files||!input.files.length)return;const files=Array.from(input.files);input.value="";const remaining=4-currentImgs.length;if(remaining<=0)return showAlert("Maximum atteint","Tu as déjà 4 photos. Supprime-en une pour en ajouter.");const toProcess=files.slice(0,remaining);if(files.length>remaining)showAlert("Maximum atteint","Seulement "+remaining+" photo(s) ajoutée(s) sur "+files.length+" sélectionnée(s). Maximum 4 photos.");let processed=0;toProcess.forEach(file=>{const reader=new FileReader();reader.onload=(e)=>{const dataURL=e.target.result;if(!dataURL||!dataURL.startsWith("data:"))return showAlert("Erreur","Impossible de lire ce fichier.");const b64=dataURL.split(",")[1];currentImgs.push(b64);processed++;if(processed===toProcess.length)renderImagesGrid();};reader.onerror=()=>showAlert("Erreur","Impossible de lire ce fichier.");reader.readAsDataURL(file);});}
     function removeImg(i){currentImgs.splice(i,1);renderImagesGrid();}
     function renderImagesGrid(){const grid=document.getElementById('images-grid');if(!grid)return;grid.innerHTML='';currentImgs.forEach((b64,i)=>{const div=document.createElement('div');div.className='img-thumb';div.innerHTML=`<img src="data:image/jpeg;base64,${b64}"><div class="img-thumb-remove" onclick="removeImg(${i})">×</div>`;grid.appendChild(div);});const btns=document.querySelectorAll('#view-meal-form .add-photo-btn');btns.forEach(b=>b.style.display=currentImgs.length>=4?'none':'');}
 
