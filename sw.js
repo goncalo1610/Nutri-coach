@@ -1,6 +1,6 @@
 // NUTRI+ Coach — Service Worker
-// ⚡ VERSION AUTO : horodatage injecté à chaque déploiement
-const CACHE_VERSION = '__CACHE_VERSION__'; // remplacé dynamiquement par l'app
+// ⚡ Bump CACHE_VERSION à chaque modif majeure de l'app pour forcer un refresh client
+const CACHE_VERSION = '2026-04-26-precision-v1'; // ajout: portion slider + Katch-McArdle + prompt Gemini v2
 const CACHE_NAME = 'nutri-coach-' + CACHE_VERSION;
 
 // ── Installation ──
