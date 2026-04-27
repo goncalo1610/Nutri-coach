@@ -3730,4 +3730,156 @@ ${fullContext}`;
             .map(m => `${m.role === 'user' ? 'Utilisateur' : 'Coach'}: ${m.content}`)
             .join('\n');
 
-        const fullPrompt = `Tu es Alex, un coach sportif et nutritionnel personnel intégré dans l'app NUTRI+. Tu es décontracté, fun, bienveillant et motivant 😎. Tu tutoies l'utilisateur, tu utilises des emojis avec parcimonie (1-2 max par réponse),
+        const fullPrompt = `Tu es Alex, un coach sportif et nutritionnel personnel intégré dans l'app NUTRI+. Tu es décontracté, fun, bienveillant et motivant 😎. Tu tutoies l'utilisateur, tu utilises des emojis avec parcimonie (1-2 max par réponse), et tu donnes des conseils pratiques et personnalisés BASÉS SUR SES VRAIES DONNÉES.
+
+DONNÉES UTILISATEUR:
+${systemContext}
+
+RÈGLES IMPORTANTES:
+- Réponds en français, de façon concise (3-5 phrases max sauf si question complexe)
+- Tu es décontracté mais pro — pas de blabla inutile
+- Base tes conseils sur les vraies données ci-dessus (repas du jour, sport, objectif...)
+- Si tu remarques quelque chose d'important dans ses données (manque de protéines, pas assez d'eau...), mentionne-le naturellement
+- Ne réponds PAS aux questions hors sport/nutrition/santé — redirige gentiment
+
+HISTORIQUE DE LA CONVERSATION:
+${historyText}
+
+Réponds maintenant à la dernière question de l'utilisateur.`;
+
+        try {
+            const url = `https://generativelanguage.googleapis.com/v1beta/models/${MODEL}:generateContent?key=${appData.apiKey}`;
+            const resp = await fetch(url, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ contents: [{ parts: [{ text: fullPrompt }] }] })
+            });
+            const data = await resp.json();
+            removeTypingIndicator(typingId);
+
+            if (!resp.ok || !data.candidates?.length) throw new Error("Pas de réponse");
+
+            const reply = data.candidates[0].content.parts[0].text.trim();
+            coachChatHistory.push({ role: 'coach', content: reply });
+            appendCoachMessage(reply, 'coach');
+
+            // Suggestions contextuelles après la réponse
+            setTimeout(() => renderContextualSuggestions(text, reply), 400);
+
+        } catch(e) {
+            removeTypingIndicator(typingId);
+            appendCoachMessage("Oups, j'ai eu un souci pour te répondre 😅 Réessaie dans un instant !", 'coach');
+        }
+
+        coachIsTyping = false;
+        document.getElementById('coach-send-btn').disabled = false;
+    }
+
+    function appendCoachMessage(text, role) {
+        const container = document.getElementById('coach-messages');
+        const now = new Date().toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' });
+
+        const wrapper = document.createElement('div');
+        wrapper.className = `chat-msg-wrapper ${role}`;
+
+        const msgRow = document.createElement('div');
+        msgRow.className = `chat-msg-with-avatar ${role}`;
+
+        if (role === 'coach') {
+            const avatar = document.createElement('div');
+            avatar.className = 'chat-msg-avatar';
+            avatar.textContent = '🏋🏼';
+            msgRow.appendChild(avatar);
+        }
+
+        const bubble = document.createElement('div');
+        bubble.className = 'chat-msg-bubble';
+        // Convertir les sauts de ligne en <br>
+        bubble.innerHTML = text.replace(/\n/g, '<br>');
+        msgRow.appendChild(bubble);
+
+        wrapper.appendChild(msgRow);
+
+        const timeEl = document.createElement('div');
+        timeEl.className = 'chat-msg-time';
+        timeEl.textContent = now;
+        wrapper.appendChild(timeEl);
+
+        container.appendChild(wrapper);
+        scrollCoachToBottom();
+    }
+
+    function showTypingIndicator() {
+        const container = document.getElementById('coach-messages');
+        const id = 'typing-' + Date.now();
+        const wrapper = document.createElement('div');
+        wrapper.className = 'chat-msg-wrapper coach';
+        wrapper.id = id;
+
+        const row = document.createElement('div');
+        row.className = 'chat-msg-with-avatar coach';
+
+        const avatar = document.createElement('div');
+        avatar.className = 'chat-msg-avatar';
+        avatar.textContent = '🏋🏼';
+
+        const typing = document.createElement('div');
+        typing.className = 'coach-typing';
+        typing.innerHTML = '<div class="typing-dot"></div><div class="typing-dot"></div><div class="typing-dot"></div>';
+
+        row.appendChild(avatar);
+        row.appendChild(typing);
+        wrapper.appendChild(row);
+        container.appendChild(wrapper);
+        scrollCoachToBottom();
+        return id;
+    }
+
+    function removeTypingIndicator(id) {
+        const el = document.getElementById(id);
+        if (el) el.remove();
+    }
+
+    function renderContextualSuggestions(userMsg, coachReply) {
+        // Suggestions basées sur le sujet abordé
+        const msg = (userMsg + coachReply).toLowerCase();
+        let suggestions = [];
+
+        if (msg.includes('muscu') || msg.includes('musculation') || msg.includes('force')) {
+            suggestions = ['🏋️ Combien de séances/sem ?', '🥩 Protéines après l\'entraînement ?', '😴 Repos entre séances ?'];
+        } else if (msg.includes('poid') || msg.includes('gras') || msg.includes('mincir') || msg.includes('perte')) {
+            suggestions = ['🔥 Déficit calorique idéal ?', '🏃 Cardio ou muscu pour maigrir ?', '🥗 Que manger le soir ?'];
+        } else if (msg.includes('repas') || msg.includes('manger') || msg.includes('nutrition') || msg.includes('calorie')) {
+            suggestions = ['🍳 Idée petit déjeuner sportif ?', '⏰ Meilleur moment pour manger ?', '🥦 Légumes les plus nutritifs ?'];
+        } else if (msg.includes('sommeil') || msg.includes('récup') || msg.includes('fatigue')) {
+            suggestions = ['😴 Combien d\'heures idéal ?', '🌙 Que manger avant de dormir ?', '💊 Suppléments pour récupérer ?'];
+        } else if (msg.includes('eau') || msg.includes('hydrat')) {
+            suggestions = ['💧 Boire pendant le sport ?', '🥤 Boissons sportives utiles ?'];
+        } else {
+            // Suggestions par défaut rotatives
+            const pool = COACH_SUGGESTIONS_DEFAULT;
+            suggestions = pool.sort(() => Math.random() - 0.5).slice(0, 3);
+        }
+
+        renderCoachSuggestions(suggestions);
+    }
+
+    function scrollCoachToBottom() {
+        const el = document.getElementById('coach-messages');
+        if (el) setTimeout(() => { el.scrollTop = el.scrollHeight; }, 50);
+    }
+
+    navigator.serviceWorker && navigator.serviceWorker.addEventListener('message', event => {
+        if (event.data?.type === 'NAVIGATE' && event.data?.section) {
+            showSection(event.data.section);
+        }
+    });
+
+    const urlParams = new URLSearchParams(window.location.search);
+    const notifSection = urlParams.get('notif');
+    if (notifSection) {
+        setTimeout(() => showSection(notifSection), 1500);
+    }
+</script>
+</body>
+</html>
