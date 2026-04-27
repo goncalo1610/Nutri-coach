@@ -135,6 +135,15 @@
         .morph-opt { border:2px solid rgba(0,0,0,0.08); border-radius:14px; padding:10px 6px; text-align:center; cursor:pointer; transition:all 0.2s; background:var(--bg-body); }
         body.dark-mode .morph-opt { border-color:rgba(255,255,255,0.1); }
         .morph-opt.selected { border-color:var(--primary); background:var(--primary-light); }
+        .portion-adjuster { background:var(--primary-light); border-radius:12px; padding:12px; margin-bottom:12px; }
+        .portion-adjuster-title { font-weight:800; font-size:0.82rem; margin-bottom:8px; color:var(--text-color); }
+        .portion-grid { display:grid; grid-template-columns:repeat(5,1fr); gap:6px; margin-bottom:6px; }
+        .portion-btn { padding:8px 2px; background:var(--bg-body); border:2px solid rgba(0,0,0,0.08); border-radius:10px; font-size:0.82rem; font-weight:800; cursor:pointer; color:var(--text-color); line-height:1.15; transition:all 0.15s; text-align:center; }
+        .portion-btn .pb-sub { display:block; font-size:0.65rem; font-weight:600; opacity:0.7; margin-top:2px; }
+        .portion-btn.active { background:var(--primary); color:#fff; border-color:var(--primary); }
+        .portion-btn.active .pb-sub { opacity:0.9; }
+        body.dark-mode .portion-btn { border-color:rgba(255,255,255,0.1); }
+        .portion-hint { font-size:0.7rem; color:var(--text-muted); text-align:center; line-height:1.3; }
         .morph-icon { font-size:1.4rem; }
         .morph-name { font-size:0.72rem; font-weight:800; color:var(--text-color); margin-top:3px; }
         .morph-desc { font-size:0.62rem; color:var(--text-muted); font-weight:600; margin-top:2px; line-height:1.3; }
@@ -860,6 +869,13 @@
                     <select id="p-sex"><option value="male">Homme</option><option value="female">Femme</option></select>
                 </div>
             </div>
+            <div class="grid-2">
+                <div>
+                    <label>% masse grasse <span class="profile-hint">optionnel — précise le BMR</span></label>
+                    <input type="number" id="p-bf" placeholder="Ex: 15" min="3" max="60" step="0.1">
+                </div>
+                <div></div>
+            </div>
             <label>Morphotype <span class="profile-hint">influence la répartition des macros</span></label>
             <div class="morph-selector" id="morph-selector">
                 <div class="morph-opt" data-val="ecto" onclick="selectMorph('ecto')">
@@ -1238,6 +1254,17 @@
                     <div class="mcc-text" style="font-size:0.88rem;font-weight:700;color:var(--text-color);line-height:1.5"></div>
                 </div>
                 <div id="meal-health-tips" style="display:none;background:rgba(214,158,46,0.1);border-left:3px solid #d69e2e;border-radius:8px;padding:10px 12px;margin-bottom:12px;color:var(--text-color)"></div>
+                <div id="portion-adjuster" class="portion-adjuster" style="display:none">
+                    <div class="portion-adjuster-title">📏 Ta portion correspond à...</div>
+                    <div class="portion-grid">
+                        <button type="button" class="portion-btn" data-mult="0.5"  onclick="setPortion(0.5)">XS<span class="pb-sub">−50%</span></button>
+                        <button type="button" class="portion-btn" data-mult="0.75" onclick="setPortion(0.75)">S<span class="pb-sub">−25%</span></button>
+                        <button type="button" class="portion-btn active" data-mult="1"    onclick="setPortion(1)">M<span class="pb-sub">IA</span></button>
+                        <button type="button" class="portion-btn" data-mult="1.25" onclick="setPortion(1.25)">L<span class="pb-sub">+25%</span></button>
+                        <button type="button" class="portion-btn" data-mult="1.5"  onclick="setPortion(1.5)">XL<span class="pb-sub">+50%</span></button>
+                    </div>
+                    <div class="portion-hint">L'IA estime une portion moyenne. Ajuste si la tienne est plus petite ou plus grosse.</div>
+                </div>
                 <div class="grid-2">
                     <div><label>Calories (kcal)</label><input type="number" id="m-kcal-val"></div>
                     <div><label>Protéines (g)</label><input type="number" id="m-prot-val"></div>
@@ -1912,6 +1939,7 @@
             document.getElementById('p-height').value = p.height || 175;
             document.getElementById('p-age').value = p.age || 30;
             if (p.sex) document.getElementById('p-sex').value = p.sex;
+            if (p.bf !== null && p.bf !== undefined) document.getElementById('p-bf').value = p.bf;
             if (p.activity) document.getElementById('p-activity').value = p.activity;
             if (p.lifestyle) document.getElementById('p-lifestyle').value = p.lifestyle;
             if (p.morph) { selectedMorph = p.morph; setTimeout(() => selectMorph(p.morph), 50); }
@@ -2031,6 +2059,8 @@ Tutoie, sois direct, chaleureux. Cite les vrais chiffres. Jamais de phrases gén
         const age = parseInt(document.getElementById('p-age').value);
         const sex = document.getElementById('p-sex').value;
         const activity = parseFloat(document.getElementById('p-activity').value);
+        const bfRaw = parseFloat(document.getElementById('p-bf').value);
+        const bf = (!isNaN(bfRaw) && bfRaw >= 3 && bfRaw <= 60) ? bfRaw : null;
         const lifestyle = document.getElementById('p-lifestyle').value.trim();
         const morph = selectedMorph;
         const goalDir = document.getElementById('p-goal-dir').value;
@@ -2047,9 +2077,17 @@ Tutoie, sois direct, chaleureux. Cite les vrais chiffres. Jamais de phrases gén
         if (isNaN(height)||height<100||height>250) return showAlert("Taille invalide","Entre une taille entre 100 et 250 cm.");
         if (isNaN(age)||age<10||age>100) return showAlert("Âge invalide","Entre un âge entre 10 et 100 ans.");
 
-        let bmr = sex==='male'
-            ? (10*weight) + (6.25*height) - (5*age) + 5
-            : (10*weight) + (6.25*height) - (5*age) - 161;
+        // BMR — Katch-McArdle (basée sur la masse maigre) si %MG renseigné = +5-10% de précision.
+        // Sinon Mifflin-St Jeor (référence quand la composition corporelle est inconnue).
+        let bmr;
+        if (bf !== null) {
+            const leanMass = weight * (1 - bf/100);
+            bmr = 370 + (21.6 * leanMass);
+        } else {
+            bmr = sex==='male'
+                ? (10*weight) + (6.25*height) - (5*age) + 5
+                : (10*weight) + (6.25*height) - (5*age) - 161;
+        }
 
         const morphMult = {ecto:1.03, meso:1.00, endo:0.97};
         let tdee = Math.round(bmr * activity * (morphMult[morph]||1));
@@ -2057,15 +2095,19 @@ Tutoie, sois direct, chaleureux. Cite les vrais chiffres. Jamais de phrases gén
         const stressMult = {low:1.0, medium:1.0, high:0.97, very_high:0.95};
         tdee = Math.round(tdee * (stressMult[stress]||1));
 
+        // Plafond sécurité physiologique : déficit max -25% TDEE, surplus max +20% TDEE
+        // (évite la fonte de masse maigre en perte / gras excessif en prise)
+        const maxDeficit = -Math.round(tdee * 0.25);
+        const maxSurplus = Math.round(tdee * 0.20);
         let goalDelta = 0;
         if (goalDir==='loss') {
             goalDelta = (weightTarget && goalWeeks)
-                ? Math.max(-1000, Math.round(((weightTarget-weight)*7700)/(goalWeeks*7)))
-                : -500;
+                ? Math.max(maxDeficit, Math.round(((weightTarget-weight)*7700)/(goalWeeks*7)))
+                : Math.max(maxDeficit, -500);
         } else if (goalDir==='gain') {
             goalDelta = (weightTarget && goalWeeks)
-                ? Math.min(700, Math.round(((weightTarget-weight)*7700)/(goalWeeks*7)))
-                : 400;
+                ? Math.min(maxSurplus, Math.round(((weightTarget-weight)*7700)/(goalWeeks*7)))
+                : Math.min(maxSurplus, 400);
         }
         const calTarget = tdee + goalDelta;
 
@@ -2092,7 +2134,7 @@ Tutoie, sois direct, chaleureux. Cite les vrais chiffres. Jamais de phrases gén
         const mealSplit = mealSplitsMap[safeMealFreq];
 
         appData.profile = {
-            name, weight, height, age, sex, activity, lifestyle, morph,
+            name, weight, height, age, sex, bf, activity, lifestyle, morph,
             goalDir, weightTarget, goalWeeks, goalDelta,
             mealFreq: safeMealFreq,
             sleep: null, stress, diet, allergies, cooking,
@@ -2448,6 +2490,9 @@ RÈGLES D'ESTIMATION — respecte-les absolument :
 3. Vérifie la cohérence via les macros : kcal doit être proche de (prot×4)+(carb×4)+(fat×9). Si l'écart dépasse 10%, recalcule.
 4. Reste CONSERVATEUR sur les quantités : une photo donne toujours une impression plus grande que la réalité.
 5. N'inclus PAS l'huile de cuisson sauf si clairement visible/décrite.
+6. RÉFÉRENCE D'ÉCHELLE : si tu identifies un objet de taille connue (main adulte ~18cm, fourchette ~20cm, couteau ~22cm, cuillère soupe ~18cm, pièce 1€ ~23mm, smartphone ~15cm, assiette plate standard ~26cm), utilise-le pour calibrer la taille des aliments. Sans référence visible, suppose une assiette standard de 26cm de diamètre.
+7. POSE DE PHOTO : photo prise de loin/plongée → portions paraissent plus petites ; photo zoomée/rapprochée → paraissent plus grandes. Compense mentalement avant d'estimer.
+8. Si la photo est trop floue, sombre ou ambiguë pour estimer fiablement, indique-le dans coachComment et donne ta meilleure estimation prudente.
 
 healthScore: 1=peu adapté à l'objectif ${goalStr}, 2=moyen, 3=bien adapté.
 healthTips: 2-3 conseils courts et concrets pour améliorer ce repas, séparés par \n.
@@ -2467,10 +2512,21 @@ JSON: {"kcal":number,"prot":number,"carb":number,"fat":number,"healthScore":1|2|
             const finalKcal = (kcal > 0 && calFromMacros > 0 && Math.abs(kcal - calFromMacros) / kcal > 0.20 && Math.abs(kcal - calFromMacros) > 50)
                 ? calFromMacros : kcal;
 
+            // Sauvegarde la baseline IA pour permettre l'ajustement de portion (×0.5 à ×1.5)
+            window._mealBaseline = { kcal: finalKcal, prot, carb, fat };
+            window._currentPortionMult = 1;
             document.getElementById('m-kcal-val').value = finalKcal;
             document.getElementById('m-prot-val').value = prot;
             document.getElementById('m-carb-val').value = carb;
             document.getElementById('m-fat-val').value  = fat;
+            // Affiche et reset le slider de portion
+            const portionAdj = document.getElementById('portion-adjuster');
+            if (portionAdj) {
+                portionAdj.style.display = 'block';
+                document.querySelectorAll('.portion-btn').forEach(b => {
+                    b.classList.toggle('active', parseFloat(b.dataset.mult) === 1);
+                });
+            }
 
             const idealKcal = getIdealKcalForMeal(activeCategory, selectedDate);
             const isOver = idealKcal > 0 && kcal > idealKcal;
@@ -2545,6 +2601,10 @@ JSON: {"kcal":number,"prot":number,"carb":number,"fat":number,"healthScore":1|2|
         document.getElementById('m-prot-val').value=m.prot;
         document.getElementById('m-carb-val').value=m.carb;
         document.getElementById('m-fat-val').value=m.fat;
+        // En édition manuelle, on cache le slider portion (pas de baseline IA disponible)
+        const pa = document.getElementById('portion-adjuster');
+        if (pa) pa.style.display = 'none';
+        window._mealBaseline = null;
         const idealKcalEdit = getIdealKcalForMeal(m.type, selectedDate);
         const isOverEdit = idealKcalEdit > 0 && m.kcal > idealKcalEdit;
         document.getElementById('meal-health-emoji').textContent = isOverEdit ? '😞' : '😊';
@@ -2561,7 +2621,37 @@ JSON: {"kcal":number,"prot":number,"carb":number,"fat":number,"healthScore":1|2|
     function closeDeleteModal(){document.getElementById('modal-delete-meal').style.display='none';mealDeleteIndex=null;}
     function triggerBilan(){const day=appData.days[selectedDate]||{closed:false};if(day.closed){day.closed=false;day.aiSummary="";saveData();renderHomeData();return;}document.getElementById('modal-steps').style.display='flex';}
     function cancelBilan(){document.getElementById('modal-steps').style.display='none';}
-    function cancelPreview(id){document.getElementById(id).style.display='none';if(id==='m-preview')document.getElementById('btn-analyze-meal').style.display='flex';}
+    function cancelPreview(id){
+        document.getElementById(id).style.display='none';
+        if(id==='m-preview'){
+            document.getElementById('btn-analyze-meal').style.display='flex';
+            const pa = document.getElementById('portion-adjuster');
+            if (pa) pa.style.display = 'none';
+            window._mealBaseline = null;
+            window._currentPortionMult = 1;
+        }
+    }
+
+    // Ajuste les macros affichées en multipliant la baseline IA par le facteur portion
+    function setPortion(mult){
+        const base = window._mealBaseline;
+        if (!base) return;
+        window._currentPortionMult = mult;
+        document.getElementById('m-kcal-val').value = Math.round(base.kcal * mult);
+        document.getElementById('m-prot-val').value = Math.round(base.prot * mult);
+        document.getElementById('m-carb-val').value = Math.round(base.carb * mult);
+        document.getElementById('m-fat-val').value  = Math.round(base.fat  * mult);
+        document.querySelectorAll('.portion-btn').forEach(b => {
+            b.classList.toggle('active', parseFloat(b.dataset.mult) === mult);
+        });
+        // Met à jour aussi appData.lastMacros pour que saveMeal récupère les bonnes infos santé
+        if (appData.lastMacros) {
+            appData.lastMacros.kcal = Math.round(base.kcal * mult);
+            appData.lastMacros.prot = Math.round(base.prot * mult);
+            appData.lastMacros.carb = Math.round(base.carb * mult);
+            appData.lastMacros.fat  = Math.round(base.fat  * mult);
+        }
+    }
 
     function renderHomeData(){
         const sumEl=document.getElementById('profile-summary');
@@ -3640,156 +3730,4 @@ ${fullContext}`;
             .map(m => `${m.role === 'user' ? 'Utilisateur' : 'Coach'}: ${m.content}`)
             .join('\n');
 
-        const fullPrompt = `Tu es Alex, un coach sportif et nutritionnel personnel intégré dans l'app NUTRI+. Tu es décontracté, fun, bienveillant et motivant 😎. Tu tutoies l'utilisateur, tu utilises des emojis avec parcimonie (1-2 max par réponse), et tu donnes des conseils pratiques et personnalisés BASÉS SUR SES VRAIES DONNÉES.
-
-DONNÉES UTILISATEUR:
-${systemContext}
-
-RÈGLES IMPORTANTES:
-- Réponds en français, de façon concise (3-5 phrases max sauf si question complexe)
-- Tu es décontracté mais pro — pas de blabla inutile
-- Base tes conseils sur les vraies données ci-dessus (repas du jour, sport, objectif...)
-- Si tu remarques quelque chose d'important dans ses données (manque de protéines, pas assez d'eau...), mentionne-le naturellement
-- Ne réponds PAS aux questions hors sport/nutrition/santé — redirige gentiment
-
-HISTORIQUE DE LA CONVERSATION:
-${historyText}
-
-Réponds maintenant à la dernière question de l'utilisateur.`;
-
-        try {
-            const url = `https://generativelanguage.googleapis.com/v1beta/models/${MODEL}:generateContent?key=${appData.apiKey}`;
-            const resp = await fetch(url, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ contents: [{ parts: [{ text: fullPrompt }] }] })
-            });
-            const data = await resp.json();
-            removeTypingIndicator(typingId);
-
-            if (!resp.ok || !data.candidates?.length) throw new Error("Pas de réponse");
-
-            const reply = data.candidates[0].content.parts[0].text.trim();
-            coachChatHistory.push({ role: 'coach', content: reply });
-            appendCoachMessage(reply, 'coach');
-
-            // Suggestions contextuelles après la réponse
-            setTimeout(() => renderContextualSuggestions(text, reply), 400);
-
-        } catch(e) {
-            removeTypingIndicator(typingId);
-            appendCoachMessage("Oups, j'ai eu un souci pour te répondre 😅 Réessaie dans un instant !", 'coach');
-        }
-
-        coachIsTyping = false;
-        document.getElementById('coach-send-btn').disabled = false;
-    }
-
-    function appendCoachMessage(text, role) {
-        const container = document.getElementById('coach-messages');
-        const now = new Date().toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' });
-
-        const wrapper = document.createElement('div');
-        wrapper.className = `chat-msg-wrapper ${role}`;
-
-        const msgRow = document.createElement('div');
-        msgRow.className = `chat-msg-with-avatar ${role}`;
-
-        if (role === 'coach') {
-            const avatar = document.createElement('div');
-            avatar.className = 'chat-msg-avatar';
-            avatar.textContent = '🏋🏼';
-            msgRow.appendChild(avatar);
-        }
-
-        const bubble = document.createElement('div');
-        bubble.className = 'chat-msg-bubble';
-        // Convertir les sauts de ligne en <br>
-        bubble.innerHTML = text.replace(/\n/g, '<br>');
-        msgRow.appendChild(bubble);
-
-        wrapper.appendChild(msgRow);
-
-        const timeEl = document.createElement('div');
-        timeEl.className = 'chat-msg-time';
-        timeEl.textContent = now;
-        wrapper.appendChild(timeEl);
-
-        container.appendChild(wrapper);
-        scrollCoachToBottom();
-    }
-
-    function showTypingIndicator() {
-        const container = document.getElementById('coach-messages');
-        const id = 'typing-' + Date.now();
-        const wrapper = document.createElement('div');
-        wrapper.className = 'chat-msg-wrapper coach';
-        wrapper.id = id;
-
-        const row = document.createElement('div');
-        row.className = 'chat-msg-with-avatar coach';
-
-        const avatar = document.createElement('div');
-        avatar.className = 'chat-msg-avatar';
-        avatar.textContent = '🏋🏼';
-
-        const typing = document.createElement('div');
-        typing.className = 'coach-typing';
-        typing.innerHTML = '<div class="typing-dot"></div><div class="typing-dot"></div><div class="typing-dot"></div>';
-
-        row.appendChild(avatar);
-        row.appendChild(typing);
-        wrapper.appendChild(row);
-        container.appendChild(wrapper);
-        scrollCoachToBottom();
-        return id;
-    }
-
-    function removeTypingIndicator(id) {
-        const el = document.getElementById(id);
-        if (el) el.remove();
-    }
-
-    function renderContextualSuggestions(userMsg, coachReply) {
-        // Suggestions basées sur le sujet abordé
-        const msg = (userMsg + coachReply).toLowerCase();
-        let suggestions = [];
-
-        if (msg.includes('muscu') || msg.includes('musculation') || msg.includes('force')) {
-            suggestions = ['🏋️ Combien de séances/sem ?', '🥩 Protéines après l\'entraînement ?', '😴 Repos entre séances ?'];
-        } else if (msg.includes('poid') || msg.includes('gras') || msg.includes('mincir') || msg.includes('perte')) {
-            suggestions = ['🔥 Déficit calorique idéal ?', '🏃 Cardio ou muscu pour maigrir ?', '🥗 Que manger le soir ?'];
-        } else if (msg.includes('repas') || msg.includes('manger') || msg.includes('nutrition') || msg.includes('calorie')) {
-            suggestions = ['🍳 Idée petit déjeuner sportif ?', '⏰ Meilleur moment pour manger ?', '🥦 Légumes les plus nutritifs ?'];
-        } else if (msg.includes('sommeil') || msg.includes('récup') || msg.includes('fatigue')) {
-            suggestions = ['😴 Combien d\'heures idéal ?', '🌙 Que manger avant de dormir ?', '💊 Suppléments pour récupérer ?'];
-        } else if (msg.includes('eau') || msg.includes('hydrat')) {
-            suggestions = ['💧 Boire pendant le sport ?', '🥤 Boissons sportives utiles ?'];
-        } else {
-            // Suggestions par défaut rotatives
-            const pool = COACH_SUGGESTIONS_DEFAULT;
-            suggestions = pool.sort(() => Math.random() - 0.5).slice(0, 3);
-        }
-
-        renderCoachSuggestions(suggestions);
-    }
-
-    function scrollCoachToBottom() {
-        const el = document.getElementById('coach-messages');
-        if (el) setTimeout(() => { el.scrollTop = el.scrollHeight; }, 50);
-    }
-
-    navigator.serviceWorker && navigator.serviceWorker.addEventListener('message', event => {
-        if (event.data?.type === 'NAVIGATE' && event.data?.section) {
-            showSection(event.data.section);
-        }
-    });
-
-    const urlParams = new URLSearchParams(window.location.search);
-    const notifSection = urlParams.get('notif');
-    if (notifSection) {
-        setTimeout(() => showSection(notifSection), 1500);
-    }
-</script>
-</body>
-</html>
+        const fullPrompt = `Tu es Alex, un coach sportif et nutritionnel personnel intégré dans l'app NUTRI+. Tu es décontracté, fun, bienveillant et motivant 😎. Tu tutoies l'utilisateur, tu utilises des emojis avec parcimonie (1-2 max par réponse),
