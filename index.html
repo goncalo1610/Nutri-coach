@@ -143,7 +143,7 @@
         .portion-btn.active { background:var(--primary); color:#fff; border-color:var(--primary); }
         .portion-btn.active .pb-sub { opacity:0.9; }
         body.dark-mode .portion-btn { border-color:rgba(255,255,255,0.1); }
-        .portion-hint { font-size:0.7rem; color:var(--text-muted); text-align:center; line-height:1.3; }
+        .portion-info-btn { display:inline-flex; align-items:center; justify-content:center; width:22px; height:22px; padding:0; margin-left:6px; background:transparent; border:1.5px solid var(--primary); border-radius:50%; color:var(--primary); font-size:0.8rem; font-weight:700; font-style:italic; cursor:pointer; vertical-align:middle; line-height:1; font-family:serif; }        .portion-info-btn:hover { background:var(--primary-light); }        body.dark-mode .portion-info-btn { color:#fff; border-color:#fff; }        .portion-hint { font-size:0.7rem; color:var(--text-muted); text-align:center; line-height:1.3; }
         .morph-icon { font-size:1.4rem; }
         .morph-name { font-size:0.72rem; font-weight:800; color:var(--text-color); margin-top:3px; }
         .morph-desc { font-size:0.62rem; color:var(--text-muted); font-weight:600; margin-top:2px; line-height:1.3; }
@@ -1255,7 +1255,7 @@
                 </div>
                 <div id="meal-health-tips" style="display:none;background:rgba(214,158,46,0.1);border-left:3px solid #d69e2e;border-radius:8px;padding:10px 12px;margin-bottom:12px;color:var(--text-color)"></div>
                 <div id="portion-adjuster" class="portion-adjuster" style="display:none">
-                    <div class="portion-adjuster-title">📏 Ta portion correspond à...</div>
+                    <div class="portion-adjuster-title">📏 Ta portion correspond à... <button type="button" onclick="showPortionHelp()" class="portion-info-btn" aria-label="Aide portion">ℹ</button></div>
                     <div class="portion-grid">
                         <button type="button" class="portion-btn" data-mult="0.5"  onclick="setPortion(0.5)">XS<span class="pb-sub">−50%</span></button>
                         <button type="button" class="portion-btn" data-mult="0.75" onclick="setPortion(0.75)">S<span class="pb-sub">−25%</span></button>
@@ -2633,7 +2633,7 @@ JSON: {"kcal":number,"prot":number,"carb":number,"fat":number,"healthScore":1|2|
     }
 
     // Ajuste les macros affichées en multipliant la baseline IA par le facteur portion
-    function setPortion(mult){
+    function showPortionHelp(){document.getElementById('alert-title').textContent="📏 Comment choisir ta portion";document.getElementById('alert-msg').innerHTML='<div style="text-align:left;line-height:1.5;font-size:0.85rem"><div style="margin-bottom:6px"><b>XS (×0,5)</b> — petite : demi-assiette, snack léger</div><div style="margin-bottom:6px"><b>S (×0,75)</b> — modeste : petit-déj léger, soir restreint</div><div style="margin-bottom:6px"><b>M (×1)</b> — classique, estimation IA (par défaut)</div><div style="margin-bottom:6px"><b>L (×1,25)</b> — généreuse : après grosse séance</div><div style="margin-bottom:10px"><b>XL (×1,5)</b> — copieuse : restaurant, gros repas</div><div style="font-size:0.78rem;color:var(--text-muted, #888);border-top:1px solid rgba(0,0,0,0.1);padding-top:8px;margin-top:6px">💡 Inclus ta main, fourchette ou pièce dans la photo pour calibrer encore mieux.</div></div>';document.getElementById('modal-alert').style.display='flex';} function setPortion(mult){
         const base = window._mealBaseline;
         if (!base) return;
         window._currentPortionMult = mult;
