@@ -36,6 +36,7 @@
             --nav-height: 65px;
             --header-height: 62px;
             --cal-card-gradient: linear-gradient(135deg, #FDF6F2 0%, #F5E3D8 100%);
+            --fiber-color: #0D9488;
         }
         body.dark-mode {
             --bg-body: #141211; --bg-app: #1C1917; --text-color: #E7E5E4;
@@ -46,6 +47,7 @@
             --carb-color: #4ADE80;
             --fat-color: #FCD34D;
             --cal-card-gradient: linear-gradient(135deg, #2C1E17 0%, #231610 100%);
+            --fiber-color: #2DD4BF;
         }
         * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
         body { margin:0; padding:0; font-family:'Nunito',sans-serif; background-color:var(--bg-body); color:var(--text-color); padding-top:env(safe-area-inset-top); min-height:100vh; }
@@ -986,79 +988,84 @@
         <div class="profile-summary" id="profile-summary"></div>
         <div id="week-container"></div>
         <!-- CARTE UNIFIÉE : Calories + 4 jauges macros -->
-        <div class="card unified-macro-card" onclick="showSection('view-day')">
-            <div class="umacro-layout">
+        <div style="background:var(--card-bg);border-radius:var(--radius);padding:14px 10px 12px;margin-bottom:12px;box-shadow:var(--shadow);border:1px solid rgba(0,0,0,0.06);cursor:pointer" onclick="showSection('view-day')">
+            <div style="font-size:0.6rem;font-weight:700;text-transform:uppercase;color:var(--text-muted);letter-spacing:1.2px;text-align:center;margin-bottom:14px">Suivi du jour</div>
+            <div style="display:grid;grid-template-columns:1fr 1.25fr 1fr;align-items:center;gap:6px">
+
                 <!-- GAUCHE: Protéines + Glucides -->
-                <div class="umacro-col">
-                    <div class="umacro-item">
-                        <div class="umacro-ring-wrap">
-                            <svg viewBox="0 0 36 36" class="umacro-svg">
-                                <circle class="umacro-ring-bg" cx="18" cy="18" r="15.9" stroke="var(--prot-color)"/>
-                                <circle id="g-prot-fill" class="umacro-ring-fill" cx="18" cy="18" r="15.9" stroke="var(--prot-color)"/>
+                <div style="display:flex;flex-direction:column;gap:14px;align-items:center">
+                    <div style="display:flex;flex-direction:column;align-items:center;gap:3px">
+                        <div style="position:relative;width:54px;height:54px;flex-shrink:0">
+                            <svg viewBox="0 0 36 36" style="width:54px;height:54px;transform:rotate(-90deg);display:block;overflow:visible">
+                                <circle cx="18" cy="18" r="15.9" fill="none" stroke="var(--prot-color)" stroke-width="3" stroke-opacity="0.15"/>
+                                <circle id="g-prot-fill" cx="18" cy="18" r="15.9" fill="none" stroke="var(--prot-color)" stroke-width="3" stroke-linecap="round" stroke-dasharray="100 100" stroke-dashoffset="100" style="transition:stroke-dashoffset 0.9s cubic-bezier(0.34,1.56,0.64,1)"/>
                             </svg>
-                            <div class="umacro-ring-icon">🥩</div>
+                            <div style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);font-size:1.1rem;line-height:1">🥩</div>
                         </div>
-                        <div class="umacro-name">Protéines</div>
-                        <div class="umacro-val" style="color:var(--prot-color)"><span id="h-prot">0</span><span class="umacro-unit">g</span></div>
-                        <div class="umacro-tgt">/ <span id="h-prot-target">—</span>g</div>
+                        <div style="font-size:0.56rem;font-weight:700;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.3px;text-align:center">Protéines</div>
+                        <div style="font-size:1rem;font-weight:800;text-align:center;line-height:1;color:var(--prot-color)"><span id="h-prot">0</span><span style="font-size:0.58rem;opacity:0.8">g</span></div>
+                        <div style="font-size:0.56rem;color:var(--text-muted);font-weight:600;text-align:center">/ <span id="h-prot-target">—</span>g</div>
                     </div>
-                    <div class="umacro-item">
-                        <div class="umacro-ring-wrap">
-                            <svg viewBox="0 0 36 36" class="umacro-svg">
-                                <circle class="umacro-ring-bg" cx="18" cy="18" r="15.9" stroke="var(--carb-color)"/>
-                                <circle id="g-carb-fill" class="umacro-ring-fill" cx="18" cy="18" r="15.9" stroke="var(--carb-color)"/>
+                    <div style="display:flex;flex-direction:column;align-items:center;gap:3px">
+                        <div style="position:relative;width:54px;height:54px;flex-shrink:0">
+                            <svg viewBox="0 0 36 36" style="width:54px;height:54px;transform:rotate(-90deg);display:block;overflow:visible">
+                                <circle cx="18" cy="18" r="15.9" fill="none" stroke="var(--carb-color)" stroke-width="3" stroke-opacity="0.15"/>
+                                <circle id="g-carb-fill" cx="18" cy="18" r="15.9" fill="none" stroke="var(--carb-color)" stroke-width="3" stroke-linecap="round" stroke-dasharray="100 100" stroke-dashoffset="100" style="transition:stroke-dashoffset 0.9s cubic-bezier(0.34,1.56,0.64,1)"/>
                             </svg>
-                            <div class="umacro-ring-icon">🍞</div>
+                            <div style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);font-size:1.1rem;line-height:1">🍞</div>
                         </div>
-                        <div class="umacro-name">Glucides</div>
-                        <div class="umacro-val" style="color:var(--carb-color)"><span id="h-carb">0</span><span class="umacro-unit">g</span></div>
-                        <div class="umacro-tgt">/ <span id="h-carb-target">—</span>g</div>
+                        <div style="font-size:0.56rem;font-weight:700;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.3px;text-align:center">Glucides</div>
+                        <div style="font-size:1rem;font-weight:800;text-align:center;line-height:1;color:var(--carb-color)"><span id="h-carb">0</span><span style="font-size:0.58rem;opacity:0.8">g</span></div>
+                        <div style="font-size:0.56rem;color:var(--text-muted);font-weight:600;text-align:center">/ <span id="h-carb-target">—</span>g</div>
                     </div>
                 </div>
+
                 <!-- CENTRE: Calories -->
-                <div class="umacro-center-col">
-                    <div class="gauge-wrapper" style="width:110px;height:110px">
-                        <svg viewBox="0 0 36 36" class="gauge-svg">
-                            <path class="gauge-bg" style="stroke-width:2.2" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"/>
-                            <path id="g-cal-fill" class="gauge-fill" style="stroke-width:2.2" stroke="var(--primary)" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"/>
+                <div style="display:flex;flex-direction:column;align-items:center;gap:4px">
+                    <div style="position:relative;width:110px;height:110px;flex-shrink:0">
+                        <svg viewBox="0 0 36 36" style="width:110px;height:110px;transform:rotate(-90deg);display:block;overflow:visible">
+                            <path fill="none" stroke="var(--primary)" stroke-opacity="0.12" stroke-width="2.2" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"/>
+                            <path id="g-cal-fill" fill="none" stroke="var(--primary)" stroke-width="2.2" stroke-linecap="round" stroke-dasharray="100,100" stroke-dashoffset="100" style="transition:stroke-dashoffset 0.9s cubic-bezier(0.34,1.56,0.64,1)" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"/>
                         </svg>
-                        <div class="gauge-icon cal-donut-center" style="white-space:nowrap">
+                        <div style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);text-align:center;white-space:nowrap">
                             <div class="cal-donut-num"><span id="h-cal">0</span></div>
                             <div class="cal-donut-sub">/ <span id="h-target">—</span> kcal</div>
                         </div>
                     </div>
-                    <div id="h-cal-status" class="umacro-cal-status">Touche pour ajouter un repas</div>
+                    <div id="h-cal-status" style="font-size:0.7rem;font-weight:600;color:var(--text-muted);text-align:center">Touche pour ajouter</div>
                 </div>
+
                 <!-- DROITE: Lipides + Fibres -->
-                <div class="umacro-col">
-                    <div class="umacro-item">
-                        <div class="umacro-ring-wrap">
-                            <svg viewBox="0 0 36 36" class="umacro-svg">
-                                <circle class="umacro-ring-bg" cx="18" cy="18" r="15.9" stroke="var(--fat-color)"/>
-                                <circle id="g-fat-fill" class="umacro-ring-fill" cx="18" cy="18" r="15.9" stroke="var(--fat-color)"/>
+                <div style="display:flex;flex-direction:column;gap:14px;align-items:center">
+                    <div style="display:flex;flex-direction:column;align-items:center;gap:3px">
+                        <div style="position:relative;width:54px;height:54px;flex-shrink:0">
+                            <svg viewBox="0 0 36 36" style="width:54px;height:54px;transform:rotate(-90deg);display:block;overflow:visible">
+                                <circle cx="18" cy="18" r="15.9" fill="none" stroke="var(--fat-color)" stroke-width="3" stroke-opacity="0.15"/>
+                                <circle id="g-fat-fill" cx="18" cy="18" r="15.9" fill="none" stroke="var(--fat-color)" stroke-width="3" stroke-linecap="round" stroke-dasharray="100 100" stroke-dashoffset="100" style="transition:stroke-dashoffset 0.9s cubic-bezier(0.34,1.56,0.64,1)"/>
                             </svg>
-                            <div class="umacro-ring-icon">🥑</div>
+                            <div style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);font-size:1.1rem;line-height:1">🥑</div>
                         </div>
-                        <div class="umacro-name">Lipides</div>
-                        <div class="umacro-val" style="color:var(--fat-color)"><span id="h-fat">0</span><span class="umacro-unit">g</span></div>
-                        <div class="umacro-tgt">/ <span id="h-fat-target">—</span>g</div>
+                        <div style="font-size:0.56rem;font-weight:700;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.3px;text-align:center">Lipides</div>
+                        <div style="font-size:1rem;font-weight:800;text-align:center;line-height:1;color:var(--fat-color)"><span id="h-fat">0</span><span style="font-size:0.58rem;opacity:0.8">g</span></div>
+                        <div style="font-size:0.56rem;color:var(--text-muted);font-weight:600;text-align:center">/ <span id="h-fat-target">—</span>g</div>
                     </div>
-                    <div class="umacro-item">
-                        <div class="umacro-ring-wrap">
-                            <svg viewBox="0 0 36 36" class="umacro-svg">
-                                <circle class="umacro-ring-bg" cx="18" cy="18" r="15.9" stroke="var(--fiber-color)"/>
-                                <circle id="g-fiber-fill" class="umacro-ring-fill" cx="18" cy="18" r="15.9" stroke="var(--fiber-color)"/>
+                    <div style="display:flex;flex-direction:column;align-items:center;gap:3px">
+                        <div style="position:relative;width:54px;height:54px;flex-shrink:0">
+                            <svg viewBox="0 0 36 36" style="width:54px;height:54px;transform:rotate(-90deg);display:block;overflow:visible">
+                                <circle cx="18" cy="18" r="15.9" fill="none" stroke="var(--fiber-color)" stroke-width="3" stroke-opacity="0.15"/>
+                                <circle id="g-fiber-fill" cx="18" cy="18" r="15.9" fill="none" stroke="var(--fiber-color)" stroke-width="3" stroke-linecap="round" stroke-dasharray="100 100" stroke-dashoffset="100" style="transition:stroke-dashoffset 0.9s cubic-bezier(0.34,1.56,0.64,1)"/>
                             </svg>
-                            <div class="umacro-ring-icon">🌾</div>
+                            <div style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);font-size:1.1rem;line-height:1">🌾</div>
                         </div>
-                        <div class="umacro-name">Fibres</div>
-                        <div class="umacro-val" style="color:var(--fiber-color)"><span id="h-fiber">0</span><span class="umacro-unit">g</span></div>
-                        <div class="umacro-tgt">/ <span id="h-fiber-target">—</span>g</div>
+                        <div style="font-size:0.56rem;font-weight:700;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.3px;text-align:center">Fibres</div>
+                        <div style="font-size:1rem;font-weight:800;text-align:center;line-height:1;color:var(--fiber-color)"><span id="h-fiber">0</span><span style="font-size:0.58rem;opacity:0.8">g</span></div>
+                        <div style="font-size:0.56rem;color:var(--text-muted);font-weight:600;text-align:center">/ <span id="h-fiber-target">—</span>g</div>
                     </div>
                 </div>
+
             </div>
         </div>
-        <div id="sport-cal-info" class="cal-info-box" style="display:none">
+                <div id="sport-cal-info" class="cal-info-box" style="display:none">
             🏋️ Bonus sport : <span id="sport-bonus-val" class="sport-bonus">+0 kcal</span> — Objectif ajusté à <span id="adjusted-target-val" style="color:var(--primary);font-weight:900">0</span> kcal
         </div>
         <div id="home-alex-tip" style="display:none;margin-bottom:14px">
