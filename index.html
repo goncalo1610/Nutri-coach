@@ -985,53 +985,86 @@
         <div id="home-subtitle" style="font-size:0.88rem;color:var(--text-muted);font-weight:500;margin:-10px 0 14px 0">Prêt pour une journée équilibrée ?</div>
         <div class="profile-summary" id="profile-summary"></div>
         <div id="week-container"></div>
-        <div class="card calorie-card" onclick="showSection('view-day')">
-            <div style="text-align:center">
-                <div style="font-size:0.62rem;font-weight:700;text-transform:uppercase;color:var(--text-muted);letter-spacing:1.5px;margin-bottom:16px">Calories du jour</div>
-                <div class="gauge-wrapper" style="width:110px;height:110px;margin:0 auto 10px">
-                    <svg viewBox="0 0 36 36" class="gauge-svg">
-                        <path class="gauge-bg" style="stroke-width:2.2" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"/>
-                        <path id="g-cal-fill" class="gauge-fill" style="stroke-width:2.2" stroke="var(--primary)" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"/>
-                    </svg>
-                    <div class="gauge-icon cal-donut-center" style="white-space:nowrap">
-                        <div class="cal-donut-num"><span id="h-cal">0</span></div>
-                        <div class="cal-donut-sub">/ <span id="h-target">—</span> kcal</div>
+        <!-- CARTE UNIFIÉE : Calories + 4 jauges macros -->
+        <div class="card unified-macro-card" onclick="showSection('view-day')">
+            <div class="umacro-layout">
+                <!-- GAUCHE: Protéines + Glucides -->
+                <div class="umacro-col">
+                    <div class="umacro-item">
+                        <div class="umacro-ring-wrap">
+                            <svg viewBox="0 0 36 36" class="umacro-svg">
+                                <circle class="umacro-ring-bg" cx="18" cy="18" r="15.9" stroke="var(--prot-color)"/>
+                                <circle id="g-prot-fill" class="umacro-ring-fill" cx="18" cy="18" r="15.9" stroke="var(--prot-color)"/>
+                            </svg>
+                            <div class="umacro-ring-icon">🥩</div>
+                        </div>
+                        <div class="umacro-name">Protéines</div>
+                        <div class="umacro-val" style="color:var(--prot-color)"><span id="h-prot">0</span><span class="umacro-unit">g</span></div>
+                        <div class="umacro-tgt">/ <span id="h-prot-target">—</span>g</div>
+                    </div>
+                    <div class="umacro-item">
+                        <div class="umacro-ring-wrap">
+                            <svg viewBox="0 0 36 36" class="umacro-svg">
+                                <circle class="umacro-ring-bg" cx="18" cy="18" r="15.9" stroke="var(--carb-color)"/>
+                                <circle id="g-carb-fill" class="umacro-ring-fill" cx="18" cy="18" r="15.9" stroke="var(--carb-color)"/>
+                            </svg>
+                            <div class="umacro-ring-icon">🍞</div>
+                        </div>
+                        <div class="umacro-name">Glucides</div>
+                        <div class="umacro-val" style="color:var(--carb-color)"><span id="h-carb">0</span><span class="umacro-unit">g</span></div>
+                        <div class="umacro-tgt">/ <span id="h-carb-target">—</span>g</div>
                     </div>
                 </div>
-                <div id="h-cal-status" style="font-size:0.78rem;font-weight:600;color:var(--text-muted)">Touche pour ajouter un repas</div>
+                <!-- CENTRE: Calories -->
+                <div class="umacro-center-col">
+                    <div class="gauge-wrapper" style="width:110px;height:110px">
+                        <svg viewBox="0 0 36 36" class="gauge-svg">
+                            <path class="gauge-bg" style="stroke-width:2.2" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"/>
+                            <path id="g-cal-fill" class="gauge-fill" style="stroke-width:2.2" stroke="var(--primary)" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"/>
+                        </svg>
+                        <div class="gauge-icon cal-donut-center" style="white-space:nowrap">
+                            <div class="cal-donut-num"><span id="h-cal">0</span></div>
+                            <div class="cal-donut-sub">/ <span id="h-target">—</span> kcal</div>
+                        </div>
+                    </div>
+                    <div id="h-cal-status" class="umacro-cal-status">Touche pour ajouter un repas</div>
+                </div>
+                <!-- DROITE: Lipides + Fibres -->
+                <div class="umacro-col">
+                    <div class="umacro-item">
+                        <div class="umacro-ring-wrap">
+                            <svg viewBox="0 0 36 36" class="umacro-svg">
+                                <circle class="umacro-ring-bg" cx="18" cy="18" r="15.9" stroke="var(--fat-color)"/>
+                                <circle id="g-fat-fill" class="umacro-ring-fill" cx="18" cy="18" r="15.9" stroke="var(--fat-color)"/>
+                            </svg>
+                            <div class="umacro-ring-icon">🥑</div>
+                        </div>
+                        <div class="umacro-name">Lipides</div>
+                        <div class="umacro-val" style="color:var(--fat-color)"><span id="h-fat">0</span><span class="umacro-unit">g</span></div>
+                        <div class="umacro-tgt">/ <span id="h-fat-target">—</span>g</div>
+                    </div>
+                    <div class="umacro-item">
+                        <div class="umacro-ring-wrap">
+                            <svg viewBox="0 0 36 36" class="umacro-svg">
+                                <circle class="umacro-ring-bg" cx="18" cy="18" r="15.9" stroke="var(--fiber-color)"/>
+                                <circle id="g-fiber-fill" class="umacro-ring-fill" cx="18" cy="18" r="15.9" stroke="var(--fiber-color)"/>
+                            </svg>
+                            <div class="umacro-ring-icon">🌾</div>
+                        </div>
+                        <div class="umacro-name">Fibres</div>
+                        <div class="umacro-val" style="color:var(--fiber-color)"><span id="h-fiber">0</span><span class="umacro-unit">g</span></div>
+                        <div class="umacro-tgt">/ <span id="h-fiber-target">—</span>g</div>
+                    </div>
+                </div>
             </div>
         </div>
         <div id="sport-cal-info" class="cal-info-box" style="display:none">
             🏋️ Bonus sport : <span id="sport-bonus-val" class="sport-bonus">+0 kcal</span> — Objectif ajusté à <span id="adjusted-target-val" style="color:var(--primary);font-weight:900">0</span> kcal
         </div>
-        <!-- Bulle Alex tip — affichée dynamiquement -->
         <div id="home-alex-tip" style="display:none;margin-bottom:14px">
             <div style="display:flex;gap:10px;background:var(--primary-light);border-radius:16px;padding:13px 15px;border:1px solid rgba(193,95,60,0.15)">
                 <div style="flex-shrink:0;font-size:0.7rem;font-weight:800;color:var(--primary);padding-top:2px;letter-spacing:0.5px">✦ Alex</div>
                 <div id="home-alex-tip-text" style="font-size:0.87rem;font-weight:600;color:var(--text-color);line-height:1.6;flex:1;font-style:italic"></div>
-            </div>
-        </div>
-        <div class="grid-3" style="margin-bottom:12px">
-            <div class="card macro-card-v3" style="margin:0">
-                <span style="font-size:0.58rem;color:var(--text-muted);font-weight:700;text-transform:uppercase;letter-spacing:0.4px">Protéines</span>
-                <div class="macro-big-val" style="color:var(--prot-color)"><span id="h-prot">0</span><span style="font-size:0.65rem;font-weight:600;opacity:0.8">g</span></div>
-                <div class="macro-target">/ <span id="h-prot-target">—</span>g</div>
-                <div class="macro-bar-track"><div id="bar-prot" class="macro-bar-fill" style="background:var(--prot-color)"></div></div>
-                <div style="display:none"><svg viewBox="0 0 36 36"><path id="g-prot-fill" class="gauge-fill" stroke="var(--prot-color)" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"/></svg></div>
-            </div>
-            <div class="card macro-card-v3" style="margin:0">
-                <span style="font-size:0.58rem;color:var(--text-muted);font-weight:700;text-transform:uppercase;letter-spacing:0.4px">Glucides</span>
-                <div class="macro-big-val" style="color:var(--carb-color)"><span id="h-carb">0</span><span style="font-size:0.65rem;font-weight:600;opacity:0.8">g</span></div>
-                <div class="macro-target">/ <span id="h-carb-target">—</span>g</div>
-                <div class="macro-bar-track"><div id="bar-carb" class="macro-bar-fill" style="background:var(--carb-color)"></div></div>
-                <div style="display:none"><svg viewBox="0 0 36 36"><path id="g-carb-fill" class="gauge-fill" stroke="var(--carb-color)" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"/></svg></div>
-            </div>
-            <div class="card macro-card-v3" style="margin:0">
-                <span style="font-size:0.58rem;color:var(--text-muted);font-weight:700;text-transform:uppercase;letter-spacing:0.4px">Lipides</span>
-                <div class="macro-big-val" style="color:var(--fat-color)"><span id="h-fat">0</span><span style="font-size:0.65rem;font-weight:600;opacity:0.8">g</span></div>
-                <div class="macro-target">/ <span id="h-fat-target">—</span>g</div>
-                <div class="macro-bar-track"><div id="bar-fat" class="macro-bar-fill" style="background:var(--fat-color)"></div></div>
-                <div style="display:none"><svg viewBox="0 0 36 36"><path id="g-fat-fill" class="gauge-fill" stroke="var(--fat-color)" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"/></svg></div>
             </div>
         </div>
         <div class="grid-2" style="margin-bottom:14px">
@@ -1286,6 +1319,10 @@
                 <div class="grid-2">
                     <div><label>Glucides (g)</label><input type="number" id="m-carb-val"></div>
                     <div><label>Lipides (g)</label><input type="number" id="m-fat-val"></div>
+                </div>
+                <div class="grid-2">
+                    <div><label>Fibres (g)</label><input type="number" id="m-fiber-val" placeholder="0"></div>
+                    <div></div>
                 </div>
                 <div class="grid-2" style="margin-top:6px">
                     <button onclick="saveMeal()" style="background:var(--success)">✅ Valider</button>
@@ -2164,7 +2201,7 @@ Tutoie, sois direct, chaleureux. Cite les vrais chiffres. Jamais de phrases gén
             goalDir, weightTarget, goalWeeks, goalDelta,
             mealFreq: safeMealFreq,
             sleep: null, stress, diet, allergies, cooking,
-            targets: { cal: calTarget, prot: protTarget, fat: fatTarget, carb: carbTarget },
+            targets: { cal: calTarget, prot: protTarget, fat: fatTarget, carb: carbTarget, fiber: 25 },
             mealSplit: mealSplit,
             bmr: Math.round(bmr),
             tdeeBase: tdee
@@ -2523,7 +2560,7 @@ RÈGLES D'ESTIMATION — respecte-les absolument :
 healthScore: 1=peu adapté à l'objectif ${goalStr}, 2=moyen, 3=bien adapté.
 healthTips: 2-3 conseils courts et concrets pour améliorer ce repas, séparés par \n.
 coachComment: UNE phrase courte (max 20 mots), directe et personnalisée. Utilise le contexte (sport, objectif, moment). Pas de généralités.
-JSON: {"kcal":number,"prot":number,"carb":number,"fat":number,"healthScore":1|2|3,"healthLabel":string,"healthTips":string,"coachComment":string}`;
+JSON: {"kcal":number,"prot":number,"carb":number,"fat":number,"fiber":number,"healthScore":1|2|3,"healthLabel":string,"healthTips":string,"coachComment":string}`;
 
         const res=await callGemini(prompt,true,currentImgs);
         document.getElementById('loader-m').style.display='none';
@@ -2545,6 +2582,8 @@ JSON: {"kcal":number,"prot":number,"carb":number,"fat":number,"healthScore":1|2|
             document.getElementById('m-prot-val').value = prot;
             document.getElementById('m-carb-val').value = carb;
             document.getElementById('m-fat-val').value  = fat;
+            const fiberInput = document.getElementById('m-fiber-val');
+            if (fiberInput) fiberInput.value = Math.round(res.fiber || 0);
             // Affiche et reset le slider de portion
             const portionAdj = document.getElementById('portion-adjuster');
             if (portionAdj) {
@@ -2590,6 +2629,7 @@ JSON: {"kcal":number,"prot":number,"carb":number,"fat":number,"healthScore":1|2|
         const prot  = Math.round(parseFloat(document.getElementById('m-prot-val').value)  || 0);
         const carb  = Math.round(parseFloat(document.getElementById('m-carb-val').value)  || 0);
         const fat   = Math.round(parseFloat(document.getElementById('m-fat-val').value)   || 0);
+        const fiber = Math.round(parseFloat(document.getElementById('m-fiber-val')?.value) || 0);
 
         const calFromMacros = (prot * 4) + (carb * 4) + (fat * 9);
         let finalKcal = kcal;
@@ -2627,6 +2667,7 @@ JSON: {"kcal":number,"prot":number,"carb":number,"fat":number,"healthScore":1|2|
         document.getElementById('m-prot-val').value=m.prot;
         document.getElementById('m-carb-val').value=m.carb;
         document.getElementById('m-fat-val').value=m.fat;
+        const efv = document.getElementById('m-fiber-val'); if(efv) efv.value = m.fiber||0;
         // En édition manuelle, on cache le slider portion (pas de baseline IA disponible)
         const pa = document.getElementById('portion-adjuster');
         if (pa) pa.style.display = 'none';
@@ -2698,12 +2739,13 @@ JSON: {"kcal":number,"prot":number,"carb":number,"fat":number,"healthScore":1|2|
         const day=appData.days[selectedDate]||{meals:[],sport:0,closed:false,aiSummary:""};
         const targets=appData.profile?appData.profile.targets:{cal:2000,prot:100,carb:200,fat:60};
 
-        let total={cal:0,prot:0,carb:0,fat:0};
+        let total={cal:0,prot:0,carb:0,fat:0,fiber:0};
         day.meals.forEach(m=>{
             total.cal += (m.kcal||0);
             total.prot += (m.prot||0);
             total.carb += (m.carb||0);
             total.fat += (m.fat||0);
+            total.fiber += (m.fiber||0);
         });
 
         const sportKcal = day.sport || 0;
@@ -2717,6 +2759,11 @@ JSON: {"kcal":number,"prot":number,"carb":number,"fat":number,"healthScore":1|2|
         document.getElementById('h-prot-target').textContent = targets.prot;
         document.getElementById('h-carb-target').textContent = targets.carb;
         document.getElementById('h-fat-target').textContent = targets.fat;
+        const fiberTarget = (targets.fiber || 25);
+        const fiberEl = document.getElementById('h-fiber');
+        const fiberTgtEl = document.getElementById('h-fiber-target');
+        if (fiberEl) fiberEl.textContent = Math.round(total.fiber);
+        if (fiberTgtEl) fiberTgtEl.textContent = fiberTarget;
 
         const sportInfoEl = document.getElementById('sport-cal-info');
         if (sportKcal > 0) {
@@ -2741,12 +2788,7 @@ JSON: {"kcal":number,"prot":number,"carb":number,"fat":number,"healthScore":1|2|
         setG('prot', total.prot, targets.prot);
         setG('carb', total.carb, targets.carb);
         setG('fat', total.fat, targets.fat);
-
-        // Update macro bars (Claude Edition)
-        [['prot', total.prot, targets.prot], ['carb', total.carb, targets.carb], ['fat', total.fat, targets.fat]].forEach(([k,v,t]) => {
-            const bar = document.getElementById('bar-' + k);
-            if (bar) bar.style.width = Math.min(t > 0 ? (v / t) * 100 : 0, 100) + '%';
-        });
+        setG('fiber', total.fiber, targets.fiber || 25);
 
         document.getElementById('h-sport-val').textContent = sportKcal > 0 ? `${sportKcal} kcal brûlées 🔥` : '+ Ajouter une séance';
 
@@ -2757,10 +2799,10 @@ JSON: {"kcal":number,"prot":number,"carb":number,"fat":number,"healthScore":1|2|
         if (subtitleEl) {
             const h = new Date().getHours();
             const name = appData.profile?.name || '';
-            if (h < 11) subtitleEl.textContent = 'Bonne matinée — commençons bien ! 🌅';
-            else if (h < 14) subtitleEl.textContent = 'L'heure du déjeuner approche 🍽️';
-            else if (h < 18) subtitleEl.textContent = 'Belle après-midi, reste hydraté 💧';
-            else subtitleEl.textContent = 'Soirée tranquille — tu l'as mérité 🌙';
+            if (h < 11) subtitleEl.textContent = "Bonne matinée — commençons bien ! 🌅";
+            else if (h < 14) subtitleEl.textContent = "L'heure du déjeuner approche 🍽️";
+            else if (h < 18) subtitleEl.textContent = "Belle après-midi, reste hydraté 💧";
+            else subtitleEl.textContent = "Soirée tranquille — tu l'as mérité 🌙";
         }
 
         // Alex tip — dernière analyse disponible
