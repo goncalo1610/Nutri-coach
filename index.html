@@ -1721,8 +1721,6 @@
                     const activeSection = document.querySelector('.view-section.active');
                     if (!activeSection || activeSection.id === 'view-home') {
                         if (p && typeof showSection === 'function') showSection('view-home');
-        // État initial pour que le geste retour sur home ne quitte pas l'app
-        history.replaceState({ section: 'view-home' }, '', '');
                         else if (!p && typeof showSection === 'function') showSection('view-profile');
                     }
                 }
@@ -2030,6 +2028,7 @@
             renderSupplHome(); renderSupplManage();
             checkWeightReminder(); checkWeeklyReport();
             showSection('view-home');
+            history.replaceState({ section: 'view-home' }, '', '');
         } else {
             showSection('view-profile');
         }
