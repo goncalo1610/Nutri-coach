@@ -2816,21 +2816,59 @@ JSON: {"kcal":number,"prot":number,"carb":number,"fat":number,"fiber":number,"he
             else subtitleEl.textContent = "Soirée tranquille — tu l'as mérité 🌙";
         }
 
-        // Alex tip — dernière analyse disponible
+        // Alex tip — contextuel selon la journée en cours
         const alexTipEl = document.getElementById('home-alex-tip');
         const alexTipText = document.getElementById('home-alex-tip-text');
         if (alexTipEl && alexTipText) {
-            const yesterday = new Date(); yesterday.setDate(yesterday.getDate()-1);
-            const ydStr = yesterday.toISOString().split('T')[0];
-            const tip = appData.days[ydStr]?.aiSummary || day.aiSummary;
-            if (tip) {
-                const sentences = tip.split(/(?<=[.!])/).filter(s => s.trim().length > 20);
-                const shortTip = sentences[0]?.trim() || tip.substring(0, 130) + '...';
-                alexTipText.textContent = '"' + shortTip + '"';
-                alexTipEl.style.display = 'block';
+            const h = new Date().getHours();
+            const name = appData.profile?.name?.split(' ')[0] || '';
+            const mealCount = day.meals?.length || 0;
+            const hasAiSummary = day.aiSummary && day.closed;
+            const hasSport = (day.sport || 0) > 0;
+            const waterGlasses = day.water || 0;
+            const waterTarget = appData.profile?.waterTarget || 8;
+            const calPct = adjCal > 0 ? Math.round((total.cal / adjCal) * 100) : 0;
+            const protPct = targets.prot > 0 ? Math.round((total.prot / targets.prot) * 100) : 0;
+
+            let tip = '';
+
+            if (hasAiSummary) {
+                // Journée clôturée → bilan IA
+                const sentences = day.aiSummary.split(/(?<=[.!])/).filter(s => s.trim().length > 20);
+                tip = sentences[0]?.trim() || day.aiSummary.substring(0, 120) + '…';
+            } else if (mealCount === 0) {
+                // Rien de saisi
+                const encouragements = [
+                    `Bonne journée ${name} ! Commence par enregistrer ton premier repas 🍳`,
+                    `C'est parti ${name} ! Ajoute ton petit-déjeuner pour bien démarrer 💪`,
+                    `Journée vierge — tout est possible ! Enregistre ton premier repas 🌟`,
+                    `Prêt à tracker ? Ton premier repas t'attend 🎯`
+                ];
+                tip = encouragements[new Date().getDate() % encouragements.length];
+            } else if (calPct < 30 && h >= 12) {
+                tip = `Tu as mangé seulement ${calPct}% de ton objectif calorique — pense à un repas complet 🍽️`;
+            } else if (calPct > 95) {
+                tip = `Objectif calorique presque atteint ! Reste léger pour la suite 👌`;
+            } else if (calPct > 110) {
+                tip = `Tu as dépassé ton objectif de ${total.cal - adjCal} kcal — compense avec une bonne nuit 😴`;
+            } else if (protPct < 50 && h >= 14) {
+                tip = `Tes protéines sont à ${total.prot}g / ${targets.prot}g — pense à en ajouter au prochain repas 🥩`;
+            } else if (hasSport && calPct < 60) {
+                tip = `Belle séance de sport ! N'oublie pas de bien manger pour récupérer 💪`;
+            } else if (waterGlasses < Math.floor(waterTarget * 0.4) && h >= 14) {
+                tip = `Seulement ${waterGlasses} verre(s) d'eau — hydrate-toi, c'est essentiel 💧`;
+            } else if (mealCount >= 2 && calPct >= 40 && calPct <= 75) {
+                tip = `Bonne progression ! Il te reste ${Math.round(adjCal - total.cal)} kcal pour la journée 🎯`;
+            } else if (h < 10) {
+                tip = `Bonne matinée ${name} ! Démarre bien avec un petit-déjeuner équilibré ☀️`;
+            } else if (h >= 21) {
+                tip = `En forme pour demain ? Clôture ta journée pour obtenir l'analyse d'Alex 🌙`;
             } else {
-                alexTipEl.style.display = 'none';
+                tip = `Continue comme ça ${name} — ${mealCount} repas enregistré${mealCount > 1 ? 's' : ''}, tu es sur la bonne voie ✦`;
             }
+
+            alexTipText.textContent = tip ? '"' + tip + '"' : '';
+            alexTipEl.style.display = tip ? 'block' : 'none';
         }
 
         const sleepEl=document.getElementById('h-sleep-val');
