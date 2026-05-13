@@ -3343,11 +3343,12 @@ Pas de généralités. Pas de morale. Tu es un coach qui suit cette personne dep
 
     function showSection(id){
         const current = document.querySelector('.view-section.active');
-        const currentId = current ? current.id : 'view-home';
-        if(currentId === id) return;
-        // Pousser l'état dans l'historique du navigateur
-        history.pushState({ section: id }, '', '');
-        navHistory.push(currentId);
+        const currentId = current ? current.id : null;
+        // Pousser dans l'historique seulement si on change vraiment de section
+        if(currentId && currentId !== id){
+            history.pushState({ section: id }, '', '');
+            navHistory.push(currentId);
+        }
         _renderSection(id);
     }
 
